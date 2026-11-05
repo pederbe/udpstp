@@ -14,6 +14,10 @@ permissions:
 jobs:
   archives:
     name: Retained ${{ matrix.target }}
+    permissions:
+      # GitHub exposes draft release assets only to callers with push access.
+      contents: write
+      attestations: read
     strategy:
       fail-fast: false
       matrix:
