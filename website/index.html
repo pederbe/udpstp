@@ -175,7 +175,7 @@
             <code id="cmd-windows" tabindex="0" role="region" aria-label="Windows PowerShell install command">irm https://udpstp.com/install.ps1 | iex</code>
             <button type="button" class="copy" data-copy="cmd-windows" aria-label="Copy the Windows PowerShell install command" hidden>Copy</button>
           </div>
-          <p class="install-note">Installs the latest release after checking its checksum, and adds it to your PATH. Or use <code>winget install pederbe.udpstp</code>.</p>
+          <p class="install-note">Installs the latest release into your account and adds it to your PATH. WinGet catalog approval is pending.</p>
         </div>
         <div class="install-panel" id="panel-cargo" aria-labelledby="method-cargo">
           <h3 class="install-method" id="method-cargo">Cargo</h3>
@@ -222,7 +222,7 @@
       </li>
       <li>
         <p class="feature-index" aria-hidden="true">03</p><h3>Memory-safe Rust</h3>
-        <p>It parses untrusted network input safely. udpstp's own crates forbid <code>unsafe</code>, from the PDU parsers to the Data Phase Engine.</p>
+        <p>It parses untrusted network input safely. The PDU parsers, protocol core and Data Phase Engine forbid <code>unsafe</code> Rust.</p>
       </li>
       <li>
         <p class="feature-index" aria-hidden="true">04</p><h3>Works with OB-UDPST</h3>

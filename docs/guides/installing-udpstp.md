@@ -1,36 +1,28 @@
 # Installing udpstp
 
-udpstp runs on Linux, macOS and Windows. The first binary release and its package-manager listings are being prepared. Until they are available, install the source version on both Test hosts with [Rust](https://rustup.rs).
-
-```sh
-cargo install --locked --git https://github.com/pederbe/udpstp udpstp
-```
-
-[Building from source](building-udpstp.md) covers the compiler and platform prerequisites. Then follow [Getting started](../getting-started.md) to share a key and run a Test.
+Install udpstp on both Test hosts. Choose your platform below, then follow [Getting started](../getting-started.md) to share a key and run a Test.
 
 <a id="platforms-and-installation-options"></a>
 
-## Planned installation methods
+## Installation methods
 
-These commands become usable after the corresponding release channel is published and verified. They install prebuilt binaries. Package-manager updates provide later versions.
-
-| Platform | Method | Status |
+| Platform | Method | Availability |
 | --- | --- | --- |
-| Linux | Signed apt and dnf repositories | Pending first publication |
-| Linux and macOS | Homebrew in the owned tap | Pending first publication |
-| Windows | PowerShell installer and portable download | Pending first publication |
-| Windows | WinGet | Pending publication and catalog admission |
-| All three | Cargo source build and cargo-binstall | Registry publication pending |
+| Linux | Archive installer, signed apt and dnf repositories | Available |
+| Linux and macOS | Homebrew | Available |
+| Windows | PowerShell installer and portable download | Available |
+| Windows | WinGet | Awaiting catalog approval |
+| All three | Cargo source build and cargo-binstall | Available |
 
 ### Linux
 
-The archive installer will select a matching Linux binary. Rerun it to update an archive installation.
+The installer selects a matching binary and places it in `~/.local/bin`.
 
 ```sh
 curl -fsSL https://udpstp.com/install.sh | sh
 ```
 
-Signed apt and dnf repositories are also planned. Their packages install the Server's systemd unit and receive normal package-manager updates. The service stays disabled until you configure it. [Hosting a Server](hosting-a-server.md) covers configuration and startup.
+Run it again to update. It leaves your shell configuration unchanged. If `~/.local/bin` is outside your PATH, add it using your shell's configuration.
 
 ### macOS
 
@@ -50,24 +42,54 @@ In PowerShell
 irm https://udpstp.com/install.ps1 | iex
 ```
 
-The installer uses your account's `LocalAppData\Programs\udpstp` folder and adds it to your PATH. Open a new terminal afterward. The [Windows guide](windows.md) covers key-file permissions, firewall rules and running the Server as a service.
+The installer uses your account's `LocalAppData\Programs\udpstp` folder and adds it to PATH. You can use udpstp in the current PowerShell window immediately. Sign out and back in to refresh PATH for other applications. The [Windows guide](windows.md) covers key-file permissions, firewall rules and running the Server as a service.
 
-### Portable downloads
+WinGet catalog approval is pending. The PowerShell installer and portable download are available now.
 
-The [release page](https://github.com/pederbe/udpstp/releases) will provide archives for each supported target. Extract an archive and run its `udpstp` executable. [Platform differences](../platforms.md) explains the available features.
+## Signed Linux packages
 
-### Cargo
+The apt and dnf repositories provide normal package-manager updates and the Server's systemd unit. The service stays disabled until you configure it and requires systemd 247 or later. [Hosting a Server](hosting-a-server.md) covers configuration and startup.
 
-After registry publication, build a release from source with
+### Debian and Ubuntu
+
+Add the repository once, then install udpstp
+
+```sh
+curl -fsSL https://packages.udpstp.com/udpstp.gpg | sudo tee "/usr/share/keyrings/udpstp.gpg" >/dev/null
+echo "deb [signed-by=/usr/share/keyrings/udpstp.gpg] https://packages.udpstp.com/apt stable main" | sudo tee /etc/apt/sources.list.d/udpstp.list
+sudo apt update
+sudo apt install udpstp
+```
+
+Updates arrive with `apt upgrade`. Remove the package with `sudo apt remove udpstp`.
+
+### Fedora, RHEL and similar distributions
+
+```sh
+sudo curl -fsSLo /etc/yum.repos.d/udpstp.repo https://packages.udpstp.com/udpstp.repo
+sudo dnf install udpstp
+```
+
+Updates arrive with `dnf upgrade`. Remove the package with `sudo dnf remove udpstp`.
+
+## Portable downloads
+
+The [release page](https://github.com/pederbe/udpstp/releases) provides archives for the supported targets. Extract an archive and run its `udpstp` executable. [Platform differences](../platforms.md) explains the available features.
+
+## Cargo
+
+With [Rust installed](https://rustup.rs), build a release from source
 
 ```sh
 cargo install --locked udpstp
 ```
 
-Or install a matching prebuilt release with
+With [cargo-binstall](https://github.com/cargo-bins/cargo-binstall) installed, fetch a matching prebuilt release
 
 ```sh
 cargo binstall udpstp
 ```
 
-AUR and Scoop recipes are retained in the repository for later activation. Their presence does not mean a public listing is available.
+[Building from source](building-udpstp.md) covers compiler and platform prerequisites.
+
+AUR and Scoop recipes remain available as sources for later catalog submissions.
