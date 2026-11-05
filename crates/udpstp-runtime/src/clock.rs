@@ -180,11 +180,18 @@ mod tests {
             "{:?}",
             at - after
         );
-        // A deadline passed maps to now, not before.
+        // An expired deadline is immediately ready. Linux rebases it onto
+        // Instant; other platforms retain the runtime's original time base.
+        #[cfg(any(target_os = "linux", target_os = "android"))]
+        let before = Instant::now();
         let past = clock
             .instant(MonoTime::from_duration(Duration::ZERO))
             .into_std();
-        assert!(past + Duration::from_millis(5) >= Instant::now());
+        assert!(past <= Instant::now());
+        #[cfg(any(target_os = "linux", target_os = "android"))]
+        assert!(past >= before);
+        #[cfg(not(any(target_os = "linux", target_os = "android")))]
+        assert_eq!(past, clock.start);
     }
 
     // : the Test Time Base read alone is the one a pair reads, never
