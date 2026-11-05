@@ -275,9 +275,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - run: sudo apt-get update && sudo apt-get install -y cmake libssl-dev
-      - name: Reconstruct a metadata-free source cache and check interoperability
+      - name: Reconstruct an incomplete source cache and check interoperability
         run: |
-          mkdir -p target/obudpst/v9.1.0/src
+          mkdir -p target/obudpst/v9.1.0/src/.git
           scripts/obudpst-build.sh --check
 
   website:

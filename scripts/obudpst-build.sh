@@ -65,7 +65,7 @@ src=$out/$TAG/src
 # The source, fetched by commit so a moved tag can't change it.
 # A restored source cache can lack Git metadata. Do not walk into the parent
 # workspace and mistake its HEAD for the reference implementation's checkout.
-if [ ! -e "$src/.git" ] || ! git -C "$src" rev-parse --verify --quiet HEAD >/dev/null 2>&1; then
+if ! git --git-dir="$src/.git" --work-tree="$src" rev-parse --verify --quiet HEAD >/dev/null 2>&1; then
     rm -rf "$src"
     mkdir -p "$src"
     git -C "$src" init --quiet
