@@ -334,7 +334,7 @@ jobs:
   deploy-website:
     needs: [ci, select, website]
     if: >-
-      always() && needs.ci.result == 'success' && needs.select.result == 'success' &&
+      !cancelled() && needs.ci.result == 'success' && needs.select.result == 'success' &&
       needs.website.result == 'success' && github.event_name == 'push' &&
       github.ref == 'refs/heads/main' && needs.select.outputs.website == 'true' &&
       vars.WEBSITE_ENABLED == 'true' && !github.event.repository.private
