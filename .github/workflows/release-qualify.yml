@@ -80,7 +80,9 @@ jobs:
           EMULATOR: ${{ matrix.emulator }}
         run: |
           set -euo pipefail
-          export PATH="$RUNNER_TEMP/extracted:$PATH"
+          directory=$RUNNER_TEMP/extracted
+          if [[ "$RUNNER_OS" == Windows ]]; then directory=$(cygpath -u "$directory"); fi
+          export PATH="$directory:$PATH"
           installed=$(command -v udpstp)
           if [[ "$RUNNER_OS" == Windows ]]; then
             cmp "$installed" "$RUNNER_TEMP/extracted/udpstp.exe"
@@ -146,7 +148,7 @@ jobs:
               mkdir -p /etc/udpstp
               printf "preserve user configuration\n" > /etc/udpstp/qualification.txt
               dpkg -r udpstp
-              ! command -v udpstp
+              if command -v udpstp; then exit 1; fi
               test "$(cat /etc/udpstp/qualification.txt)" = "preserve user configuration"
             '
           docker run --rm --network none -v "$assets:/assets:ro" -v "$helper:/checker:ro" -v "$results:/results" \
@@ -156,7 +158,7 @@ jobs:
               mkdir -p /etc/udpstp
               printf "preserve user configuration\n" > /etc/udpstp/qualification.txt
               rpm -e udpstp
-              ! command -v udpstp
+              if command -v udpstp; then exit 1; fi
               test "$(cat /etc/udpstp/qualification.txt)" = "preserve user configuration"
             '
       - uses: actions/upload-artifact@v7.0.2
