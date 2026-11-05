@@ -100,8 +100,12 @@ jobs:
       - run: rustup toolchain install
       - run: rustup target add ${{ matrix.target }}
       - uses: taiki-e/install-action@c509219cf42fba86913069efd0ade2458c59337b # v2
+        if: matrix.target != 'x86_64-apple-darwin'
         with:
           tool: cargo-about@0.9.3
+      - name: Install cargo-about with its CLI on Intel macOS
+        if: matrix.target == 'x86_64-apple-darwin'
+        run: cargo install --locked cargo-about --features cli
       - name: Generate third-party notices
         shell: bash
         run: sh scripts/release-notices.sh "${{ matrix.target }}"
