@@ -1,0 +1,172 @@
+name: Release archive checks
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Draft or published release to qualify
+        required: true
+
+permissions:
+  contents: read
+  attestations: read
+
+jobs:
+  archives:
+    name: Retained ${{ matrix.target }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {target: x86_64-unknown-linux-gnu, os: ubuntu-26.04, package_arch: amd64, rpm_arch: x86_64, helper_target: x86_64-unknown-linux-musl}
+          - {target: aarch64-unknown-linux-gnu, os: ubuntu-26.04-arm, package_arch: arm64, rpm_arch: aarch64, helper_target: aarch64-unknown-linux-musl}
+          - {target: x86_64-unknown-linux-musl, os: ubuntu-26.04}
+          - {target: aarch64-unknown-linux-musl, os: ubuntu-26.04-arm}
+          - {target: armv7-unknown-linux-musleabihf, os: ubuntu-26.04, emulator: qemu-arm}
+          - {target: x86_64-pc-windows-msvc, os: windows-2025}
+          - {target: aarch64-apple-darwin, os: macos-15}
+          - {target: x86_64-apple-darwin, os: macos-15-intel}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ inputs.tag }}
+      TARGET: ${{ matrix.target }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - run: rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - name: Download and verify the frozen assets
+        run: |
+          set -euo pipefail
+          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          source=$(gh api "repos/$GITHUB_REPOSITORY/commits/$TAG" --jq .sha)
+          suffix=tar.gz
+          if [[ "$RUNNER_OS" == Windows ]]; then suffix=zip; fi
+          archive="udpstp-$TAG-$TARGET.$suffix"
+          mkdir "$RUNNER_TEMP/assets" "$RUNNER_TEMP/extracted" "$RUNNER_TEMP/qualification"
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --dir "$RUNNER_TEMP/assets" \
+            --pattern "$archive" --pattern SHA256SUMS
+          cd "$RUNNER_TEMP/assets"
+          if [[ "$RUNNER_OS" == macOS ]]; then
+            grep -F "  $archive" SHA256SUMS | shasum -a 256 -c -
+          else
+            grep -F "  $archive" SHA256SUMS | sha256sum -c -
+          fi
+          for file in SHA256SUMS "$archive"; do
+            gh attestation verify "$file" --repo "$GITHUB_REPOSITORY" \
+              --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/release.yml" \
+              --source-ref "refs/tags/$TAG" --source-digest "$source"
+          done
+          if [[ "$RUNNER_OS" == Windows ]]; then
+            7z x -y "$archive" "-o$RUNNER_TEMP/unpacked" > /dev/null
+            cp "$RUNNER_TEMP/unpacked/udpstp-$TAG-$TARGET/"* "$RUNNER_TEMP/extracted/"
+          else
+            tar -xf "$archive" --strip-components=1 -C "$RUNNER_TEMP/extracted"
+          fi
+          for file in README.md CHANGELOG.md LICENSE-MIT LICENSE-APACHE THIRD-PARTY-LICENSES.md; do
+            test -s "$RUNNER_TEMP/extracted/$file"
+          done
+      - name: Install the ARMv7 execution tool
+        if: matrix.emulator
+        run: sudo apt-get update -q && sudo apt-get install -qy qemu-user
+      - name: Exercise the extracted binary through PATH
+        env:
+          EMULATOR: ${{ matrix.emulator }}
+        run: |
+          set -euo pipefail
+          directory=$RUNNER_TEMP/extracted
+          if [[ "$RUNNER_OS" == Windows ]]; then directory=$(cygpath -u "$directory"); fi
+          export PATH="$directory:$PATH"
+          installed=$(command -v udpstp)
+          if [[ "$RUNNER_OS" == Windows ]]; then
+            cmp "$installed" "$RUNNER_TEMP/extracted/udpstp.exe"
+            installed=$(cygpath -w "$installed")
+          else
+            cmp "$installed" "$RUNNER_TEMP/extracted/udpstp"
+          fi
+          args=("$installed" "${TAG#v}" "$RUNNER_TEMP/qualification/native")
+          if [[ -n "$EMULATOR" ]]; then
+            args=("$RUNNER_TEMP/extracted/udpstp" "${TAG#v}" "$RUNNER_TEMP/qualification/native" "$EMULATOR")
+          fi
+          cargo run --locked -p xtask -- release-smoke "${args[@]}"
+      - name: Prepare the static compatibility checker
+        if: matrix.helper_target
+        env:
+          HELPER_TARGET: ${{ matrix.helper_target }}
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -qy musl-tools rpm2cpio cpio
+          rustup target add "$HELPER_TARGET"
+          cargo build --locked -p xtask --target "$HELPER_TARGET"
+      - name: Check baseline execution and the native package payloads
+        if: matrix.package_arch
+        env:
+          PACKAGE_ARCH: ${{ matrix.package_arch }}
+          RPM_ARCH: ${{ matrix.rpm_arch }}
+          HELPER_TARGET: ${{ matrix.helper_target }}
+        run: |
+          set -euo pipefail
+          version=${TAG#v}
+          assets=$RUNNER_TEMP/assets
+          results=$RUNNER_TEMP/qualification
+          helper=$GITHUB_WORKSPACE/target/$HELPER_TARGET/debug/xtask
+          deb=udpstp_${version}-1_${PACKAGE_ARCH}.deb
+          rpm=udpstp-${version}-1.${RPM_ARCH}.rpm
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --dir "$assets" --pattern "$deb" --pattern "$rpm"
+          source=$(gh api "repos/$GITHUB_REPOSITORY/commits/$TAG" --jq .sha)
+          for file in "$deb" "$rpm"; do
+            (cd "$assets" && grep -F "  $file" SHA256SUMS | sha256sum -c -)
+            gh attestation verify "$assets/$file" --repo "$GITHUB_REPOSITORY" \
+              --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/release.yml" \
+              --source-ref "refs/tags/$TAG" --source-digest "$source"
+          done
+          mkdir "$RUNNER_TEMP/deb" "$RUNNER_TEMP/rpm"
+          dpkg-deb -x "$assets/$deb" "$RUNNER_TEMP/deb"
+          (cd "$RUNNER_TEMP/rpm" && rpm2cpio "$assets/$rpm" | cpio -idm)
+          cmp "$RUNNER_TEMP/extracted/udpstp" "$RUNNER_TEMP/deb/usr/bin/udpstp"
+          cmp "$RUNNER_TEMP/extracted/udpstp" "$RUNNER_TEMP/rpm/usr/bin/udpstp"
+          for notice in LICENSE-MIT LICENSE-APACHE THIRD-PARTY-LICENSES.md; do
+            cmp "$RUNNER_TEMP/extracted/$notice" "$RUNNER_TEMP/deb/usr/share/doc/udpstp/$notice"
+            cmp "$RUNNER_TEMP/extracted/$notice" "$RUNNER_TEMP/rpm/usr/share/licenses/udpstp/$notice"
+          done
+          for image in debian:10 rockylinux:8; do
+            name=${image//:/-}
+            docker run --rm --network none \
+              -v "$RUNNER_TEMP/extracted:/release:ro" -v "$helper:/checker:ro" -v "$results:/results" \
+              --entrypoint /checker "$image" release-smoke /release/udpstp "$version" "/results/$name"
+          done
+          docker run --rm --network none -v "$assets:/assets:ro" -v "$helper:/checker:ro" -v "$results:/results" \
+            -e VERSION="$version" -e PACKAGE="$deb" debian:10 sh -ec '
+              dpkg -i "/assets/$PACKAGE"
+              /checker release-smoke /usr/bin/udpstp "$VERSION" /results/deb-installed
+              mkdir -p /etc/udpstp
+              printf "preserve user configuration\n" > /etc/udpstp/qualification.txt
+              dpkg -r udpstp
+              if command -v udpstp; then exit 1; fi
+              test "$(cat /etc/udpstp/qualification.txt)" = "preserve user configuration"
+            '
+          docker run --rm --network none -v "$assets:/assets:ro" -v "$helper:/checker:ro" -v "$results:/results" \
+            -e VERSION="$version" -e PACKAGE="$rpm" rockylinux:8 sh -ec '
+              rpm -i "/assets/$PACKAGE"
+              /checker release-smoke /usr/bin/udpstp "$VERSION" /results/rpm-installed
+              mkdir -p /etc/udpstp
+              printf "preserve user configuration\n" > /etc/udpstp/qualification.txt
+              rpm -e udpstp
+              if command -v udpstp; then exit 1; fi
+              test "$(cat /etc/udpstp/qualification.txt)" = "preserve user configuration"
+            '
+      - uses: actions/upload-artifact@v7.0.2
+        if: always()
+        with:
+          name: qualification-${{ matrix.target }}
+          path: |
+            ${{ runner.temp }}/qualification/**/*.json
+            ${{ runner.temp }}/qualification/**/*.log
+          if-no-files-found: warn
+          retention-days: 30

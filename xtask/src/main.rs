@@ -6,6 +6,7 @@ mod glossary;
 mod kat;
 mod links;
 mod records;
+mod release_smoke;
 mod req;
 mod site;
 
@@ -32,6 +33,8 @@ commands:
          docs/conformance/summary.md and docs/conformance/interop-masks.toml
   req hash
          print the text hash of a requirement read from stdin
+  release-smoke BIN VERSION DIRECTORY [RUNNER]
+         check an installed release with authenticated loopback Tests
   site <prepare|finish|check|contrast>
          build the udpstp.com website's pages and check them (run by
          scripts/build-site.sh, which also runs mdBook and mermaid-cli)";
@@ -49,6 +52,7 @@ fn main() -> ExitCode {
             Some(other) => Err(format!("unknown req subcommand: {other}\n\n{USAGE}")),
         },
         Some("site") => site::run(&std::env::args().skip(2).collect::<Vec<_>>()),
+        Some("release-smoke") => release_smoke::run(&std::env::args().skip(2).collect::<Vec<_>>()),
         None | Some("help") => {
             println!("{USAGE}");
             Ok(())

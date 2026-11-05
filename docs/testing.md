@@ -421,6 +421,13 @@ Quotations are exempt, blockquotes and text in double quotes, and so is an avoid
 
 ### Contribution checks
 
+`cargo xtask release-smoke BIN VERSION DIRECTORY` exercises an installed release
+binary with authenticated Downstream and Upstream Tests and checks its JSON
+results. Use a fresh output directory. An optional final runner argument supports
+ARMv7 execution with QEMU. The Release archive checks workflow runs it against
+the retained archives, native package payloads and supported Linux runtime
+baselines. These are functional installation checks, not rate measurements.
+
 Use the workspace commands above for a code change and the relevant tier-specific checks for its behavior. GitHub-hosted checks cover the selected platform and integration requirements. Documentation-only changes run the documentation profile. Packaging, installer, conformance, shared fixture and check-tool changes use the full profile.
 
 `scripts/check.sh` provides the maintained validation entry point. `scripts/check-commit.sh` can also check a clean commit locally. The platform-specific tiers below describe their dependencies.

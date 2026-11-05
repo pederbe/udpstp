@@ -16,17 +16,17 @@ Use it to check access lines and circuits, compare network paths, or collect mea
 
 ## Install
 
-The first binary release is being prepared. With [Rust installed](https://rustup.rs), build the current version on Linux, macOS or Windows with one command.
+With [Rust installed](https://rustup.rs), build the current source on Linux, macOS or Windows with one command.
 
 ```sh
 cargo install --locked --git https://github.com/pederbe/udpstp udpstp
 ```
 
-The [installation guide](docs/guides/installing-udpstp.md) describes the planned package managers, portable binaries and installers. Each channel becomes available with its first verified publication.
+See the [installation guide](https://udpstp.com/guides/installing-udpstp.html) for portable binaries, installers and current package manager availability.
 
 ## Run a Test
 
-Install on both hosts and give them the same private Key Table. [Getting started](docs/getting-started.md) shows how to create one and open the required UDP ports.
+Install on both hosts and give them the same private Key Table. [Getting started](https://udpstp.com/getting-started.html) shows how to create one and open the required UDP ports.
 
 On the Server host
 
@@ -67,7 +67,7 @@ In an Upstream Test, the Client sends the Load PDUs and the Server still decides
 
 ## Status
 
-udpstp runs complete Tests and reports their results. Release qualification is still in progress.
+udpstp runs complete Tests and reports their results.
 
 | Area | State |
 | --- | --- |
@@ -78,7 +78,8 @@ udpstp runs complete Tests and reports their results. Release qualification is s
 | Linux batched I/O and available kernel UDP fast paths | Done |
 | Linux systemd unit and Windows service | Done |
 | Conformance Records and interoperability tests with OB-UDPST | Done |
-| Release binaries, packages, installers and hosted documentation | Pending first publication |
+| Hosted documentation | Done |
+| Release binaries, packages and installers | [Current availability](https://udpstp.com/guides/installing-udpstp.html) |
 
 [Platform differences](docs/platforms.md) describes options that depend on the operating system. JSON results, exit statuses, key files and address pseudonyms are stable from 0.1.0. The command line, configuration and Server JSON logs can change in minor 0.x releases, with changes listed in the [changelog](CHANGELOG.md).
 

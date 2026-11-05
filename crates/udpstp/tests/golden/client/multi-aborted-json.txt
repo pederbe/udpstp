@@ -8,7 +8,7 @@ udpstp: ERROR: the Test was aborted: the Server gave Test Connection 1 other par
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.0",
+		"SoftwareVersion":	"udpstp 0.1.1",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},

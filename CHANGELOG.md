@@ -2,7 +2,7 @@
 
 User-facing changes in udpstp, including capabilities, installation and compatibility.
 
-## [0.1.0] - 2026-11-05
+## [0.1.1] - 2026-11-05
 
 ### Added
 
