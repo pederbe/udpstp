@@ -1,0 +1,62 @@
+# An example systemd unit for the udpstp Server: unprivileged and
+# hardened. docs/guides/hosting-a-server.md ("Run it as a service") says
+# how to install it. scripts/systemd-check.sh checks it with
+# systemd-analyze verify and security.
+[Unit]
+Description=udpstp Server for UDPSTP (RFC 9946)
+Documentation=https://github.com/pederbe/udpstp/blob/main/docs/guides/hosting-a-server.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# The credential mount may use mode 0440. Keep the application's strict
+# private-file policy by copying it into the service's private runtime directory.
+LoadCredential=keys.toml:/etc/udpstp/keys.toml
+RuntimeDirectory=udpstp
+RuntimeDirectoryMode=0700
+ExecStartPre=/usr/bin/install -m 0400 ${CREDENTIALS_DIRECTORY}/keys.toml %t/udpstp/keys.toml
+ExecStart=/usr/local/bin/udpstp server --config /etc/udpstp/server.toml --key-file %t/udpstp/keys.toml
+Restart=on-failure
+RestartSec=5s
+
+# A user of its own, created when it starts; the Standard Port and the
+# Ephemeral Ports are above 1024, so no capability is needed.
+DynamicUser=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+NoNewPrivileges=yes
+UMask=0077
+# A core dump could hold the Key Table.
+LimitCORE=0
+
+# Read-only view of the system, with the private runtime directory writable.
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectProc=invisible
+ProcSubset=pid
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+RemoveIPC=yes
+
+# UDP over IPv4 and IPv6, and the journal's socket.
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+DevicePolicy=closed
+PrivateUsers=yes
+
+[Install]
+WantedBy=multi-user.target

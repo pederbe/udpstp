@@ -1,0 +1,39 @@
+
+[round]
+kind = "server-scale"
+test_interval = 10
+warm_up = 2
+engines = ["udpstp", "obudpst"]
+calibration = []
+obudpst_pinned = true
+must_have = "obudpst"
+reading = "home-lab"
+runs_at_target = { udpstp = 10, obudpst = 10 }
+runs_elsewhere = 5
+probe_stop_engines = ["udpstp"]
+probe_stop_cases = ["H4u"]
+close_call_runs = 3
+close_call_most = 20
+client_env = { UDPSTP_ENGINE_HOLD_OFF_US = "250" }
+executor = "pool"
+
+[confine]
+candidates = ["1"]
+count = 150
+runs = 1
+
+[[case]]
+name = "H4u"
+direction = "upstream"
+row = 4
+counts = [150]
+target = 150
+runs = 5
+
+[[case]]
+name = "H4uc"
+direction = "upstream"
+row = 4
+counts = [25, 50, 75, 100, 125, 150]
+target = 150
+confined = true

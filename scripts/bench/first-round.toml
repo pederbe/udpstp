@@ -1,0 +1,46 @@
+
+[defaults]
+test_interval = 10
+repeats = 4
+jumbo = true
+host_samples = true
+
+[[test]]
+name = "M1 search"
+rate = "search"
+pairs = ["udpstp/udpstp", "obudpst/obudpst"]
+
+[[test]]
+name = "M2 row 100"
+kernel_send_timestamps = true
+rate = 100
+pairs = ["udpstp/udpstp"]
+
+[[test]]
+name = "M2 row 500"
+kernel_send_timestamps = true
+rate = 500
+pairs = ["udpstp/udpstp"]
+
+[[test]]
+name = "M2 row 1000"
+kernel_send_timestamps = true
+rate = 1000
+pairs = ["udpstp/udpstp", "obudpst/obudpst"]
+
+[[test]]
+name = "M3 interop"
+rate = "search"
+pairs = ["udpstp/obudpst", "obudpst/udpstp"]
+
+[[test]]
+name = "M4 multi"
+rate = "search"
+test_connections = 4
+pairs = ["udpstp/udpstp", "obudpst/obudpst"]
+
+[[test]]
+name = "M5 home"
+rate = "search"
+client = "home"
+pairs = ["udpstp/udpstp", "obudpst/obudpst"]

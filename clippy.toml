@@ -1,0 +1,6 @@
+# `#![forbid(unsafe_code)]` doesn't catch `unsafe` expanded from another
+# crate's macro, so the one that would put `unsafe` in udpstp's code is
+# banned here (ADR 0014).
+disallowed-macros = [
+  { path = "windows_service::define_windows_service", reason = "it expands `unsafe` into udpstp's code; write the service's entry point without it (ADR 0014)" },
+]

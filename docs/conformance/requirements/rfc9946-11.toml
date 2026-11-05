@@ -1,0 +1,58 @@
+# RFC 9946 section 11: Security Considerations.
+# Format and ID convention: docs/conformance/README.md.
+
+[[requirement]]
+id = "RFC9946-11-1"
+text = "Cooperating client and server hosts and agreements to test the path between the hosts are REQUIRED."
+text_sha256 = "2c79ad2f5e6d0e81"
+state = "operational"
+note = "Agreements between the parties; authentication (Section 5.3) is one way to assure them."
+
+[[requirement]]
+id = "RFC9946-11-2"
+text = "It is REQUIRED to have a user client-initiated setup handshake between cooperating hosts that allows firewalls to control inbound unsolicited UDP traffic that goes to either a control port or ephemeral ports that are only created as needed."
+text_sha256 = "65671b670d1f7737"
+state = "pending"
+note = "Test Setup exchange (Section 6); Ephemeral Ports opened per Test Connection."
+
+[[requirement]]
+id = "RFC9946-11-3"
+text = "Client-server authentication and integrity protection for feedback messages conveying measurements is RECOMMENDED."
+text_sha256 = "a64f85f1569d2c8e"
+state = "pending"
+note = "authMode 2 (Section 5.3.2)."
+
+[[requirement]]
+id = "RFC9946-11-4"
+text = "Hosts MUST limit the number of simultaneous tests to avoid resource exhaustion and inaccurate results."
+text_sha256 = "be66441ddf35a65e"
+state = "pending"
+note = "Server limits on Tests and Test Connections."
+
+[[requirement]]
+id = "RFC9946-11-5"
+text = "Senders MUST be rate-limited."
+text_sha256 = "725695ea2873187e"
+state = "pending"
+note = "The Sending Rate Table bounds every rate."
+
+[[requirement]]
+id = "RFC9946-11-6"
+text = "Testing with the Service Provider's measurement hosts SHOULD be limited in frequency and/or overall volume of test traffic (for example, the range of test interval duration values should be limited)."
+text_sha256 = "b0c5f3c6a6595e3a"
+state = "deviation"
+reference = "no-frequency-or-volume-quotas"
+
+[[requirement]]
+id = "RFC9946-11-L1"
+text = "This can be accomplished using a pre-built table defining all the offered sending rates that will be supported."
+text_sha256 = "46f2f163b44be103"
+state = "pending"
+note = "The Sending Rate Table."
+
+[[requirement]]
+id = "RFC9946-11-L2"
+text = "Optionally, the server could utilize the maxBandwidth field (and the CHSR_USDIR_BIT bit) in the Setup Request from the client to limit the maximum that it will attempt to achieve."
+text_sha256 = "945567a6e0952a2d"
+state = "pending"
+note = "maxBandwidth field (Section 6.1)."

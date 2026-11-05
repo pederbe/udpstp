@@ -1,0 +1,39 @@
+Results Summary
+  Downstream Search Test with 192.0.2.1:24601, started 2026-09-21T14:13:20Z (T0)
+  Test Interval (I) 4 s · 4 Sub-Intervals (dt) 1000 ms · Trial Interval (FT) and
+    st 50 ms
+  1 Test Connection (F) · MaxHops 16 · DSCP 0 agreed
+  Performance Criterion: loss ≤ 1% or one Load PDU · Tmax ≤ 1000 ms
+  Late Load PDUs count in the Sub-Interval where their gap was seen.
+  The Server set testIntTime to 4 (asked for 10)
+
+  Sub-Interval results
+  SI      C (Mbps)  Loss Ratio  Lost  Reordered  Duplicates  DV (ms)  RTTV (ms)
+   1         90.00    0.000000     0          1           0    0/1/3     1-4, 2
+   2         95.00    0.047619    50          1           0    0/1/3     1-4, 2
+   3         93.00    0.001996     2          1           0    0/1/3     1-4, 2
+   4  not measured           -     -          -           -        -          -
+  SI: Sub-Interval · C: IP-Layer Capacity
+  DV: delay variation (min/avg/max) · RTTV: RTT variation (min-max, avg) · -: no
+    measurement
+
+Final metrics
+  Maximum IP-Layer Capacity: 93.00 Mbps (Sub-Interval 3)
+  Maximum Sub-Interval result received at an unknown time
+  Loss Ratio 0.001996, RTT minimum 10 ms, maximum 14 ms; Highest IP-Layer
+    Capacity 95.00 Mbps in Sub-Interval 2 (Loss Ratio 0.047619); 1 Sub-Interval
+    not measured
+  RTT minimum 10 ms
+  Minimum one-way delay 5 ms (clockDeltaMin; valid only if the clocks are
+    synchronized)
+
+  Warnings
+    3 Load PDUs not sent: this host fell behind (Skipped Bursts)
+    2 PDUs from the peer said it had stopped receiving (rxStopped)
+    The OS held the socket buffers below the 2097152 bytes asked for, so
+      datagrams may have been dropped locally; raise the net.core.rmem_max and
+      net.core.wmem_max sysctls
+
+  This host: DF set, socket buffers receive 212992 and send 212992 bytes;
+    portable Data Phase Engine, sending with sendmmsg and UDP GSO, receiving
+    with recvmmsg and kernel timestamps, waking on arrival with ppoll

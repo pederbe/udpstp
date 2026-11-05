@@ -1,0 +1,54 @@
+[package]
+name = "udpstp-bench"
+version = "0.0.0"
+description = "udpstp's benchmark Rounds: the first round and the Server-scale round"
+edition.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+# The bench tooling is never published.
+publish = false
+
+[features]
+default = []
+hotpath = ["dep:hotpath", "hotpath/hotpath"]
+hotpath-alloc = ["hotpath", "hotpath/hotpath-alloc"]
+
+[dependencies]
+bench-rounds.workspace = true
+# The command line, with round.py's options.
+clap.workspace = true
+# The report's groups, in the order they came, as a Python dict keeps them.
+indexmap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+hotpath = { workspace = true, optional = true }
+# The binary stamps recorded by a Server-scale Round (design §5).
+sha2.workspace = true
+# The matrices, read as the Python's tomllib reads them.
+toml = { workspace = true, features = ["preserve_order"] }
+# The Round's Operator Key wiped from memory.
+zeroize.workspace = true
+
+[dev-dependencies]
+# The goldens and the Python's answers, read with a parser independent of
+# the one under test (bench_rounds::py).
+serde_json.workspace = true
+
+[target."cfg(target_os = \"linux\")".dependencies]
+# Ownership-checked sampler stops and real-interrupt regressions.
+nix = { workspace = true, features = ["signal", "socket", "uio", "net", "time", "sched", "poll", "process"] }
+socket2.workspace = true
+rustix.workspace = true
+
+[[test]]
+name = "round_interrupt"
+harness = false
+
+[[test]]
+name = "step_interrupt"
+harness = false
+
+[lints]
+workspace = true

@@ -1,0 +1,17 @@
+format	1
+table	format
+table	key
+key	admin_key_name
+key	key_id
+key	kdf
+key	alg_id
+key	key_text
+key	key_hex
+key	send_lifetime_start
+key	send_lifetime_end
+key	accept_lifetime_start
+key	accept_lifetime_end
+key	operator
+key	max_test_interval
+key	tests_per_quota_period
+key	bytes_per_quota_period

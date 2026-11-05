@@ -1,0 +1,540 @@
+# Conformance records: the Data Phase. Load and Status PDUs, timeouts,
+# the STOP exchange, the Upstream Load Sender, statistics, the header
+# checksum, group addresses and the IP header fields test traffic carries.
+# Format: docs/conformance/README.md.
+
+# --- Timeouts (ADR 0002) ---
+
+[[record]]
+id = "receive-timeouts-stop-sending-at-1s"
+kind = "interpretation"
+summary = "After 1 s without Load PDUs the Load Receiver stops sending Status PDUs, and after 1 s without Status PDUs the Load Sender stops sending Load PDUs (§5.1 items 7-9). The Watchdog ends the Test Connection 3 s after the last valid PDU, §6.1's 1 s warning plus 2 s. ADR 0002 reconciles the two sections."
+rfc = "RFC 9946 §5.1, §6.1"
+requirements = ["RFC9946-5.1-11"]
+obudpst = "OB-UDPST follows §6.1 alone: its 1 s timer only warns and sets rxStopped, and traffic keeps flowing until its 3 s watchdog ends the Test Connection."
+reference = ["ADR 0002"]
+tests = [
+  "crates/udpstp-core/tests/timeouts.rs::a_downstream_path_that_breaks_stops_within_1_s_and_ends_at_3_s",
+  "crates/udpstp-core/tests/timeouts.rs::an_upstream_client_stops_when_status_pdus_stop",
+  "crates/udpstp-core/tests/timeouts.rs::the_watchdog_ends_the_test_connection_3_s_after_the_last_pdu",
+]
+
+[[record]]
+id = "rx-stopped-from-half-the-timeout"
+kind = "interpretation"
+summary = "rxStopped is asserted once 0.5 s, half the 1 s receive timeout, has passed without a PDU, so the PDUs sent before an end stops carry it. §8.1 recommends 1 s, which the 1 s timeouts would never let a peer see."
+rfc = "RFC 9946 §8.1"
+requirements = ["RFC9946-8.1-L5"]
+obudpst = "OB-UDPST asserts rxStopped from 1 s, and keeps sending until 3 s."
+reference = ["ADR 0002"]
+tests = [
+  "crates/udpstp-core/tests/timeouts.rs::a_downstream_path_that_breaks_stops_within_1_s_and_ends_at_3_s",
+  "crates/udpstp-core/tests/timeouts.rs::rx_stopped_clears_when_traffic_comes_back_in_time",
+]
+
+[[record]]
+id = "receive-timeout-is-final"
+kind = "interpretation"
+summary = "Once a receive timeout has stopped an end sending, traffic that comes back neither restarts sending nor resets the Watchdog: §5.1's \"SHALL be closed\" is read as final, over §8.1's \"until traffic is received again\"."
+rfc = "RFC 9946 §5.1, §8.1"
+requirements = ["RFC9946-5.1-13", "RFC9946-5.1-16", "RFC9946-8.1-4", "RFC9946-8.1-12"]
+reference = ["ADR 0002"]
+tests = ["crates/udpstp-core/tests/timeouts.rs::traffic_that_comes_back_after_the_timeout_changes_nothing"]
+
+[[record]]
+id = "receive-timeouts-run-from-data-phase-start"
+kind = "interpretation"
+summary = "The Load PDU and Status PDU timeouts and the Watchdog run from the start of the Data Phase, so a peer that never sends stops this end after 1 s and ends the Test Connection after 3 s. The RFC doesn't say when they start."
+rfc = "RFC 9946 §5.1"
+requirements = ["RFC9946-5.1-11"]
+obudpst = "OB-UDPST also measures from activation, but only warns at 1 s."
+reference = ["ADR 0002"]
+
+[[record]]
+id = "peer-tears-down-a-second-later"
+kind = "obudpst-difference"
+summary = "An end that stopped sending also stops refreshing its peer's Watchdog. After a break in one direction, an OB-UDPST peer ends its Test Connection about 1 s after udpstp does, and reports traffic stopped in both directions."
+obudpst = "OB-UDPST keeps sending for 3 s, so its peer's Watchdog was last reset about 1 s later than ours."
+reference = ["ADR 0002"]
+
+[[record]]
+id = "stop-pdus-reset-the-watchdog"
+kind = "obudpst-difference"
+summary = "Every valid Load PDU or Status PDU resets the Watchdog, STOP ones included, as the RFC describes the reset."
+obudpst = "OB-UDPST resets its watchdog only while both its own and the received testAction are TEST_ACT_TEST."
+reference = []
+
+[[record]]
+id = "undefined-flags-are-invalid"
+kind = "interpretation"
+summary = "A Load PDU or Status PDU whose testAction is above TEST_ACT_STOP2, or whose rxStopped isn't 0 or 1, is invalid and counted, as OB-UDPST treats it. §8.1 defines the values but not what to do with others."
+rfc = "RFC 9946 §8.1"
+requirements = ["RFC9946-8.1-3"]
+reference = []
+tests = ["crates/udpstp-core/tests/timeouts.rs::a_load_pdu_with_undefined_flags_is_invalid"]
+
+# --- STOP exchange ---
+
+[[record]]
+id = "server-test-interval-timer-runs-half-a-second-over"
+kind = "interpretation"
+summary = "The Server's Test Interval timer sets TEST_ACT_STOP1 at testIntTime plus 0.5 s, as OB-UDPST's does, so the last Sub-Interval completes: Sub-Intervals open at the first Status PDU, just after activation. §9 reads as exactly testIntTime."
+rfc = "RFC 9946 §9"
+requirements = ["RFC9946-9-1"]
+reference = []
+tests = ["crates/udpstp-core/tests/stop_exchange.rs::the_test_stops_gracefully_when_the_servers_test_interval_ends"]
+
+[[record]]
+id = "stop-confirmation-waits"
+kind = "interpretation"
+summary = "After STOP1 the Server keeps marking its PDUs TEST_ACT_STOP2 for one Trial Interval plus 1 s, waiting for the Client's confirmation, then ends the Test Connection unconfirmed. The Client ends by its own Test Interval timer 1 s past the Server's STOP1, so the Server's STOP2 has time to cross the path."
+rfc = "RFC 9946 §9"
+requirements = ["RFC9946-9-2"]
+obudpst = "An OB-UDPST Client ends by its own timer at testIntTime plus 3.5 s. An OB-UDPST Server in an Upstream Test sends only one STOP2 Status PDU."
+reference = []
+tests = ["crates/udpstp-core/tests/stop_exchange.rs::a_cleared_stop_cannot_extend_the_test"]
+
+[[record]]
+id = "stop-test-action-per-role"
+kind = "interpretation"
+summary = "The Client acts on TEST_ACT_STOP2 only: TEST_ACT_STOP1 is the Server's local state, so the Client ignores it. The Server takes any valid testAction but TEST_ACT_TEST as the Client's STOP, because an OB-UDPST Client that ends by its own timer sends STOP1."
+rfc = "RFC 9946 §8.1, §9"
+requirements = ["RFC9946-9-4", "RFC9946-9-8"]
+obudpst = "An OB-UDPST Client takes any testAction but TEST_ACT_TEST as the Server's STOP."
+reference = []
+tests = [
+  "crates/udpstp-core/tests/stop_exchange.rs::only_stop2_stops_the_client_and_later_load_pdus_are_ignored",
+  "crates/udpstp-core/tests/stop_exchange.rs::the_server_ends_on_a_stop1_from_the_client",
+]
+
+[[record]]
+id = "stop-ends-counting"
+kind = "interpretation"
+summary = "The Client confirms a STOP once, with its next PDU, then ends. If STOP2 is its first Load PDU, no Status PDU timer exists yet, so it confirms at once. A STOP ends the Load Receiver's counting, as in OB-UDPST: the Load PDU carrying it is not counted, and later ones are ignored."
+rfc = "RFC 9946 §9"
+requirements = ["RFC9946-9-4"]
+reference = []
+tests = [
+  "crates/udpstp-core/tests/stop_exchange.rs::the_test_stops_gracefully_when_the_servers_test_interval_ends",
+  "crates/udpstp-core/tests/stop_exchange.rs::only_stop2_stops_the_client_and_later_load_pdus_are_ignored",
+  "crates/udpstp-core/tests/server_shutdown.rs::shutdown_completes_when_stop_is_the_first_downstream_load_pdu",
+]
+
+[[record]]
+id = "stop-bursts-of-one-without-add-on"
+kind = "interpretation"
+summary = "Once a Load Sender marks its Load PDUs TEST_ACT_STOP2, each Burst is one datagram with no Add-on: §9's MAY for Bursts of one is read as one datagram in all."
+rfc = "RFC 9946 §9"
+requirements = ["RFC9946-9-3", "RFC9946-9-6"]
+obudpst = "OB-UDPST cuts the Burst to one datagram but keeps the Add-on."
+reference = []
+tests = ["crates/udpstp-core/tests/stop_exchange.rs::the_test_stops_gracefully_when_the_servers_test_interval_ends"]
+
+[[record]]
+id = "client-initiated-stop"
+kind = "interpretation"
+summary = "A Client that ends a Test early (a Coercion it refuses, or `DataPhase::stop`) sends one PDU marked TEST_ACT_STOP2 at once and ends, within 1 s if the PDU can't go out, so the Server ends its Test Connection at once instead of by its Watchdog. §9 defines only a Server-initiated stop. A STOP that reaches the Server before its own STOP1 ends the Test Connection as `StoppedByClient`; an on-path attacker setting STOP (§11) looks the same."
+rfc = "RFC 9946 §9, §11"
+reference = []
+tests = [
+  "crates/udpstp-core/tests/stop_exchange.rs::a_client_that_refuses_a_coercion_stops_the_server_at_once",
+  "crates/udpstp-core/tests/stop_exchange.rs::a_client_stopping_its_data_phase_tells_the_server_at_once",
+  "crates/udpstp-core/tests/upstream.rs::an_upstream_client_that_stops_early_sends_a_stop2_load_pdu",
+]
+
+[[record]]
+id = "server-initiated-stop"
+kind = "interpretation"
+summary = "When its administrator stops the Server, each active Test Connection makes a final send attempt marked TEST_ACT_STOP2 at once and ends as Stopped, without waiting for confirmation. As Load Sender, its Send Plan includes any Deferred Datagrams. If the PDU cannot be handed to the runtime, the Data Phase ends within 1 s. An end already silenced by its receive timeout sends nothing. This lets a reachable Client complete its Test instead of ending by its Watchdog. Section 9 defines the timer-triggered STOP exchange but not an administrator's shutdown; its ordinary timer-driven behavior is unchanged."
+rfc = "RFC 9946 §5.1, §9"
+reference = ["ADR 0014"]
+tests = [
+  "crates/udpstp-core/tests/server_shutdown.rs::a_stopping_server_stops_each_data_phase_and_then_releases_it",
+  "crates/udpstp-core/tests/server_shutdown.rs::shutdown_completes_when_stop_is_the_first_downstream_load_pdu",
+  "crates/udpstp-core/tests/server_shutdown.rs::shutdown_sends_stop_before_the_first_upstream_load_pdu",
+  "crates/udpstp-core/tests/server_shutdown.rs::shutdown_does_not_send_stop_after_the_receive_timeout",
+  "crates/udpstp/tests/loopback.rs::a_server_stopped_by_a_signal_ends_its_tests_and_reports_them",
+]
+
+# --- The Upstream Load Sender ---
+
+[[record]]
+id = "sending-rate-structure-sanity-limits"
+kind = "deviation"
+deviation = "non-conformance"
+summary = "A Client zeroes each Sending Rate Structure field beyond OB-UDPST's sanity limits, as an OB-UDPST Client does: an interval above 1 s, a size above 8972 bytes (the random-size flag masked off), a Burst above 100. A size above the largest the Test's Sending Rate Table variant allows is zeroed too. §8.1 says the Client uses the parameters it receives and gives no limits; this keeps a Server from making it send absurd sizes or Bursts. Only the size limit rests on the RFC (§6.1's packet sizes); the interval and Burst limits depart from §8.1."
+rfc = "RFC 9946 §8.1"
+requirements = ["RFC9946-8.1-6"]
+reference = []
+tests = [
+  "crates/udpstp-core/tests/upstream.rs::srstruct_values_beyond_the_sanity_limits_are_not_sent",
+  "crates/udpstp-core/tests/upstream.rs::the_sanity_limits_keep_their_edges",
+  "crates/udpstp-core/src/data_phase.rs::a_size_beyond_the_table_variant_is_refused",
+]
+default = "on"
+revisit = "If a Server needed intervals above 1 s or Bursts above 100 datagrams, or RFC 9946 gave limits of its own."
+
+[[record]]
+id = "random-size-flag"
+kind = "interpretation"
+summary = "OB-UDPST's random-size flag (0x80000000 in a size field), which RFC 9946 doesn't define, is honoured: a size is drawn once per Burst, uniformly from 52 bytes (32 over IPv6) up to the field's low 31 bits, as OB-UDPST does. A random field whose maximum is 0 sends no datagram. OB-UDPST's row 0 sets it on the Add-on of every Upstream search."
+rfc = "RFC 9946 §8.1"
+requirements = ["RFC9946-8.1-6"]
+reference = []
+tests = [
+  "crates/udpstp-core/tests/upstream.rs::a_random_size_add_on_is_sent_at_random_sizes",
+  "crates/udpstp-core/tests/upstream.rs::an_ipv6_client_draws_random_sizes_from_32",
+]
+
+[[record]]
+id = "sending-rate-structure-only-from-test-status-pdus"
+kind = "interpretation"
+summary = "The Client takes a new Sending Rate Structure only from Status PDUs marked TEST_ACT_TEST, as OB-UDPST does: a STOP Status PDU's needn't be one to send at."
+rfc = "RFC 9946 §8.1"
+requirements = ["RFC9946-8.1-6"]
+reference = []
+tests = ["crates/udpstp-core/tests/upstream.rs::a_stop_status_pdu_does_not_change_the_rate"]
+
+[[record]]
+id = "transmitter-switched-on-starts-at-once"
+kind = "obudpst-difference"
+summary = "A Transmitter that a new Sending Rate Structure switches back on starts at once."
+obudpst = "OB-UDPST arms it only when the other Transmitter fires, so once both are zeroed the Client never sends again."
+reference = []
+tests = ["crates/udpstp-core/tests/upstream.rs::a_new_srstruct_can_swap_transmitters"]
+
+[[record]]
+id = "stop-confirmed-without-a-transmitter"
+kind = "obudpst-difference"
+summary = "An Upstream Client whose Sending Rate Structure has no Transmitter still confirms a STOP, with a header-only Load PDU."
+obudpst = "An OB-UDPST Client confirms at its next send timer, so with no Transmitter armed it sends nothing to confirm with."
+reference = []
+tests = ["crates/udpstp-core/tests/upstream.rs::a_client_with_nothing_to_send_still_confirms_a_stop"]
+
+[[record]]
+id = "server-polices-upstream-rate"
+kind = "obudpst-difference"
+summary = "The Server polices an Upstream Client: three Trial Intervals in a row above 1.5 times the highest rate it assigned within the last second start the STOP exchange early and end the Test Connection with `EndReason::OverRate` (ADR 0008, amended by ADR 0011 so a search through a deep buffer isn't stopped)."
+obudpst = "OB-UDPST doesn't police the Client's rate."
+reference = ["ADR 0008", "ADR 0011"]
+tests = [
+  "crates/udpstp-core/tests/upstream.rs::the_server_stops_a_client_sending_over_its_rate",
+  "crates/udpstp-core/tests/algorithm_b.rs::an_upstream_search_through_a_deep_buffer_is_not_stopped_over_rate",
+]
+
+[[record]]
+id = "no-lost-status-backoff-upstream"
+kind = "deviation"
+deviation = "non-conformance"
+summary = "Lost Status Backoff runs only in Downstream Tests, where the Server is the Load Sender. RFC 9097 §8.1, which RFC 9946 §5.1 imports, says \"the offered load SHALL then be decreased\" when Status PDUs stop arriving; in an Upstream Test nothing lowers it: the Client SHALL send the rates the Server communicates (RFC 9946 §8.1), and a lower rate from the Server could reach it only in the Status PDUs being lost. The Test relies on the 1 s Status PDU timeout instead, which stops the Client (ADR 0002)."
+rfc = "RFC 9097 §8.1; RFC 9946 §4, §5.1, §8.1"
+requirements = ["RFC9097-8.1-13"]
+reference = ["ADR 0002"]
+tests = ["crates/udpstp-core/tests/lost_status_backoff.rs::an_upstream_server_does_not_back_off"]
+default = "on"
+revisit = "If the Client, as Load Sender, were allowed to lower its own rate when Status PDUs stop arriving, or Upstream Tests were seen to flood a path during feedback loss before the 1 s timeout."
+
+# --- Sending Load PDUs ---
+
+[[record]]
+id = "lpdu-time-per-burst"
+kind = "interpretation"
+summary = "Every Load PDU of a Send Plan carries the same lpduTime, read once just before the headers are written. lpduTime is the Test Time Base plus a wall-clock offset fixed at activation, so wall-clock steps don't move it. OB-UDPST also stamps once per Burst, from its cached loop clock."
+rfc = "RFC 9946 §8.1"
+requirements = ["RFC9946-8.1-L10"]
+reference = ["docs/spec.md Time model"]
+tests = ["crates/udpstp-core/tests/downstream_load.rs::lpdu_time_is_the_send_time_and_ignores_wall_clock_steps"]
+
+[[record]]
+id = "deferred-datagrams-and-withheld-bursts"
+kind = "interpretation"
+summary = "Datagrams of a Send Plan the host didn't take are Deferred Datagrams: they lead the next Send Plan (a STOP one included) with their sequence numbers and a fresh lpduTime, so host backpressure never shows as loss. A failed send defers the rest of its Send Plan. A new Burst is a Withheld Burst, counted and reported (`DataEvent::BurstsWithheld`), while at least as many Deferred Datagrams as it holds are waiting or it would overflow the Send Plan. The RFC doesn't say what a Load Sender does with datagrams the host refuses."
+rfc = "RFC 9946 §8.1"
+obudpst = "OB-UDPST drops the datagrams the host refused and, with seqNumAdjust, rolls lpduSeqNo back so they don't count as loss."
+reference = ["ADR 0008"]
+tests = [
+  "crates/udpstp-core/tests/partial_sends.rs::deferred_datagrams_keep_their_sequence_numbers_and_count_no_loss",
+  "crates/udpstp-core/tests/partial_sends.rs::deferred_datagrams_carry_the_time_they_are_sent",
+  "crates/udpstp-core/tests/partial_sends.rs::a_whole_deferred_burst_withholds_the_next",
+  "crates/udpstp-core/tests/partial_sends.rs::a_host_that_takes_nothing_withholds_every_burst",
+  "crates/udpstp-core/tests/partial_sends.rs::a_stop_sends_the_deferred_datagrams_first",
+]
+
+[[record]]
+id = "missed-bursts-catch-up-or-are-skipped"
+kind = "obudpst-difference"
+summary = "The Load Sender keeps an absolute schedule. After a late wake-up it still sends each missed Burst less than the catch-up budget (1 ms; 2 ms on Windows, whose timers wake later) late, and the most recent one always; older ones are Skipped Bursts, counted, reported (`DataEvent::BurstsSkipped`) and deducted from the IP-Layer Sender Bit Rate. ADR 0008 and ADR 0012 hold the reasoning."
+obudpst = "OB-UDPST re-arms each send timer from \"now\", so missed intervals are lost with no catch-up and no record."
+reference = ["ADR 0008", "ADR 0012"]
+tests = [
+  "crates/udpstp-core/tests/downstream_load.rs::a_stalled_engine_skips_missed_bursts_and_reports_them",
+  "crates/udpstp-core/tests/downstream_load.rs::bursts_missed_by_less_than_the_catch_up_budget_are_all_sent",
+  "crates/udpstp-core/tests/downstream_load.rs::bursts_missed_by_more_than_the_catch_up_budget_are_skipped",
+  "crates/udpstp-core/tests/downstream_load.rs::a_burst_exactly_the_catch_up_budget_late_is_skipped",
+]
+
+# --- Status PDUs ---
+
+[[record]]
+id = "sub-interval-boundaries"
+kind = "interpretation"
+summary = "A Sub-Interval opens when the first Status PDU is sent. It closes just after the first Status PDU sent more than subIntPeriod minus trialInt/2 after it opened (whole ms, strict `>`), so the next Status PDU reports it. Until one has completed, subIntSeqNo is 0 and sisSav is zero. accumTime adds up each Sub-Interval's duration rounded to ms. The RFC is silent on these; they are OB-UDPST's, so both report the same Sub-Intervals."
+rfc = "RFC 9946 §8.2"
+requirements = ["RFC9946-8.2-L3", "RFC9946-8.2-L11"]
+reference = []
+tests = [
+  "crates/udpstp-core/tests/status_pdus.rs::sub_intervals_are_counted_from_the_first_status_pdu",
+  "crates/udpstp-core/tests/status_pdus.rs::a_late_status_pdu_does_not_shift_the_next_sub_interval",
+]
+
+[[record]]
+id = "status-pdu-grid-from-first-load-pdu"
+kind = "interpretation"
+summary = "Status PDUs stay on a Trial Interval grid from the first Load PDU received, so a late one doesn't move the later ones, and the first tiDeltaTime is measured from the first Load PDU."
+rfc = "RFC 9946 §8.2"
+requirements = ["RFC9946-8.2-1"]
+obudpst = "OB-UDPST re-arms its Status PDU timer after each send, and measures the first tiDeltaTime from activation."
+reference = []
+tests = [
+  "crates/udpstp-core/tests/status_pdus.rs::status_pdus_follow_the_first_load_pdu_every_trial_interval",
+  "crates/udpstp-core/tests/status_pdus.rs::each_status_pdu_counts_its_trial_interval",
+]
+
+[[record]]
+id = "status-pdu-sums-saturate"
+kind = "obudpst-difference"
+summary = "tiRxBytes, delayVarSum and the RTT variation sums saturate at their field's maximum. Only extreme byte counts or lpduTimes reach this."
+obudpst = "OB-UDPST's wrap."
+reference = []
+
+[[record]]
+id = "received-bytes-from-datagram-length"
+kind = "interpretation"
+summary = "The Load Receiver counts each Load PDU's bytes from the datagram's actual length, which the runtime knows even when it reads only the header, not from its udpPayload field, which §8.1 says allows accurate counts under receive truncation. A peer can't inflate the results by stating a larger udpPayload."
+rfc = "RFC 9946 §8.1"
+requirements = ["RFC9946-8.1-L7"]
+obudpst = "OB-UDPST sums the udpPayload fields."
+reference = []
+tests = [
+  "crates/udpstp-core/tests/status_pdus.rs::bytes_are_counted_from_the_datagram_not_its_udp_payload_field",
+  "crates/udpstp-core/tests/sub_interval_results.rs::a_forged_udp_payload_field_doesnt_inflate_the_capacity",
+]
+
+[[record]]
+id = "status-pdu-auth-fields-ignored-outside-mode-2"
+kind = "interpretation"
+summary = "Outside Authentication Mode 2 a Load Sender doesn't check a Status PDU's keyId, authUnixTime and authDigest, which the RFC has zero there; only mode 2 authenticates Status PDUs. udpstp sends them zero."
+rfc = "RFC 9946 §5.3.2, §6.2"
+requirements = ["RFC9946-5.3.2-6"]
+obudpst = "OB-UDPST carries other data in these fields."
+reference = []
+tests = [
+  "crates/udpstp-core/tests/status_pdus.rs::the_load_sender_tolerates_auth_fields_in_mode1_status_pdus",
+  "crates/udpstp-core/tests/status_pdus.rs::status_pdus_carry_the_auth_mode_and_zero_auth_fields",
+]
+
+# --- Sequence Errors ---
+
+[[record]]
+id = "sequence-errors-count-load-pdus"
+kind = "interpretation"
+summary = "Sequence Errors count Load PDUs, not events: a gap of n counts n lost. The Load PDUs before the first one received count as lost, none if that first lpduSeqNo is 0 or more than 1024 from 1."
+rfc = "RFC 9946 §8.2"
+reference = []
+tests = [
+  "crates/udpstp-core/tests/sequence_errors.rs::loss_counts_every_missing_load_pdu",
+  "crates/udpstp-core/tests/sequence_errors.rs::the_rfc_example_counts_four_out_of_order",
+  "crates/udpstp-core/tests/sequence_errors.rs::a_first_load_pdu_numbered_0_counts_no_loss",
+  "crates/udpstp-core/tests/sequence_errors.rs::a_far_first_load_pdu_counts_no_loss",
+]
+
+[[record]]
+id = "late-load-pdu-decrement-in-its-own-interval"
+kind = "interpretation"
+summary = "An out-of-order Load PDU takes one off the loss count, as OB-UDPST does, but only in a Trial Interval or Sub-Interval that counted it as lost."
+rfc = "RFC 9946 §8.2"
+requirements = ["RFC9946-8.2-L9"]
+obudpst = "OB-UDPST takes it off whatever interval is open, which can cancel an unrelated loss."
+reference = []
+tests = [
+  "crates/udpstp-core/tests/sequence_errors.rs::a_late_load_pdu_in_the_next_trial_interval_leaves_the_loss_counted",
+  "crates/udpstp-core/tests/sequence_errors.rs::a_late_load_pdu_does_not_cancel_a_later_loss",
+]
+
+[[record]]
+id = "lpdu-seq-no-modulo-2-32"
+kind = "interpretation"
+summary = "lpduSeqNos are compared modulo 2^32, so counting carries on across the wrap from 4294967295 to 0. A Load PDU exactly 2^31 ahead counts as late."
+rfc = "RFC 9946 §8.2"
+requirements = ["RFC9946-8.2-L9"]
+obudpst = "OB-UDPST doesn't handle the wrap."
+reference = []
+tests = [
+  "crates/udpstp-core/tests/sequence_errors.rs::half_the_sequence_space_ahead_counts_as_late",
+  "crates/udpstp-core/tests/sequence_errors.rs::sequence_errors_are_counted_across_the_wrap",
+]
+
+[[record]]
+id = "lpdu-seq-no-jumps-held"
+kind = "obudpst-difference"
+summary = "An lpduSeqNo jump of more than 1024 (for a first Load PDU, more than 1024 from 1 either way) counts only once the next Load PDU continues from it within 1024; otherwise it is ignored (`DataEvent::IgnoredLoadPdus`). 32 out-of-order Load PDUs in a consecutive run more than 1024 behind resync counting to them, and open intervals then take back their own loss. The held Load PDU gives no delay sample and counts in the interval of the Load PDU that confirms it. Load PDUs carry no authentication, so this keeps a forged one from hiding loss."
+obudpst = "In OB-UDPST one forged Load PDU up to 2^31 ahead leaves every later one out of order, hiding all loss for the rest of the Test."
+reference = []
+tests = [
+  "crates/udpstp-core/tests/sequence_errors.rs::a_jump_over_1024_waits_for_the_next_load_pdu",
+  "crates/udpstp-core/tests/sequence_errors.rs::a_forged_first_load_pdu_is_ignored",
+  "crates/udpstp-core/tests/sequence_errors.rs::counting_follows_a_run_of_32_out_of_order_load_pdus",
+  "crates/udpstp-core/tests/sequence_errors.rs::a_resync_lets_the_interval_take_back_its_own_loss",
+]
+
+# --- Delay variation and RTT ---
+
+[[record]]
+id = "ms-rounding-half-up"
+kind = "interpretation"
+summary = "A span in ms is rounded half up with floor division (−0.5 ms is 0, −0.5000001 ms is −1), per Load PDU, before the minimum and the subtraction, as OB-UDPST's `tspecmsec` does. §8.2 doesn't say how to round."
+rfc = "RFC 9946 §8.2"
+requirements = ["RFC9946-8.2-L10"]
+reference = []
+tests = [
+  "crates/udpstp-core/tests/delay_variation.rs::delay_variation_is_rounded_per_load_pdu",
+  "crates/udpstp-core/tests/delay_variation.rs::rtt_resp_delay_adjusts_the_rtt",
+  "crates/udpstp-core/tests/delay_variation.rs::rtt_resp_delay_is_the_time_since_the_status_pdu_arrived",
+]
+
+[[record]]
+id = "clock-delta-min-encoding"
+kind = "interpretation"
+summary = "clockDeltaMin is sent as a two's-complement 32-bit integer, as OB-UDPST sends it, and never read as \"no value\" (−1 is 0xFFFFFFFF). It saturates at the 32-bit limits in ms, and is 0 until the first Load PDU. The RFC gives no encoding for a negative value."
+rfc = "RFC 9946 §8.2"
+requirements = ["RFC9946-8.2-L14"]
+reference = []
+tests = [
+  "crates/udpstp-core/tests/delay_variation.rs::delay_variation_is_rounded_per_load_pdu",
+  "crates/udpstp-core/tests/delay_variation.rs::clock_delta_min_saturates",
+]
+
+[[record]]
+id = "delay-samples-from-in-order-load-pdus"
+kind = "interpretation"
+summary = "Only in-order Load PDUs give delay and RTT samples, and the first one only seeds clockDeltaMin, as in OB-UDPST."
+rfc = "RFC 9946 §8.2"
+reference = []
+tests = ["crates/udpstp-core/tests/delay_variation.rs::late_and_duplicate_load_pdus_give_no_delay_sample"]
+
+[[record]]
+id = "wall-clock-step-drops-delay-samples"
+kind = "interpretation"
+summary = "When the clock pair around a read disagrees (the wall clock stepped during it), that read's delay and RTT samples are dropped and counted (`DataEvent::DelaySamplesDropped`): docs/spec.md's \"flagged\" read as not trusted."
+rfc = "RFC 9946 §8.2"
+reference = ["docs/spec.md Time model"]
+tests = ["crates/udpstp-core/tests/delay_variation.rs::a_wall_clock_step_during_the_read_gives_no_samples"]
+
+[[record]]
+id = "kernel-receive-timestamp-clamped"
+kind = "interpretation"
+summary = "A kernel receive timestamp, a Load PDU's or a Status PDU's, is kept no later than the read, and no earlier than the 1 s receive timeout before it, since a datagram may have waited in the socket buffer."
+rfc = "RFC 9946 §8.1, §8.2"
+reference = ["docs/spec.md Time model"]
+tests = [
+    "crates/udpstp-core/tests/delay_variation.rs::kernel_receive_timestamps_give_the_receive_time",
+    "crates/udpstp-core/src/data_phase.rs::status_pdu_receive_times_are_clamped",
+]
+
+[[record]]
+id = "rtt-sample-rules"
+kind = "interpretation"
+summary = "A Load PDU gives an RTT sample only when it echoes a new spduTime; spduTime 0 has nothing to echo. The RTT is the receive time minus spduTime minus rttRespDelay. An rttRespDelay one more than the raw RTT is rounding and gives 0, so rttMinimum may be 0 (rtt-minimum-may-be-zero); a larger one leaves the RTT as it is. Both as in OB-UDPST."
+rfc = "RFC 9946 §8.1, §8.2"
+requirements = ["RFC9946-8.1-L12", "RFC9946-8.2-L15"]
+reference = []
+tests = [
+  "crates/udpstp-core/tests/delay_variation.rs::rtt_is_measured_from_echoed_status_pdus",
+  "crates/udpstp-core/tests/delay_variation.rs::rtt_resp_delay_adjusts_the_rtt",
+]
+
+[[record]]
+id = "negative-rtt-gives-no-sample"
+kind = "obudpst-difference"
+summary = "A negative raw RTT, from an echoed spduTime in the future, which only a forged or corrupted Load PDU carries, gives no sample."
+obudpst = "OB-UDPST casts it to unsigned and reports a huge rttVarSample."
+reference = []
+tests = ["crates/udpstp-core/tests/delay_variation.rs::an_rtt_from_a_future_spdu_time_gives_no_sample"]
+
+# --- Header checksum ---
+
+[[record]]
+id = "zero-checksum-sent-as-ffff"
+kind = "interpretation"
+summary = "A computed checksum of 0 is sent as 0xFFFF, its equal in one's complement, so a populated field never reads as unpopulated. This applies to every PDU udpstp fills a checkSum in. §5.6 gives no substitution rule."
+rfc = "RFC 9946 §5.6"
+requirements = ["RFC9946-5.6-3"]
+obudpst = "OB-UDPST sends 0, which its peer reads as unpopulated."
+reference = []
+tests = ["crates/udpstp-wire/tests/control_checksum.rs::a_zero_checksum_is_sent_as_ffff"]
+
+[[record]]
+id = "checksum-verified-only-when-configured"
+kind = "obudpst-difference"
+summary = "A populated checkSum is verified only when checksum use is configured, as §5.6 says."
+obudpst = "OB-UDPST verifies every populated checkSum, whatever its build flag."
+reference = []
+tests = [
+  "crates/udpstp-core/tests/control_checksum.rs::only_a_configured_receiver_verifies_and_only_a_populated_field",
+  "crates/udpstp-core/tests/downstream_load.rs::the_client_verifies_a_populated_checksum_when_configured",
+]
+
+# --- Group addresses ---
+
+[[record]]
+id = "broadcast-means-limited-broadcast"
+kind = "interpretation"
+summary = "\"Broadcast\" is 255.255.255.255, also in its IPv4-mapped IPv6 form; multicast is 224.0.0.0/4 and ff00::/8. A subnet's directed broadcast address can't be told without its prefix length, which the core doesn't know, and deprecated IPv4-compatible IPv6 addresses aren't looked into. Activation Requests from a multicast or broadcast source are dropped too (docs/spec.md story 89)."
+rfc = "RFC 9946 §6"
+requirements = ["RFC9946-6-1", "RFC9946-6-2"]
+reference = []
+tests = [
+  "crates/udpstp-core/tests/setup_addresses.rs::a_setup_request_from_a_group_address_is_dropped_silently",
+  "crates/udpstp-core/tests/setup_addresses.rs::a_setup_request_to_a_group_address_is_dropped_silently",
+  "crates/udpstp-core/tests/setup_addresses.rs::unicast_sources_are_answered",
+  "crates/udpstp-core/tests/setup_addresses.rs::an_activation_request_from_a_group_address_is_dropped",
+]
+
+# --- IP header fields on Windows ---
+
+[[record]]
+id = "windows-dont-fragment-unset"
+kind = "deviation"
+deviation = "platform-gap"
+summary = "On Windows test traffic leaves without DF, since no crate udpstp allows sets IP_DONTFRAGMENT without `unsafe`. The Client and Server warn at startup. Linux and macOS set it by default."
+rfc = "RFC 9946 §5"
+requirements = ["RFC9946-5-1"]
+default = "on"
+revisit = "An allowed crate sets DF on Windows without our own `unsafe`."
+reference = ["docs/technology.md"]
+tests = ["crates/udpstp-runtime/src/ip_options.rs::test_traffic_carries_df_and_max_hops"]
+
+[[record]]
+id = "windows-dscp-coerced-to-0"
+kind = "interpretation"
+summary = "Where test traffic can't be marked (Windows, which reserves the DS field for its QoS API), a Server allows only DSCP 0, coercing any other dscpEcn to it, and a Client asks for 0, each with a warning. dscpEcn is read as the marking the Test's traffic actually carries, so the Activation Response never states one that isn't sent; §7.2.1 lets the Server coerce dscpEcn."
+rfc = "RFC 9946 §7.1, §7.2.1"
+requirements = ["RFC9946-7.2.1-L1"]
+reference = ["docs/technology.md"]
+tests = ["crates/udpstp-core/tests/dscp.rs::a_server_that_cant_mark_allows_only_0_even_to_operators"]
+
+[[record]]
+id = "rtt-minimum-may-be-zero"
+kind = "deviation"
+deviation = "interop-accommodation"
+summary = "rttMinimum may be 0 although §8.2 says it MUST be positive: an RTT below a millisecond, or one that rttRespDelay's rounding brings to 0 (rtt-sample-rules), is reported as it is, as OB-UDPST reports it, rather than raised to 1 ms."
+rfc = "RFC 9946 §8.2"
+requirements = ["RFC9946-8.2-8"]
+obudpst = "OB-UDPST reports 0 too."
+default = "on"
+revisit = "If a peer refuses a Status PDU whose rttMinimum is 0, or RFC 9946 errata say which to send."
+reference = []
+tests = [
+  "crates/udpstp-core/tests/delay_variation.rs::rtt_resp_delay_adjusts_the_rtt",
+  "crates/udpstp-core/tests/delay_variation.rs::rtt_is_measured_from_echoed_status_pdus",
+]

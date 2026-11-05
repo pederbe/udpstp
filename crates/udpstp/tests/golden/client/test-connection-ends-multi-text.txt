@@ -1,0 +1,1046 @@
+=== completed
+ErrorStatus 6, completed: exit 0
+--- stdout
+--------------------------------------------------------------------------------
+Endpoints
+  Test Connection 0: Client unknown; Server 192.0.2.1:24601
+  Test Connection 1: Client unknown; Server 192.0.2.2:24601
+All 2 Test Connections together:
+Results Summary
+  Downstream Search Test with 192.0.2.1:24601, started 2026-09-21T14:13:20Z (T0)
+  Test Interval (I) 5 s · 5 Sub-Intervals (dt) 1000 ms · Trial Interval (FT) and
+    st 50 ms
+  2 Test Connections (F) · MaxHops 16 · DSCP 0 agreed
+  Performance Criterion: loss ≤ 1% or one Load PDU · Tmax ≤ 1000 ms
+  Late Load PDUs count in the Sub-Interval where their gap was seen.
+  The Server set testIntTime to 5 (asked for 10)
+
+  Sub-Interval results
+  Active = Test Connections that received in the Sub-Interval.
+  SI  C (Mbps)  Loss Ratio  Lost  Reordered  Duplicates
+   1     91.00    0.000000     0          0           0
+   2     92.00    0.000000     0          0           0
+   3     93.00    0.000000     0          0           0
+   4     94.00    0.166667   200          0           0
+   5     95.00    0.000000     0          0           0
+
+  SI  DV (ms)  RTTV (ms)  Active  B (Mbps)*
+   1   0/7/12    0-12, 8       1      90.00
+   2   0/7/12    0-12, 8       1      90.00
+   3   0/7/12    0-12, 8       1      90.00
+   4   0/7/12    0-12, 8       1      90.00
+   5   0/7/12    0-12, 8       1      90.00
+
+  SI: Sub-Interval · C: IP-Layer Capacity · B: IP-Layer Sender Bit Rate
+  DV: delay variation (min/avg/max) · RTTV: RTT variation (min-max, avg) · -: no
+    measurement
+  * Estimated from the Server's lpduSeqNo span on its st clock.
+  Lost Load PDUs use the size of surrounding Load PDUs.
+
+Final metrics
+  Maximum IP-Layer Capacity: 95.00 Mbps (Sub-Interval 5)
+  Maximum Sub-Interval result received at 2026-09-21T14:13:25.017000000Z
+  Loss Ratio 0.000000, RTT minimum 1 ms, maximum 13 ms, estimated IP-Layer
+    Sender Bit Rate 90.00 Mbps
+  RTT minimum 1 ms
+
+  Warnings
+    2 invalid Load PDUs ignored
+
+  This host: DF set, socket buffers receive 4194304 and send 4194304 bytes;
+    portable Data Phase Engine, no fast paths
+Test Connection 0 to 192.0.2.1:24601: Completed
+
+Final metrics
+  Maximum IP-Layer Capacity: 95.00 Mbps (Sub-Interval 5)
+  Maximum Sub-Interval result received at 2026-09-21T14:13:25.017000000Z
+  Loss Ratio 0.000000, RTT minimum 1 ms, maximum 13 ms, estimated IP-Layer
+    Sender Bit Rate 90.00 Mbps
+  RTT minimum 1 ms
+  Minimum one-way delay 0 ms (clockDeltaMin; valid only if the clocks are
+    synchronized)
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--------------------------------------------------------------------------------
+Test outcome: partially completed
+
+=== test-interval-elapsed
+ErrorStatus 6, completed: exit 0
+--- stdout
+--------------------------------------------------------------------------------
+Endpoints
+  Test Connection 0: Client unknown; Server 192.0.2.1:24601
+  Test Connection 1: Client unknown; Server 192.0.2.2:24601
+All 2 Test Connections together:
+Results Summary
+  Downstream Search Test with 192.0.2.1:24601, started 2026-09-21T14:13:20Z (T0)
+  Test Interval (I) 5 s · 5 Sub-Intervals (dt) 1000 ms · Trial Interval (FT) and
+    st 50 ms
+  2 Test Connections (F) · MaxHops 16 · DSCP 0 agreed
+  Performance Criterion: loss ≤ 1% or one Load PDU · Tmax ≤ 1000 ms
+  Late Load PDUs count in the Sub-Interval where their gap was seen.
+  The Server set testIntTime to 5 (asked for 10)
+
+  Sub-Interval results
+  Active = Test Connections that received in the Sub-Interval.
+  SI  C (Mbps)  Loss Ratio  Lost  Reordered  Duplicates
+   1     91.00    0.000000     0          0           0
+   2     92.00    0.000000     0          0           0
+   3     93.00    0.000000     0          0           0
+   4     94.00    0.166667   200          0           0
+   5     95.00    0.000000     0          0           0
+
+  SI  DV (ms)  RTTV (ms)  Active  B (Mbps)*
+   1   0/7/12    0-12, 8       1      90.00
+   2   0/7/12    0-12, 8       1      90.00
+   3   0/7/12    0-12, 8       1      90.00
+   4   0/7/12    0-12, 8       1      90.00
+   5   0/7/12    0-12, 8       1      90.00
+
+  SI: Sub-Interval · C: IP-Layer Capacity · B: IP-Layer Sender Bit Rate
+  DV: delay variation (min/avg/max) · RTTV: RTT variation (min-max, avg) · -: no
+    measurement
+  * Estimated from the Server's lpduSeqNo span on its st clock.
+  Lost Load PDUs use the size of surrounding Load PDUs.
+
+Final metrics
+  Maximum IP-Layer Capacity: 95.00 Mbps (Sub-Interval 5)
+  Maximum Sub-Interval result received at 2026-09-21T14:13:25.017000000Z
+  Loss Ratio 0.000000, RTT minimum 1 ms, maximum 13 ms, estimated IP-Layer
+    Sender Bit Rate 90.00 Mbps
+  RTT minimum 1 ms
+
+  Warnings
+    2 invalid Load PDUs ignored
+    Test Connection 0 ended without the Server's STOP: TestIntervalElapsed
+
+  This host: DF set, socket buffers receive 4194304 and send 4194304 bytes;
+    portable Data Phase Engine, no fast paths
+Test Connection 0 to 192.0.2.1:24601: TestIntervalElapsed
+
+Final metrics
+  Maximum IP-Layer Capacity: 95.00 Mbps (Sub-Interval 5)
+  Maximum Sub-Interval result received at 2026-09-21T14:13:25.017000000Z
+  Loss Ratio 0.000000, RTT minimum 1 ms, maximum 13 ms, estimated IP-Layer
+    Sender Bit Rate 90.00 Mbps
+  RTT minimum 1 ms
+  Minimum one-way delay 0 ms (clockDeltaMin; valid only if the clocks are
+    synchronized)
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--------------------------------------------------------------------------------
+Test outcome: partially completed
+
+=== watchdog
+ErrorStatus 200, not completed: exit 200
+--- stdout
+--------------------------------------------------------------------------------
+Endpoints
+  Test Connection 0: Client unknown; Server 192.0.2.1:24601
+  Test Connection 1: Client unknown; Server 192.0.2.2:24601
+All 2 Test Connections together:
+Results Summary
+  Downstream Search Test with 192.0.2.1:24601, started 2026-09-21T14:13:20Z (T0)
+  Test Interval (I) 5 s · 5 Sub-Intervals (dt) 1000 ms · Trial Interval (FT) and
+    st 50 ms
+  2 Test Connections (F) · MaxHops 16 · DSCP 0 agreed
+  Performance Criterion: loss ≤ 1% or one Load PDU · Tmax ≤ 1000 ms
+  Late Load PDUs count in the Sub-Interval where their gap was seen.
+  The Server set testIntTime to 5 (asked for 10)
+
+  Sub-Interval results
+  Active = Test Connections that received in the Sub-Interval.
+  SI      C (Mbps)  Loss Ratio  Lost  Reordered  Duplicates
+   1         91.00    0.000000     0          0           0
+   2         92.00    0.000000     0          0           0
+   3  not measured           -     -          -           -
+   4  not measured           -     -          -           -
+   5  not measured           -     -          -           -
+
+  SI  DV (ms)  RTTV (ms)  Active  B (Mbps)*
+   1   0/7/12    0-12, 8       1      90.00
+   2   0/7/12    0-12, 8       1      90.00
+   3        -          -       -          -
+   4        -          -       -          -
+   5        -          -       -          -
+
+  SI: Sub-Interval · C: IP-Layer Capacity · B: IP-Layer Sender Bit Rate
+  DV: delay variation (min/avg/max) · RTTV: RTT variation (min-max, avg) · -: no
+    measurement
+  * Estimated from the Server's lpduSeqNo span on its st clock.
+  Lost Load PDUs use the size of surrounding Load PDUs.
+
+Final metrics
+  Maximum IP-Layer Capacity: 92.00 Mbps (Sub-Interval 2)
+  Maximum Sub-Interval result received at 2026-09-21T14:13:22.017000000Z
+  Loss Ratio 0.000000, RTT minimum 1 ms, maximum 13 ms, estimated IP-Layer
+    Sender Bit Rate 90.00 Mbps; 3 Sub-Intervals not measured
+  RTT minimum 1 ms
+
+  Warnings
+    2 invalid Load PDUs ignored
+    Nothing was received for 1 s, so this end stopped sending
+    The Watchdog ended Test Connection 0: nothing received for 3 s
+
+  This host: DF set, socket buffers receive 4194304 and send 4194304 bytes;
+    portable Data Phase Engine, no fast paths
+Test Connection 0 to 192.0.2.1:24601: Watchdog
+
+Final metrics
+  Maximum IP-Layer Capacity: 92.00 Mbps (Sub-Interval 2)
+  Maximum Sub-Interval result received at 2026-09-21T14:13:22.017000000Z
+  Loss Ratio 0.000000, RTT minimum 1 ms, maximum 13 ms, estimated IP-Layer
+    Sender Bit Rate 90.00 Mbps; 3 Sub-Intervals not measured
+  RTT minimum 1 ms
+  Minimum one-way delay 0 ms (clockDeltaMin; valid only if the clocks are
+    synchronized)
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: warning: the Watchdog ended Test Connection 0: nothing received for 3 s
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: failed
+
+=== stopped-interrupted
+ErrorStatus 204, not completed: exit 204
+--- stdout
+--------------------------------------------------------------------------------
+Endpoints
+  Test Connection 0: Client unknown; Server 192.0.2.1:24601
+  Test Connection 1: Client unknown; Server 192.0.2.2:24601
+All 2 Test Connections together:
+Results Summary
+  Downstream Search Test with 192.0.2.1:24601, started 2026-09-21T14:13:20Z (T0)
+  Test Interval (I) 5 s · 5 Sub-Intervals (dt) 1000 ms · Trial Interval (FT) and
+    st 50 ms
+  2 Test Connections (F) · MaxHops 16 · DSCP 0 agreed
+  Performance Criterion: loss ≤ 1% or one Load PDU · Tmax ≤ 1000 ms
+  Late Load PDUs count in the Sub-Interval where their gap was seen.
+  The Server set testIntTime to 5 (asked for 10)
+
+  Sub-Interval results
+  Active = Test Connections that received in the Sub-Interval.
+  SI      C (Mbps)  Loss Ratio  Lost  Reordered  Duplicates
+   1         91.00    0.000000     0          0           0
+   2         92.00    0.000000     0          0           0
+   3  not measured           -     -          -           -
+   4  not measured           -     -          -           -
+   5  not measured           -     -          -           -
+
+  SI  DV (ms)  RTTV (ms)  Active  B (Mbps)*
+   1   0/7/12    0-12, 8       1      90.00
+   2   0/7/12    0-12, 8       1      90.00
+   3        -          -       -          -
+   4        -          -       -          -
+   5        -          -       -          -
+
+  SI: Sub-Interval · C: IP-Layer Capacity · B: IP-Layer Sender Bit Rate
+  DV: delay variation (min/avg/max) · RTTV: RTT variation (min-max, avg) · -: no
+    measurement
+  * Estimated from the Server's lpduSeqNo span on its st clock.
+  Lost Load PDUs use the size of surrounding Load PDUs.
+
+Final metrics
+  Maximum IP-Layer Capacity: 92.00 Mbps (Sub-Interval 2)
+  Maximum Sub-Interval result received at 2026-09-21T14:13:22.017000000Z
+  Loss Ratio 0.000000, RTT minimum 1 ms, maximum 13 ms, estimated IP-Layer
+    Sender Bit Rate 90.00 Mbps; 3 Sub-Intervals not measured
+  RTT minimum 1 ms
+
+  Warnings
+    2 invalid Load PDUs ignored
+    The Test was interrupted, so the results are partial
+
+  This host: DF set, socket buffers receive 4194304 and send 4194304 bytes;
+    portable Data Phase Engine, no fast paths
+Test Connection 0 to 192.0.2.1:24601: Stopped
+
+Final metrics
+  Maximum IP-Layer Capacity: 92.00 Mbps (Sub-Interval 2)
+  Maximum Sub-Interval result received at 2026-09-21T14:13:22.017000000Z
+  Loss Ratio 0.000000, RTT minimum 1 ms, maximum 13 ms, estimated IP-Layer
+    Sender Bit Rate 90.00 Mbps; 3 Sub-Intervals not measured
+  RTT minimum 1 ms
+  Minimum one-way delay 0 ms (clockDeltaMin; valid only if the clocks are
+    synchronized)
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: the Test was aborted: it was interrupted
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: interrupted
+
+=== stopped
+ErrorStatus 200, not completed: exit 200
+--- stdout
+--------------------------------------------------------------------------------
+Endpoints
+  Test Connection 0: Client unknown; Server 192.0.2.1:24601
+  Test Connection 1: Client unknown; Server 192.0.2.2:24601
+All 2 Test Connections together:
+Results Summary
+  Downstream Search Test with 192.0.2.1:24601, started 2026-09-21T14:13:20Z (T0)
+  Test Interval (I) 5 s · 5 Sub-Intervals (dt) 1000 ms · Trial Interval (FT) and
+    st 50 ms
+  2 Test Connections (F) · MaxHops 16 · DSCP 0 agreed
+  Performance Criterion: loss ≤ 1% or one Load PDU · Tmax ≤ 1000 ms
+  Late Load PDUs count in the Sub-Interval where their gap was seen.
+  The Server set testIntTime to 5 (asked for 10)
+
+  Sub-Interval results
+  Active = Test Connections that received in the Sub-Interval.
+  SI      C (Mbps)  Loss Ratio  Lost  Reordered  Duplicates
+   1         91.00    0.000000     0          0           0
+   2         92.00    0.000000     0          0           0
+   3  not measured           -     -          -           -
+   4  not measured           -     -          -           -
+   5  not measured           -     -          -           -
+
+  SI  DV (ms)  RTTV (ms)  Active  B (Mbps)*
+   1   0/7/12    0-12, 8       1      90.00
+   2   0/7/12    0-12, 8       1      90.00
+   3        -          -       -          -
+   4        -          -       -          -
+   5        -          -       -          -
+
+  SI: Sub-Interval · C: IP-Layer Capacity · B: IP-Layer Sender Bit Rate
+  DV: delay variation (min/avg/max) · RTTV: RTT variation (min-max, avg) · -: no
+    measurement
+  * Estimated from the Server's lpduSeqNo span on its st clock.
+  Lost Load PDUs use the size of surrounding Load PDUs.
+
+Final metrics
+  Maximum IP-Layer Capacity: 92.00 Mbps (Sub-Interval 2)
+  Maximum Sub-Interval result received at 2026-09-21T14:13:22.017000000Z
+  Loss Ratio 0.000000, RTT minimum 1 ms, maximum 13 ms, estimated IP-Layer
+    Sender Bit Rate 90.00 Mbps; 3 Sub-Intervals not measured
+  RTT minimum 1 ms
+
+  Warnings
+    2 invalid Load PDUs ignored
+    Test Connection 0 ended without the Server's STOP: Stopped
+
+  This host: DF set, socket buffers receive 4194304 and send 4194304 bytes;
+    portable Data Phase Engine, no fast paths
+Test Connection 0 to 192.0.2.1:24601: Stopped
+
+Final metrics
+  Maximum IP-Layer Capacity: 92.00 Mbps (Sub-Interval 2)
+  Maximum Sub-Interval result received at 2026-09-21T14:13:22.017000000Z
+  Loss Ratio 0.000000, RTT minimum 1 ms, maximum 13 ms, estimated IP-Layer
+    Sender Bit Rate 90.00 Mbps; 3 Sub-Intervals not measured
+  RTT minimum 1 ms
+  Minimum one-way delay 0 ms (clockDeltaMin; valid only if the clocks are
+    synchronized)
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--------------------------------------------------------------------------------
+Test outcome: failed
+
+=== unconfirmed
+ErrorStatus 255, not completed: exit 255
+--- stdout
+--------------------------------------------------------------------------------
+Endpoints
+  Test Connection 0: Client unknown; Server 192.0.2.1:24601
+  Test Connection 1: Client unknown; Server 192.0.2.2:24601
+All 2 Test Connections together:
+Results Summary
+  Downstream Search Test with 192.0.2.1:24601, started 2026-09-21T14:13:20Z (T0)
+  Test Interval (I) 5 s · 5 Sub-Intervals (dt) 1000 ms · Trial Interval (FT) and
+    st 50 ms
+  2 Test Connections (F) · MaxHops 16 · DSCP 0 agreed
+  Performance Criterion: loss ≤ 1% or one Load PDU · Tmax ≤ 1000 ms
+  Late Load PDUs count in the Sub-Interval where their gap was seen.
+  The Server set testIntTime to 5 (asked for 10)
+
+  Sub-Interval results
+  Active = Test Connections that received in the Sub-Interval.
+  SI      C (Mbps)  Loss Ratio  Lost  Reordered  Duplicates
+   1         91.00    0.000000     0          0           0
+   2         92.00    0.000000     0          0           0
+   3  not measured           -     -          -           -
+   4  not measured           -     -          -           -
+   5  not measured           -     -          -           -
+
+  SI  DV (ms)  RTTV (ms)  Active  B (Mbps)*
+   1   0/7/12    0-12, 8       1      90.00
+   2   0/7/12    0-12, 8       1      90.00
+   3        -          -       -          -
+   4        -          -       -          -
+   5        -          -       -          -
+
+  SI: Sub-Interval · C: IP-Layer Capacity · B: IP-Layer Sender Bit Rate
+  DV: delay variation (min/avg/max) · RTTV: RTT variation (min-max, avg) · -: no
+    measurement
+  * Estimated from the Server's lpduSeqNo span on its st clock.
+  Lost Load PDUs use the size of surrounding Load PDUs.
+
+Final metrics
+  Maximum IP-Layer Capacity: 92.00 Mbps (Sub-Interval 2)
+  Maximum Sub-Interval result received at 2026-09-21T14:13:22.017000000Z
+  Loss Ratio 0.000000, RTT minimum 1 ms, maximum 13 ms, estimated IP-Layer
+    Sender Bit Rate 90.00 Mbps; 3 Sub-Intervals not measured
+  RTT minimum 1 ms
+
+  Warnings
+    2 invalid Load PDUs ignored
+    Test Connection 0 ended without the Server's STOP: Unconfirmed
+
+  This host: DF set, socket buffers receive 4194304 and send 4194304 bytes;
+    portable Data Phase Engine, no fast paths
+Test Connection 0 to 192.0.2.1:24601: Unconfirmed
+
+Final metrics
+  Maximum IP-Layer Capacity: 92.00 Mbps (Sub-Interval 2)
+  Maximum Sub-Interval result received at 2026-09-21T14:13:22.017000000Z
+  Loss Ratio 0.000000, RTT minimum 1 ms, maximum 13 ms, estimated IP-Layer
+    Sender Bit Rate 90.00 Mbps; 3 Sub-Intervals not measured
+  RTT minimum 1 ms
+  Minimum one-way delay 0 ms (clockDeltaMin; valid only if the clocks are
+    synchronized)
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: warning: Test Connection 0 ended without the Server's STOP: Unconfirmed
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: failed
+
+=== stopped-by-client
+ErrorStatus 255, not completed: exit 255
+--- stdout
+--------------------------------------------------------------------------------
+Endpoints
+  Test Connection 0: Client unknown; Server 192.0.2.1:24601
+  Test Connection 1: Client unknown; Server 192.0.2.2:24601
+All 2 Test Connections together:
+Results Summary
+  Downstream Search Test with 192.0.2.1:24601, started 2026-09-21T14:13:20Z (T0)
+  Test Interval (I) 5 s · 5 Sub-Intervals (dt) 1000 ms · Trial Interval (FT) and
+    st 50 ms
+  2 Test Connections (F) · MaxHops 16 · DSCP 0 agreed
+  Performance Criterion: loss ≤ 1% or one Load PDU · Tmax ≤ 1000 ms
+  Late Load PDUs count in the Sub-Interval where their gap was seen.
+  The Server set testIntTime to 5 (asked for 10)
+
+  Sub-Interval results
+  Active = Test Connections that received in the Sub-Interval.
+  SI      C (Mbps)  Loss Ratio  Lost  Reordered  Duplicates
+   1         91.00    0.000000     0          0           0
+   2         92.00    0.000000     0          0           0
+   3  not measured           -     -          -           -
+   4  not measured           -     -          -           -
+   5  not measured           -     -          -           -
+
+  SI  DV (ms)  RTTV (ms)  Active  B (Mbps)*
+   1   0/7/12    0-12, 8       1      90.00
+   2   0/7/12    0-12, 8       1      90.00
+   3        -          -       -          -
+   4        -          -       -          -
+   5        -          -       -          -
+
+  SI: Sub-Interval · C: IP-Layer Capacity · B: IP-Layer Sender Bit Rate
+  DV: delay variation (min/avg/max) · RTTV: RTT variation (min-max, avg) · -: no
+    measurement
+  * Estimated from the Server's lpduSeqNo span on its st clock.
+  Lost Load PDUs use the size of surrounding Load PDUs.
+
+Final metrics
+  Maximum IP-Layer Capacity: 92.00 Mbps (Sub-Interval 2)
+  Maximum Sub-Interval result received at 2026-09-21T14:13:22.017000000Z
+  Loss Ratio 0.000000, RTT minimum 1 ms, maximum 13 ms, estimated IP-Layer
+    Sender Bit Rate 90.00 Mbps; 3 Sub-Intervals not measured
+  RTT minimum 1 ms
+
+  Warnings
+    2 invalid Load PDUs ignored
+    Test Connection 0 ended without the Server's STOP: StoppedByClient
+
+  This host: DF set, socket buffers receive 4194304 and send 4194304 bytes;
+    portable Data Phase Engine, no fast paths
+Test Connection 0 to 192.0.2.1:24601: StoppedByClient
+
+Final metrics
+  Maximum IP-Layer Capacity: 92.00 Mbps (Sub-Interval 2)
+  Maximum Sub-Interval result received at 2026-09-21T14:13:22.017000000Z
+  Loss Ratio 0.000000, RTT minimum 1 ms, maximum 13 ms, estimated IP-Layer
+    Sender Bit Rate 90.00 Mbps; 3 Sub-Intervals not measured
+  RTT minimum 1 ms
+  Minimum one-way delay 0 ms (clockDeltaMin; valid only if the clocks are
+    synchronized)
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: warning: Test Connection 0 ended without the Server's STOP:
+  StoppedByClient
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: failed
+
+=== over-rate
+ErrorStatus 255, not completed: exit 255
+--- stdout
+--------------------------------------------------------------------------------
+Endpoints
+  Test Connection 0: Client unknown; Server 192.0.2.1:24601
+  Test Connection 1: Client unknown; Server 192.0.2.2:24601
+All 2 Test Connections together:
+Results Summary
+  Downstream Search Test with 192.0.2.1:24601, started 2026-09-21T14:13:20Z (T0)
+  Test Interval (I) 5 s · 5 Sub-Intervals (dt) 1000 ms · Trial Interval (FT) and
+    st 50 ms
+  2 Test Connections (F) · MaxHops 16 · DSCP 0 agreed
+  Performance Criterion: loss ≤ 1% or one Load PDU · Tmax ≤ 1000 ms
+  Late Load PDUs count in the Sub-Interval where their gap was seen.
+  The Server set testIntTime to 5 (asked for 10)
+
+  Sub-Interval results
+  Active = Test Connections that received in the Sub-Interval.
+  SI      C (Mbps)  Loss Ratio  Lost  Reordered  Duplicates
+   1         91.00    0.000000     0          0           0
+   2         92.00    0.000000     0          0           0
+   3  not measured           -     -          -           -
+   4  not measured           -     -          -           -
+   5  not measured           -     -          -           -
+
+  SI  DV (ms)  RTTV (ms)  Active  B (Mbps)*
+   1   0/7/12    0-12, 8       1      90.00
+   2   0/7/12    0-12, 8       1      90.00
+   3        -          -       -          -
+   4        -          -       -          -
+   5        -          -       -          -
+
+  SI: Sub-Interval · C: IP-Layer Capacity · B: IP-Layer Sender Bit Rate
+  DV: delay variation (min/avg/max) · RTTV: RTT variation (min-max, avg) · -: no
+    measurement
+  * Estimated from the Server's lpduSeqNo span on its st clock.
+  Lost Load PDUs use the size of surrounding Load PDUs.
+
+Final metrics
+  Maximum IP-Layer Capacity: 92.00 Mbps (Sub-Interval 2)
+  Maximum Sub-Interval result received at 2026-09-21T14:13:22.017000000Z
+  Loss Ratio 0.000000, RTT minimum 1 ms, maximum 13 ms, estimated IP-Layer
+    Sender Bit Rate 90.00 Mbps; 3 Sub-Intervals not measured
+  RTT minimum 1 ms
+
+  Warnings
+    2 invalid Load PDUs ignored
+    Test Connection 0 ended without the Server's STOP: OverRate
+
+  This host: DF set, socket buffers receive 4194304 and send 4194304 bytes;
+    portable Data Phase Engine, no fast paths
+Test Connection 0 to 192.0.2.1:24601: OverRate
+
+Final metrics
+  Maximum IP-Layer Capacity: 92.00 Mbps (Sub-Interval 2)
+  Maximum Sub-Interval result received at 2026-09-21T14:13:22.017000000Z
+  Loss Ratio 0.000000, RTT minimum 1 ms, maximum 13 ms, estimated IP-Layer
+    Sender Bit Rate 90.00 Mbps; 3 Sub-Intervals not measured
+  RTT minimum 1 ms
+  Minimum one-way delay 0 ms (clockDeltaMin; valid only if the clocks are
+    synchronized)
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: warning: Test Connection 0 ended without the Server's STOP: OverRate
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: failed
+
+=== data-phase-engine-failed
+ErrorStatus 255, not completed: exit 255
+--- stdout
+--------------------------------------------------------------------------------
+Endpoints
+  Test Connection 0: Client unknown; Server 192.0.2.1:24601
+  Test Connection 1: Client unknown; Server 192.0.2.2:24601
+All 2 Test Connections together:
+Results Summary
+  Downstream Search Test with 192.0.2.1:24601, started 2026-09-21T14:13:20Z (T0)
+  Test Interval (I) 5 s · 5 Sub-Intervals (dt) 1000 ms · Trial Interval (FT) and
+    st 50 ms
+  2 Test Connections (F) · MaxHops 16 · DSCP 0 agreed
+  Performance Criterion: loss ≤ 1% or one Load PDU · Tmax ≤ 1000 ms
+  Late Load PDUs count in the Sub-Interval where their gap was seen.
+  The Server set testIntTime to 5 (asked for 10)
+
+  Sub-Interval results
+  Active = Test Connections that received in the Sub-Interval.
+  SI      C (Mbps)  Loss Ratio  Lost  Reordered  Duplicates
+   1         91.00    0.000000     0          0           0
+   2         92.00    0.000000     0          0           0
+   3  not measured           -     -          -           -
+   4  not measured           -     -          -           -
+   5  not measured           -     -          -           -
+
+  SI  DV (ms)  RTTV (ms)  Active  B (Mbps)*
+   1   0/7/12    0-12, 8       1      90.00
+   2   0/7/12    0-12, 8       1      90.00
+   3        -          -       -          -
+   4        -          -       -          -
+   5        -          -       -          -
+
+  SI: Sub-Interval · C: IP-Layer Capacity · B: IP-Layer Sender Bit Rate
+  DV: delay variation (min/avg/max) · RTTV: RTT variation (min-max, avg) · -: no
+    measurement
+  * Estimated from the Server's lpduSeqNo span on its st clock.
+  Lost Load PDUs use the size of surrounding Load PDUs.
+
+Final metrics
+  Maximum IP-Layer Capacity: 92.00 Mbps (Sub-Interval 2)
+  Maximum Sub-Interval result received at 2026-09-21T14:13:22.017000000Z
+  Loss Ratio 0.000000, RTT minimum 1 ms, maximum 13 ms, estimated IP-Layer
+    Sender Bit Rate 90.00 Mbps; 3 Sub-Intervals not measured
+  RTT minimum 1 ms
+
+  Warnings
+    2 invalid Load PDUs ignored
+    Test Connection 0's Data Phase failed, so the results are partial: the Data
+      Phase panicked
+
+  This host: DF set, socket buffers receive 4194304 and send 4194304 bytes;
+    portable Data Phase Engine, no fast paths
+Test Connection 0 to 192.0.2.1:24601: the Data Phase failed: the Data Phase
+  panicked
+
+Final metrics
+  Maximum IP-Layer Capacity: 92.00 Mbps (Sub-Interval 2)
+  Maximum Sub-Interval result received at 2026-09-21T14:13:22.017000000Z
+  Loss Ratio 0.000000, RTT minimum 1 ms, maximum 13 ms, estimated IP-Layer
+    Sender Bit Rate 90.00 Mbps; 3 Sub-Intervals not measured
+  RTT minimum 1 ms
+  Minimum one-way delay 0 ms (clockDeltaMin; valid only if the clocks are
+    synchronized)
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: Test Connection 0's Data Phase failed: the Data Phase panicked
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: failed
+
+=== activation-rejected
+ErrorStatus 152, not completed: exit 152
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: the Activation Request was rejected
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: 192.0.2.1:24601 rejected Test Connection 0's Activation Request
+udpstp: the Test was aborted: fewer than 2 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted
+
+=== activation-rejected-fixed-rate
+ErrorStatus 152, not completed: exit 152
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: the Activation Request was rejected
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: Test Connection 0: the Server rejected the Activation Request; only an
+  Operator Key may run a Fixed-Rate Test (RFC 9946 §4.1), so check the key, or
+  the Server's log
+udpstp: the Test was aborted: fewer than 2 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted
+
+=== unknown-activation-response
+ErrorStatus 150, not completed: exit 150
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: UnknownActivationResponse
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: Test Connection 0 ended: UnknownActivationResponse
+udpstp: the Test was aborted: fewer than 2 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted
+
+=== unacceptable-coercion
+ErrorStatus 201, not completed: exit 201
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: UnacceptableCoercion
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: Test Connection 0: 192.0.2.1:24601 set dscpEcn to 0 (asked for 184),
+  which --refuse-coercion doesn't accept; the Test ended
+udpstp: the Test was aborted: Test Connection 0 ended it
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted
+
+=== unrunnable-parameter
+ErrorStatus 202, not completed: exit 202
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: UnrunnableParameter
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: Test Connection 0: the Server set testIntTime to 1, which the Client
+  can't run with; the Test ended
+udpstp: the Test was aborted: Test Connection 0 ended it
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted
+
+=== setup-rejected
+ErrorStatus 108, not completed: exit 108
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: SetupRejectedAuthTimeInvalid
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: 192.0.2.1:24601 refused Test Connection 0: the request's time was more
+  than 5 s from its clock
+udpstp: Test Connection 0: check both clocks
+udpstp: the Test was aborted: fewer than 2 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted
+
+=== unknown-setup-response
+ErrorStatus 100, not completed: exit 100
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: UnknownSetupResponse
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: 192.0.2.1:24601 answered Test Connection 0's Setup Request with
+  cmdResponse 99, which RFC 9946 doesn't define; it was not started
+udpstp: the Test was aborted: fewer than 2 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted
+
+=== no-authentication
+ErrorStatus 50, not completed: exit 50
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: NoAuthenticationConfigured
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: Test Connection 0: configuration error: no key to authenticate with;
+  give one with --key-file, or --unauthenticated for a Server that allows
+  Unauthenticated Mode
+udpstp: the Test was aborted: fewer than 2 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted
+
+=== no-key
+ErrorStatus 50, not completed: exit 50
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: NoKeyForSending
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: Test Connection 0: configuration error: no key in the key file may be
+  sent with now (its send lifetime), or none with the --key-id given
+udpstp: the Test was aborted: fewer than 2 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted
+
+=== ambiguous-key
+ErrorStatus 50, not completed: exit 50
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: AmbiguousKeyForSending
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: Test Connection 0: configuration error: several keys are valid now;
+  choose one with --key-id
+udpstp: the Test was aborted: fewer than 2 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted
+
+=== multicast-server
+ErrorStatus 50, not completed: exit 50
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 224.0.0.1:24601: MulticastOrBroadcastServer
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: Test Connection 0: configuration error: 224.0.0.1:24601 is a multicast
+  or broadcast address; the Server address must be unicast (RFC 9946 §6)
+udpstp: the Test was aborted: fewer than 2 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted
+
+=== socket-unavailable
+ErrorStatus 75, not completed: exit 75
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: SocketUnavailable
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: Test Connection 0's socket couldn't be opened
+udpstp: the Test was aborted: fewer than 2 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted
+
+=== socket-error
+ErrorStatus 255, not completed: exit 255
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: socket error: Too many open files (os
+  error 24)
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: Test Connection 0 to 192.0.2.1:24601: Too many open files (os error 24)
+udpstp: the Test was aborted: fewer than 2 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted
+
+=== abandoned
+ErrorStatus 204, not completed: exit 204
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: abandoned
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: the Test was aborted: it was interrupted
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: interrupted
+
+=== timed-out-setup-unanswered
+ErrorStatus 200, not completed: exit 200
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: TestInitiationTimedOut
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: Test Connection 0: no answer from 192.0.2.1:24601 within 3 s
+udpstp: the Test was aborted: fewer than 2 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted
+
+=== timed-out-setup-late
+ErrorStatus 108, not completed: exit 108
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: TestInitiationTimedOut
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: Test Connection 0 to 192.0.2.1:24601: the Setup exchange didn't complete
+  within 3 s
+udpstp: Test Connection 0: a response was more than 5 s from this host's clock;
+  check both clocks
+udpstp: the Test was aborted: fewer than 2 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted
+
+=== timed-out-setup-unverified
+ErrorStatus 107, not completed: exit 107
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: TestInitiationTimedOut
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: Test Connection 0 to 192.0.2.1:24601: the Setup exchange didn't complete
+  within 3 s
+udpstp: Test Connection 0: a response failed verification; check the key
+udpstp: the Test was aborted: fewer than 2 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted
+
+=== timed-out-setup-broadcast
+ErrorStatus 200, not completed: exit 200
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: TestInitiationTimedOut
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: Test Connection 0 to 192.0.2.1:24601: the Setup exchange didn't complete
+  within 3 s
+udpstp: Test Connection 0: a Setup Response came to a broadcast or multicast
+  address and was ignored (RFC 9946 §6)
+udpstp: the Test was aborted: fewer than 2 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted
+
+=== timed-out-setup-corrupted
+ErrorStatus 200, not completed: exit 200
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: TestInitiationTimedOut
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: Test Connection 0 to 192.0.2.1:24601: the Setup exchange didn't complete
+  within 3 s
+udpstp: Test Connection 0: a response failed its header checksum (--checksum):
+  it was corrupted on the path, or the Server computes the checksum otherwise
+udpstp: the Test was aborted: fewer than 2 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted
+
+=== timed-out-activation-unanswered
+ErrorStatus 200, not completed: exit 200
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: TestInitiationTimedOut
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: Test Connection 0 to 192.0.2.1:24601: the Activation exchange didn't
+  complete within 3 s
+udpstp: the Test was aborted: fewer than 2 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted
+
+=== timed-out-activation-late
+ErrorStatus 158, not completed: exit 158
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: TestInitiationTimedOut
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: Test Connection 0 to 192.0.2.1:24601: the Activation exchange didn't
+  complete within 3 s
+udpstp: Test Connection 0: a response was more than 5 s from this host's clock;
+  check both clocks
+udpstp: the Test was aborted: fewer than 2 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted
+
+=== timed-out-activation-unverified
+ErrorStatus 157, not completed: exit 157
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: TestInitiationTimedOut
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: Test Connection 0 to 192.0.2.1:24601: the Activation exchange didn't
+  complete within 3 s
+udpstp: Test Connection 0: a response failed verification; check the key
+udpstp: the Test was aborted: fewer than 2 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted
+
+=== timed-out-activation-corrupted
+ErrorStatus 200, not completed: exit 200
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: TestInitiationTimedOut
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: Test Connection 0 to 192.0.2.1:24601: the Activation exchange didn't
+  complete within 3 s
+udpstp: Test Connection 0: a response failed its header checksum (--checksum):
+  it was corrupted on the path, or the Server computes the checksum otherwise
+udpstp: the Test was aborted: fewer than 2 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted
+
+=== both-timed-out-setup-late
+ErrorStatus 108, not completed: exit 108
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: TestInitiationTimedOut
+Test Connection 1 to 192.0.2.2:24601: TestInitiationTimedOut
+--- stderr
+udpstp: Test Connection 0 to 192.0.2.1:24601: the Setup exchange didn't complete
+  within 3 s
+udpstp: Test Connection 1 to 192.0.2.2:24601: the Setup exchange didn't complete
+  within 3 s
+udpstp: Test Connections 0 and 1: a response was more than 5 s from this host's
+  clock; check both clocks
+udpstp: the Test was aborted: fewer than 2 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted
+
+=== both-activation-rejected-fixed-rate
+ErrorStatus 152, not completed: exit 152
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: the Activation Request was rejected
+Test Connection 1 to 192.0.2.2:24601: the Activation Request was rejected
+--- stderr
+udpstp: Test Connections 0 and 1: the Server rejected the Activation Request;
+  only an Operator Key may run a Fixed-Rate Test (RFC 9946 §4.1), so check the
+  key, or the Server's log
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: failed
+
+=== four-refused-late
+ErrorStatus 108, not completed: exit 108
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: SetupRejectedAuthTimeInvalid
+Test Connection 1 to 192.0.2.2:24601: SetupRejectedAuthTimeInvalid
+Test Connection 2 to 192.0.2.1:24601: SetupRejectedAuthTimeInvalid
+Test Connection 3 to 192.0.2.2:24601: SetupRejectedAuthTimeInvalid
+--- stderr
+udpstp: 192.0.2.1:24601 refused Test Connection 0: the request's time was more
+  than 5 s from its clock
+udpstp: 192.0.2.2:24601 refused Test Connection 1: the request's time was more
+  than 5 s from its clock
+udpstp: 192.0.2.1:24601 refused Test Connection 2: the request's time was more
+  than 5 s from its clock
+udpstp: 192.0.2.2:24601 refused Test Connection 3: the request's time was more
+  than 5 s from its clock
+udpstp: Test Connections 0, 1, 2 and 3: check both clocks
+udpstp: the Test was aborted: fewer than 1 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted
+
+=== both-refused-mode-2-unverified
+ErrorStatus 107, not completed: exit 107
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: TestInitiationTimedOut
+Test Connection 1 to 192.0.2.1:24601: TestInitiationTimedOut
+--- stderr
+udpstp: Test Connection 0 to 192.0.2.1:24601: the Setup exchange didn't complete
+  within 3 s
+udpstp: Test Connection 0: an unverified Setup Response said: it doesn't run
+  this Authentication Mode
+udpstp: Test Connection 1 to 192.0.2.1:24601: the Setup exchange didn't complete
+  within 3 s
+udpstp: Test Connection 1: an unverified Setup Response said: it doesn't run
+  this Authentication Mode
+udpstp: Test Connections 0 and 1: 192.0.2.1:24601 probably doesn't support mode
+  2: it rejected it, unverified; use --auth-mode 1 (the Client never falls back
+  by itself)
+udpstp: the Test was aborted: fewer than 2 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted

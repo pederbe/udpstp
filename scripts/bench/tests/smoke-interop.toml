@@ -1,0 +1,17 @@
+[defaults]
+test_interval = 5
+repeats = 1
+jumbo = true
+
+[[test]]
+name = "interop search"
+rate = "search"
+directions = ["downstream"]
+pairs = ["udpstp/udpstp", "obudpst/obudpst", "udpstp/obudpst", "obudpst/udpstp"]
+
+[[test]]
+name = "interop row 50"
+rate = 50
+directions = ["upstream"]
+test_connections = 2
+pairs = ["obudpst/obudpst", "udpstp/obudpst"]

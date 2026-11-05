@@ -1,0 +1,66 @@
+# RFC 9097 section 4: General Parameters and Definitions.
+# Imported by RFC 9946 section 5.1 item 12.
+# Format and ID convention: docs/conformance/README.md.
+
+[[requirement]]
+id = "RFC9097-4-1"
+text = "This section lists the REQUIRED input factors to specify a Sender or Receiver metric."
+text_sha256 = "d82c94d14d5b1a3e"
+state = "not-applicable"
+note = "An introduction to the section's Requirements, each recorded with its own ID; nothing to do beyond them."
+
+[[requirement]]
+id = "RFC9097-4-L1"
+text = "The nominal duration of a measurement interval at the Destination (default 10 sec)."
+text_sha256 = "b18a615d4b87cc86"
+state = "pending"
+note = "I, the Test Interval (testIntTime)."
+
+[[requirement]]
+id = "RFC9097-4-L2"
+text = "The nominal duration of m equal sub-intervals in I at the Destination (default 1 sec)."
+text_sha256 = "943f916d07ba6c77"
+state = "pending"
+note = "dt, the Sub-Interval (subIntPeriod)."
+
+[[requirement]]
+id = "RFC9097-4-L3"
+text = "The results are evaluated throughout the test to determine how to adjust the current offered load rate at the Sender (default 50 msec)."
+text_sha256 = "9da7a9f7f0d218c8"
+state = "pending"
+note = "FT, the Trial Interval (trialInt)."
+
+[[requirement]]
+id = "RFC9097-4-L4"
+text = "A maximum waiting time for test packets to arrive at the Destination, set sufficiently long to disambiguate packets with long delays from packets that are discarded (lost), such that the distribution of one-way delay is not truncated."
+text_sha256 = "3d63b116d33156fe"
+state = "pending"
+note = "Tmax."
+
+[[requirement]]
+id = "RFC9097-4-L5"
+text = "The number of different flows synthesized by the method (default one flow)."
+text_sha256 = "267f7e569084e7f6"
+state = "pending"
+note = "F; more than one is a Multi-Connection Test."
+
+[[requirement]]
+id = "RFC9097-4-2"
+text = "Note: The IPv6 flow label SHOULD be included in the flow definition when routers have complied with the guidelines provided in [RFC6438]."
+text_sha256 = "544cf67a61c2df6d"
+state = "not-applicable"
+note = "About the flow definition: udpstp sets no IPv6 flow label, and the OS's is constant for a socket, so a Test Connection is one flow with or without it."
+
+[[requirement]]
+id = "RFC9097-4-3"
+text = "If there is payload compression in the path and tests intend to characterize a possible advantage due to compression, then payload content SHOULD be supplied by a pseudorandom sequence generator, by using part of a compressed file, or by other means."
+text_sha256 = "36ccd08e5476985c"
+state = "pending"
+note = "Random payload (CHTA_RAND_PAYLOAD, `--random-payload`)."
+
+[[requirement]]
+id = "RFC9097-4-4"
+text = "At least one fundamental metric and target performance threshold MUST be supplied (such as one-way IP packet loss [RFC7680] equal to zero)."
+text_sha256 = "f95fcc4592a646c7"
+state = "pending"
+note = "PM: the Performance Criterion."

@@ -1,0 +1,96 @@
+# RFC 9946 section 12: IANA Considerations.
+# Format and ID convention: docs/conformance/README.md.
+# Section 12 has no BCP 14 keywords. The registry values are captured as
+# requirements on the codec: each entry quotes the sentence that introduces
+# its table, and the note names the values. Sections 12.3 and 12.4 have none.
+
+[[requirement]]
+id = "RFC9946-12.1-L1"
+text = "IANA has registered the following service name in the \"Service Name and Transport Protocol Port Number Registry\":"
+text_sha256 = "18b45e56df3b7b09"
+state = "pending"
+note = "Service Name and Transport Protocol Port Number Registry: udpstp, UDP port 24601, the Standard Port."
+
+[[requirement]]
+id = "RFC9946-12.2-L1"
+text = "IANA has added the following KDF entry to the \"KeyTable KDFs\" registry (see <https://www.iana.org/assignments/keytable>):"
+text_sha256 = "146e84b306340f96"
+state = "pending"
+note = "KeyTable KDFs registry: HMAC-SHA-256, the KDF of Section 5.4.1."
+
+[[requirement]]
+id = "RFC9946-12.3.1-L1"
+text = "IANA has assigned values in the \"PDU Identifier\" registry as follows:"
+text_sha256 = "f2e9a3ff8da3f88e"
+state = "pending"
+note = "PDU Identifier registry (pduId): 0xACE1 Test Setup, 0xACE2 Test Activation, 0xBEEF Load, 0xDEAD Null, 0xFEED Status Feedback; 0x0000 and 0xFFFF reserved."
+
+[[requirement]]
+id = "RFC9946-12.3.2-L1"
+text = "IANA has assigned decimal value 20 in the \"Protocol Version\" registry as follows:"
+text_sha256 = "b3f28fd7d928eb27"
+state = "pending"
+note = "Protocol Version registry (protocolVer): 20."
+
+[[requirement]]
+id = "RFC9946-12.3.3-L1"
+text = "IANA has assigned bitmap values in the \"Test Setup PDU Modifier Bitmap\" registry as follows:"
+text_sha256 = "c429bfc4fc858ffb"
+state = "pending"
+note = "Test Setup PDU Modifier Bitmap registry (modifierBitmap): 0x01 Jumbo datagram sizes above 1 Gbps, 0x02 Traditional MTU."
+
+[[requirement]]
+id = "RFC9946-12.3.4-L1"
+text = "IANA has assigned decimal values in the \"Test Setup PDU Authentication Mode\" registry as follows:"
+text_sha256 = "22b0171e95287348"
+state = "pending"
+note = "Test Setup PDU Authentication Mode registry (authMode): 0 not used, 1 the Control Phase, 2 the Control Phase and Status PDUs."
+
+[[requirement]]
+id = "RFC9946-12.3.5-L1"
+text = "IANA has assigned decimal values in the \"Test Setup PDU Command Response Field\" registry as follows:"
+text_sha256 = "47ac7c24974f3abd"
+state = "pending"
+note = "Test Setup PDU Command Response Field registry (cmdResponse): 0 None, 1 Acknowledgment, 2 to 13 errors; 255 reserved."
+
+[[requirement]]
+id = "RFC9946-12.3.5-L2"
+text = "Note that value 4 is required for backward compatibility with previous experimental versions of software already in use."
+text_sha256 = "9b8bcf7165168dc9"
+state = "pending"
+note = "Test Setup cmdResponse 4, unexpected authentication in Setup Request."
+
+[[requirement]]
+id = "RFC9946-12.3.5-L3"
+text = "Further, value 6 signals that a client erroneously used an authMode that hasn't been standardized yet (i.e., authMode is greater than 1 or 2)."
+text_sha256 = "3937036aabfe8163"
+state = "pending"
+note = "Test Setup cmdResponse 6; \"greater than 1 or 2\" is garbled."
+
+[[requirement]]
+id = "RFC9946-12.3.6-L1"
+text = "IANA has assigned decimal values in the \"Test Activation PDU Command Request\" registry as follows:"
+text_sha256 = "f11ef79d74cfe5b0"
+state = "pending"
+note = "Test Activation PDU Command Request registry (cmdRequest): 0 No Request, 1 upstream, 2 downstream; 255 reserved. The section says \"Test Setup PDU layout\" in error."
+
+[[requirement]]
+id = "RFC9946-12.3.7-L1"
+text = "IANA has assigned bitmap values in the \"Test Activation PDU Modifier Bitmap\" registry as follows:"
+text_sha256 = "2d9b31a3ae6773cc"
+state = "pending"
+note = "Test Activation PDU Modifier Bitmap registry (modifierBitmap): 0x01 CHTA_SRIDX_ISSTART, 0x02 randomized UDP payload."
+
+[[requirement]]
+id = "RFC9946-12.3.8-L1"
+text = "IANA has assigned capitalized alphabetic UTF-8 values, as well as the corresponding incremental numeric values, in the \"Test Activation PDU Rate Adjustment Algo\" registry as follows:"
+text_sha256 = "4ee7f0cdfedf4129"
+state = "pending"
+note = "Test Activation PDU Rate Adjustment Algo registry (rateAdjAlgo): B is 0, C is 1; A not used."
+
+[[requirement]]
+id = "RFC9946-12.3.9-L1"
+text = "IANA has assigned decimal values in the \"Test Activation PDU Command Response Field\" registry as follows:"
+text_sha256 = "0ba3cb8e41f891d7"
+state = "pending"
+note = "Test Activation PDU Command Response Field registry (cmdResponse): 0 None, 1 CHTA_CRSP_ACKOK, 2 CHTA_CRSP_BADPARAM; 255 reserved."

@@ -1,0 +1,7 @@
+# What a container build (contrib/container/Containerfile) doesn't need.
+target/
+fuzz/target/
+fuzz/corpus/
+fuzz/artifacts/
+reference/
+.git/

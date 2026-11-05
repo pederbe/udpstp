@@ -1,0 +1,125 @@
+name: Nightly
+
+# What is too slow or too unsteady to gate a change (docs/testing.md):
+# fuzzing, mutation testing, deferred and quarantined tests, loopback precision
+# and the simulator's cross-check against netem.
+# Run these checks independently of the required CI gate with workflow_dispatch.
+on:
+  workflow_dispatch:
+    inputs:
+      seconds:
+        description: How long each fuzz target runs, in seconds
+        default: "300"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # Deferred exhaustive benchmark comparisons and tests quarantined as
+  # flaky, #[ignore = "flaky: #N"] (docs/testing.md, "Flaky tests"; ),
+  # on Linux with the network-namespace tier's tools.
+  quarantine:
+    name: Deferred and quarantined tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - run: rustup toolchain install
+      - run: cargo test --locked --workspace -- --ignored
+      - name: Network-namespace and interop tests
+        run: |
+          sudo apt-get update && sudo apt-get install -y cmake libssl-dev
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+          scripts/netns-test.sh -- --ignored
+
+  # Loopback precision: Fixed-Rate
+  # Tests over loopback, the achieved rate within 1 % up to 1 Gbps and the
+  # kernel send timestamps' lag behind lpduTime within 100 µs at p99. A
+  # shared runner is noisier than a quiet host: a failure here is a
+  # prompt to measure on one.
+  precision:
+    name: Loopback precision
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - run: rustup toolchain install
+      - run: cargo build --locked --release -p udpstp -p udpstp-bench
+      - run: target/release/udpstp-bench precision --bin target/release/udpstp --runs 3 --json precision.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: precision
+          path: precision.json
+
+  # The simulator against netem: the
+  # same scenarios in the simulator and through the netns bottleneck. Its
+  # tolerances were set on a quiet host; a shared runner may miss them, and
+  # a failure here is a prompt to rerun on one.
+  crosscheck:
+    name: Simulator against netem
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - run: rustup toolchain install
+      - run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+      - run: scripts/crosscheck.sh --out crosscheck.jsonl
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: crosscheck
+          path: crosscheck.jsonl
+
+  # Mutation testing of the core (.cargo/mutants.toml): each run
+  # selects one of 14 shards by the day of the year. Manual runs do not
+  # guarantee that every shard is tried. A mutant the tests don't
+  # catch is reported in the run's summary and its mutants.out artifact;
+  # it doesn't fail the run.
+  mutants:
+    name: Mutation testing
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v7
+      - run: rustup toolchain install
+      - run: cargo install --locked cargo-mutants
+      - name: Mutants
+        run: |
+          shard=$(( $(date +%-j) % 14 ))
+          echo "## Mutation testing, shard $shard of 14" >> "$GITHUB_STEP_SUMMARY"
+          status=0
+          # A mutant can allocate without end; 8 GB of address space per
+          # process makes it fail alone instead of taking the runner down
+          # (the tests themselves pass under 8 GB).
+          ulimit -v 8000000
+          cargo mutants --shard "$shard/14" -j 2 --no-shuffle || status=$?
+          # 2: some mutants survived, which is the report, not a failure.
+          if [ -s mutants.out/missed.txt ]; then
+            { echo '```'; cat mutants.out/missed.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Every mutant was caught." >> "$GITHUB_STEP_SUMMARY"
+          fi
+          [ "$status" = 0 ] || [ "$status" = 2 ] || [ "$status" = 3 ]
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: mutants.out
+          path: mutants.out/
+
+  # Every PDU decoder and the Server core (fuzz/).
+  fuzz:
+    name: Fuzzing
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - run: rustup toolchain install nightly --profile minimal
+      - run: cargo install cargo-fuzz --locked
+      - run: scripts/fuzz.sh "${{ inputs.seconds || '300' }}"
+      - name: Keep the crashing inputs
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: fuzz-artifacts
+          path: fuzz/artifacts/

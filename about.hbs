@@ -1,0 +1,14 @@
+# Third-party licenses
+
+udpstp includes the following third-party software.
+
+{{#each licenses}}
+## {{name}} ({{id}})
+
+Used by {{#each used_by}}`{{crate.name}} {{crate.version}}`{{#unless @last}}, {{/unless}}{{/each}}.
+
+```text
+{{{text}}}
+```
+
+{{/each}}

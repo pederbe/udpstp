@@ -1,0 +1,73 @@
+# Fuzz targets for the PDU decoders, the Server core and its
+# Admission, outside the workspace because cargo-fuzz needs nightly
+# Rust (spec ). docs/testing.md ("Fuzzing") says how to run them.
+[package]
+name = "udpstp-fuzz"
+version = "0.0.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = { version = "0.4.13", features = ["arbitrary-derive"] }
+# `fuzzing` exposes the drivers of internal modules, such as Admission's.
+udpstp-core = { path = "../crates/udpstp-core", features = ["fuzzing"] }
+udpstp-wire = { path = "../crates/udpstp-wire" }
+
+# Its own workspace, so the main one's toolchain and lints don't apply.
+[workspace]
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[[bin]]
+name = "setup_pdu"
+path = "fuzz_targets/setup_pdu.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "activation_pdu"
+path = "fuzz_targets/activation_pdu.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "null_pdu"
+path = "fuzz_targets/null_pdu.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "load_pdu"
+path = "fuzz_targets/load_pdu.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "status_pdu"
+path = "fuzz_targets/status_pdu.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "server_core"
+path = "fuzz_targets/server_core.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "admission"
+path = "fuzz_targets/admission.rs"
+test = false
+doc = false
+bench = false

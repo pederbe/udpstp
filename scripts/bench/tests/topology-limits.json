@@ -1,0 +1,21 @@
+[
+  {"name": "huge compact range", "parser": "cpu_list", "blocks": [["0-9223372036854775807", 1]], "error": "CPU topology exceeds 65536 expansion steps"},
+  {"name": "range cardinality", "parser": "cpu_list", "blocks": [["0-4096", 1]], "error": "CPU topology exceeds 4096 distinct CPUs"},
+  {"name": "combined cardinality", "parser": "cpu_list", "blocks": [["0-2047,2048-4096", 1]], "error": "CPU topology exceeds 4096 distinct CPUs"},
+  {"name": "overlap work", "parser": "cpu_list", "blocks": [["0-4095,", 17]], "error": "CPU topology exceeds 65536 expansion steps"},
+  {"name": "duplicate components", "parser": "cpu_list", "blocks": [["0,", 4096]], "error": "CPU topology exceeds 4096 range components"},
+  {"name": "invalid components", "parser": "cpu_list", "blocks": [["x,", 4096]], "error": "CPU topology exceeds 4096 range components"},
+  {"name": "input bytes", "parser": "cpu_list", "blocks": [["x", 1048577]], "error": "CPU topology exceeds 1048576 input bytes"},
+  {"name": "UTF-8 input bytes", "parser": "cpu_list", "blocks": [["\u00e9", 524289]], "error": "CPU topology exceeds 1048576 input bytes"},
+  {"name": "retained affinities", "parser": "as_found", "blocks": [["irq 1 0-4095 nic\nirq 2 0-4095 nic\nirq 3 0-4095 nic\nirq 4 0-4095 nic\nirq 5 0-4095 nic\n", 1]], "error": "CPU topology exceeds 16384 retained CPU entries"},
+  {"name": "overwritten affinities", "parser": "as_found", "blocks": [["irq 1 0-4095 nic\n", 5]], "error": "CPU topology exceeds 16384 retained CPU entries"},
+  {"name": "work across IRQ records", "parser": "as_found", "blocks": [["irq 1 0-4095,0-4095,0-4095,0-4095 nic\n", 5]], "error": "CPU topology exceeds 65536 expansion steps"},
+  {"name": "cardinality across IRQ records", "parser": "as_found", "blocks": [["irq 1 0-4095 nic\nirq 2 4096 nic\n", 1]], "error": "CPU topology exceeds 4096 distinct CPUs"},
+  {"name": "components across IRQ records", "parser": "as_found", "blocks": [["irq 1 ?,? nic\n", 2049]], "error": "CPU topology exceeds 4096 range components"},
+  {"name": "repeated IRQ records", "parser": "as_found", "blocks": [["irq 1 ? nic\n", 4097]], "error": "CPU topology exceeds 4096 IRQ records"},
+  {"name": "duplicate topology rows", "parser": "topology", "blocks": [["0,0\n", 4097]], "error": "CPU topology exceeds 4096 topology rows"},
+  {"name": "duplicate queue records", "parser": "queue_irqs", "blocks": [["1 0\n", 4097]], "error": "CPU topology exceeds 4096 IRQ records"},
+  {"name": "huge readback affinity", "parser": "irq_affinities", "blocks": [["1 0-9223372036854775807\n", 1]], "error": "CPU topology exceeds 65536 expansion steps"},
+  {"name": "overwritten readback affinities", "parser": "irq_affinities", "blocks": [["1 0-4095\n", 5]], "error": "CPU topology exceeds 16384 retained CPU entries"},
+  {"name": "repeated readback records", "parser": "irq_affinities", "blocks": [["1 ?\n", 4097]], "error": "CPU topology exceeds 4096 IRQ records"}
+]

@@ -1,0 +1,40 @@
+Results Summary
+  Downstream Search Test with [2001:db8:abcd:1234:5678:9999:aaaa:bbbb]:24601, started
+    2026-09-21T14:13:20Z (T0)
+  Test Interval (I) 4 s · 4 Sub-Intervals (dt) 1000 ms · Trial Interval (FT) and st 50 ms
+  3 Test Connections (F) · MaxHops 16 · DSCP 0 agreed
+  Performance Criterion: loss ≤ 1% or one Load PDU · Tmax ≤ 1000 ms
+  Late Load PDUs count in the Sub-Interval where their gap was seen.
+
+  Sub-Interval results
+  Active = Test Connections that received in the Sub-Interval.
+  SI      C (Mbps)  Loss Ratio  Lost  Reordered  Duplicates  DV (ms)  RTTV (ms)  Active  B (Mbps)*
+   1        123.45    0.000971    12         17          19    2/5/9    3-11, 7       3     125.67
+   2  not measured           -     -          -           -        -          -       -          -
+   3         77.88    0.333333    50          1           0    0/1/3     1-4, 2       1          -
+   4  not measured           -     -          -           -        -          -       -          -
+  SI: Sub-Interval · C: IP-Layer Capacity · B: IP-Layer Sender Bit Rate
+  DV: delay variation (min/avg/max) · RTTV: RTT variation (min-max, avg) · -: no measurement
+  * Approximate sum by st number across Test Connections. Each st grid
+  starts one one-way delay before its Load Receiver's grid.
+
+Final metrics
+  Capacity Mode 1 (Sub-Intervals 1-2)
+  Maximum IP-Layer Capacity: 123.45 Mbps (Sub-Interval 1)
+  Maximum Sub-Interval result received at an unknown time
+  Loss Ratio 0.000971, RTT minimum 23 ms, maximum 34 ms, IP-Layer Sender Bit Rate 125.67 Mbps; 1
+    Sub-Interval not measured
+  Capacity Mode 2 (Sub-Intervals 3-4)
+  No Maximum IP-Layer Capacity: no Sub-Interval met the Performance Criterion. The Highest IP-Layer
+    Capacity was 77.88 Mbps in Sub-Interval 3 (Loss Ratio 0.333333); 1 Sub-Interval not measured
+  RTT minimum 10 ms
+  Minimum one-way delay 5 ms (clockDeltaMin; valid only if the clocks are synchronized)
+
+  Warnings
+    The Watchdog ended the Test: nothing received for 3 s
+    The OS held the socket buffers below the 2097152 bytes asked for, so datagrams may have been
+      dropped locally; raise the net.core.rmem_max and net.core.wmem_max sysctls
+
+  This host: DF set, socket buffers receive 212992 and send 212992 bytes; portable Data Phase
+    Engine, sending with sendmmsg and UDP GSO, receiving with recvmmsg and kernel timestamps, waking
+    on arrival with ppoll

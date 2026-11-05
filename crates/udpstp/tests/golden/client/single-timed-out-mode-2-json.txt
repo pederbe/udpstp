@@ -1,0 +1,28 @@
+ErrorStatus 107, not completed: exit 107
+--- stderr
+udpstp: 192.0.2.1:24601 probably doesn't support mode 2: it rejected it, unverified; use --auth-mode 1 (the Client never falls back by itself)
+udpstp: 192.0.2.1:24601: the Setup exchange didn't complete within 3 s
+udpstp: an unverified Setup Response said: it doesn't run this Authentication Mode
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	107,
+	"ErrorMessage":	"an unverified Setup Response said: it doesn't run this Authentication Mode",
+	"ErrorMessage2":	"192.0.2.1:24601: the Setup exchange didn't complete within 3 s",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"ControlPhaseFailed",
+		"ControlPhaseFailure":	"TestInitiationTimedOut",
+		"Coercions":	[],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[]
+	}
+}

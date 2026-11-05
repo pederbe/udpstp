@@ -1,0 +1,9 @@
+#!/bin/sh
+# Windows' OpenSSH's scp, for a round run in WSL (see ssh beside it). A
+# local file is given by its Windows path, which is all Windows' scp reads.
+for arg; do
+    shift
+    [ -e "$arg" ] && arg=$(wslpath -w "$arg")
+    set -- "$@" "$arg"
+done
+exec /mnt/c/Windows/System32/OpenSSH/scp.exe "$@"

@@ -1,0 +1,43 @@
+ErrorStatus 113, not completed: exit 113
+--- stderr
+udpstp: WARNING: Test Connection 0 to 192.0.2.1:24601: SetupRejectedConnectionAllocationFailure
+udpstp: 192.0.2.1:24601 refused Test Connection 0: it runs as many Tests or Test Connections as it allows, or one from this address or network, or this address or key used its quota of Tests
+udpstp: WARNING: Test Connection 1 to 192.0.2.2:24601: abandoned
+udpstp: Test Connection 0: retry later
+udpstp: ERROR: the Test was aborted: fewer than 2 Test Connections (--min-test-connections) could run
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	113,
+	"ErrorMessage":	"ERROR: the Test was aborted: fewer than 2 Test Connections (--min-test-connections) could run",
+	"ErrorMessage2":	"Test Connection 0: retry later",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"TooFewTestConnections",
+		"ControlPhaseFailure":	null,
+		"Coercions":	[],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[],
+		"TestConnections":	[{
+				"McIndex":	0,
+				"Server":	"192.0.2.1:24601",
+				"EndReason":	"ControlPhaseFailed",
+				"ControlPhaseFailure":	"SetupRejectedConnectionAllocationFailure",
+				"CapacityModes":	[]
+			}, {
+				"McIndex":	1,
+				"Server":	"192.0.2.2:24601",
+				"EndReason":	"Abandoned",
+				"ControlPhaseFailure":	null,
+				"CapacityModes":	[]
+			}]
+	}
+}

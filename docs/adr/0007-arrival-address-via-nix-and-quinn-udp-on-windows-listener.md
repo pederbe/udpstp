@@ -1,0 +1,9 @@
+# The Server learns each Setup Request's arrival address through nix, or quinn-udp on Windows
+
+The Setup Response must leave from the local address the Setup Request arrived on, from the Standard Port (RFC 9946 §6.2.2: a reply from the new Ephemeral Port would be blocked by the Client's firewall), and the Test Connection's ephemeral socket is bound to that address. On a wildcard listener that needs per-datagram destination addresses. On Linux and macOS `nix` (already a dependency) reads them and sets the source address on send (IP_PKTINFO / IPV6_PKTINFO), and also supplies the received TOS and truncation facts the core's datagram metadata needs. Windows has no safe path except `quinn-udp`'s `RecvMeta::dst_ip` / `Transmit::src_ip`, so `quinn-udp` is allowed on Windows for the standard-port listener only, with its defaults. This amends the earlier decision not to use `quinn-udp`, whose reasons (it overwrites DSCP and always sets DF) do not matter for small Setup PDUs on the listener; the Data Phase stays on `nix`, `rustix` and `socket2`. `quinn-udp` was chosen over its fork `noq-udp` for maturity and because of ADR 0006. The Server runs two listeners, IPv4 and IPv6-only, so no IPv4-mapped addresses reach the listener.
+
+## Consequences
+
+- The core interface gains an optional source address on outgoing datagrams and a scope id on socket-open requests (for IPv6 link-local Clients); the received TOS in datagram metadata becomes optional, since Windows and macOS cannot always supply it.
+- Datagrams queued before quinn-udp's socket state is created arrive without a destination address and are dropped; Clients retry.
+- Untested and tracked: Windows multi-homed hosts (a reply's source address can fail with WSAEINVAL under the strong-host model), port shadowing of the listener, and macOS arrival addresses for dual-stack IPv4.

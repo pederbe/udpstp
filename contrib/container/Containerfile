@@ -1,0 +1,17 @@
+# The udpstp Server as a container image. docs/guides/
+# hosting-a-server.md ("In a container") says how to run it: with the
+# host's network, for accurate results, and the Key Table as a secret.
+#
+#   podman build -f contrib/container/Containerfile -t udpstp .
+
+FROM docker.io/library/rust:1.99.1-slim-bookworm@sha256:24707e70a4f1e23d9a7b25202ec43126d28a52294b96aad5c670df1fd1f1d400 AS build
+WORKDIR /src
+COPY . .
+RUN cargo build --release --locked -p udpstp
+
+# glibc and CA-free, with no shell; runs as uid 65532 (nonroot).
+FROM gcr.io/distroless/cc-debian12:nonroot@sha256:9dac0a79194e45a7da0158a9c6da57b217585af0786db3845d1f0ec1a0dd182f
+COPY --from=build /src/target/release/udpstp /usr/local/bin/udpstp
+COPY contrib/container/server.toml /etc/udpstp/server.toml
+EXPOSE 24601/udp
+ENTRYPOINT ["/usr/local/bin/udpstp", "server", "--config", "/etc/udpstp/server.toml", "--key-file", "/run/secrets/keys.toml"]

@@ -1,0 +1,257 @@
+# Load Rate Adjustment Algorithms B and C, Lost Status Backoff, Trial
+# Interval classification, Status PDU sequencing and the Sending Rate
+# Structure's size convention.
+
+# Algorithms B and C
+
+[[record]]
+id = "shallow-queue-search-alternates-at-the-bottleneck"
+kind = "interpretation"
+summary = "Through a queue too shallow for delay variation to reach upperThresh, Algorithm B confirms Congestion at its first overshoot below the 1 Gbps row: Fast Mode's jump of highSpeedDelta rows past the bottleneck's rate brings slowAdjThresh Errored Intervals back to back, and the third takes 3 × highSpeedDelta rows off, once. From then on, in Single-Step Mode, each Errored Interval takes one row off and each Clean one adds one back, and loss, the only signal such a queue gives, comes back a Trial Interval or two late, so the search settles into a cycle a few rows around the bottleneck's rate and every Sub-Interval loses Load PDUs at the rows above it (5-8 % through 20 ms at 50 Mbit/s with the default seqErrThresh, about 2 % with 0). Above the 1 Gbps row there is no Fast Mode: the search climbs a row at a time, its first overshoot is one row, and it cycles the same way, but its Errored Intervals can come too few at a time to confirm Congestion, which it then never does: through 1 ms of queue at 2.5 Gbit/s, one or two at a time in the simulator, and in network namespaces through tbf two at a time, three in some Tests; through 20 ms, three at a time, which confirms it. The share of the Load PDUs the cycle loses in every Sub-Interval at the bottleneck's rate grows with the row's step against the rate: in the simulator about 2 % at 2.5 Gbit/s through 20 ms over a 10 ms round trip and 3-4 % at 1.2 Gbit/s, growing with the path's delay at the points tested there. Above the 1 Gbps row, where the rows are 100 Mbps apart, it is often above 1 %; below it, from a few hundred Mbit/s up, near 1 %, which the path's delay moves either way. The Client's warning that no search found the path's limit takes a search that never confirmed Congestion as having met it at its end: of its last 64 Trial Intervals, from the first Errored Interval among them on, at least 4 and at least 1 in 4 were errored. udpstp runs the algorithm as specified rather than adding a back-off of its own, and takes RFC 9097 §6.3's maximum over every Sub-Interval that meets the Performance Criterion, the search's climb included; §6.5 doesn't say what a maximum from a Sub-Interval without congestion means in a Test with it. So where no Sub-Interval at the bottleneck's rate meets the criterion, such a Test reports no valid maximum (ErrorStatus 49), or, where a Sub-Interval of the climb met it, at the latest the one in which the search first overshot, a Maximum IP-Layer Capacity from the climb, well below the bottleneck and with no warning: a cliff, not a bias. 1960 Mbit/s of 2.5 Gbit/s through tbf's 20 ms in network namespaces; in the simulator 1885 Mbit/s there, Fast Mode's last Sub-Interval, 893 Mbit/s, at 1 to 2 Gbit/s, and 287 Mbit/s at 500 Mbit/s over a 40 ms round trip, where the cycle loses 1.04 %. Either way it gives the Highest IP-Layer Capacity with its Loss Ratio; `--max-loss-ratio` accepts more loss."
+rfc = "RFC 9097 §6.3, §6.5, §8.1"
+requirements = ["RFC9097-6.3-L1", "RFC9097-6.3-3", "RFC9097-6.3-4", "RFC9097-8.1-L11"]
+obudpst = "OB-UDPST's search takes the same steps (one row each way above the 1 Gbps row, the confirming drop only below it, Sequence Errors counted without reordering and duplicates), so while the queue's delay stays under lowThresh it cycles the same way with the same loss: measured at 50 Mbit/s, and above the 1 Gbps row read from its code. Between lowThresh and upperThresh its Hold Intervals differ, since it judges the RTT variation by default (record delay-var-is-the-maximum-by-default). It reports the Highest IP-Layer Capacity as its maximum whatever the loss (record json-at-max-is-the-maximum), there the bottleneck's rate."
+reference = []
+tests = [
+    "crates/udpstp-core/tests/algorithm_b.rs::a_search_through_a_shallow_queue_alternates_around_the_bottleneck",
+    "crates/udpstp-core/tests/congestion_never_confirmed.rs::a_search_alternating_above_the_gigabit_row_met_the_limit",
+    "crates/udpstp-core/tests/congestion_never_confirmed.rs::a_search_alternating_near_12_gbit_s_met_the_limit",
+    "crates/udpstp-core/tests/maximum_through_drop_tail_queues.rs::above_the_gigabit_row_a_20_ms_queue_leaves_the_maximum_on_the_climb",
+]
+
+[[record]]
+id = "fast-mode-stops-at-the-gigabit-row"
+kind = "interpretation"
+summary = "Fast Mode never passes the 1 Gbps row (row 1000). Algorithm B adds highSpeedDelta rows but stops at that row; algorithm C jumps to it when doubling would pass it. Above it, the search moves in Single-Step Mode, one row at a time, as a Test already there would. RFC 9097 §8.1's prose says the rate is only increased by one above a high rate such as 1 Gbps; Y.1540 Amd 2 and TR-471's flowcharts, and RFC 9097's example pseudocode, add highSpeedDelta with no cap, so a search just below the 1 Gbps row could overshoot it by up to highSpeedDelta - 1 rows, which above row 1000 are OB-UDPST's much larger jumbo rows. OB-UDPST caps it the same way, so results match."
+rfc = "RFC 9097 §8.1; RFC 9946 §5.1"
+requirements = ["RFC9946-5.1-7", "RFC9097-8.1-L12"]
+reference = ["docs/spec.md"]
+tests = [
+    "crates/udpstp-core/tests/algorithm_b.rs::rows_stay_within_the_table_and_fast_mode_stops_at_1_gbps",
+    "crates/udpstp-core/tests/algorithm_c.rs::the_jump_to_1_gbps_leaves_update_as_it_was",
+]
+
+[[record]]
+id = "latched-congestion-confirmed"
+kind = "interpretation"
+summary = "Congestion is confirmed by slowAdjThresh Errored Intervals back to back: any Clean or Hold Interval resets the count, following RFC 9946 §5.1(5)'s \"in all of the consecutive intervals\". Congestion Confirmed is then latched, so algorithm B never leaves Single-Step Mode (RFC 9946 §7), and algorithm C clears it only in a Fast-Mode Retry. Resetting the flowchart's SlowAdjCount instead would let algorithm B return to Fast Mode and oscillate."
+rfc = "RFC 9946 §5.1"
+requirements = ["RFC9946-5.1-L1"]
+obudpst = "Keeps the flowchart's single SlowAdjCount, reset only by a Fast Mode pass, so errored, hold, errored, hold, errored also confirms Congestion. OB-UDPST can confirm Congestion earlier on paths with intermittent errors, so the two can report different capacities on the same path."
+reference = ["ADR 0005"]
+tests = [
+    "crates/udpstp-core/tests/algorithm_b.rs::congestion_is_confirmed_by_back_to_back_errored_intervals",
+    "crates/udpstp-core/tests/algorithm_b.rs::intermittent_errored_intervals_do_not_confirm_congestion",
+    "crates/udpstp-core/tests/algorithm_b.rs::algorithm_b_never_leaves_single_step_mode",
+]
+
+[[record]]
+id = "confirming-drop-below-the-gigabit-row-only"
+kind = "interpretation"
+summary = "The Errored Interval that confirms Congestion takes 3 × highSpeedDelta rows off, stopping at row 0, only when the row is below the 1 Gbps row, as the flowchart's `rate < HSpeedThresh` and RFC 9097's pseudocode compare it. At or above the 1 Gbps row it takes one row off, like any other Errored Interval. The comparison is on row indexes: row N is N Mbps up to row 1000."
+rfc = "RFC 9946 §5.1"
+requirements = ["RFC9946-5.1-7"]
+reference = []
+tests = [
+    "crates/udpstp-core/tests/algorithm_b.rs::the_confirming_drop_stops_at_row_0_and_follows_the_row_it_starts_from",
+    "crates/udpstp-core/tests/algorithm_b.rs::above_the_gigabit_row_every_step_is_one_row",
+]
+
+[[record]]
+id = "algorithm-c-doubles-the-row-index"
+kind = "interpretation"
+summary = "Algorithm C's \"Increase Sending by 2x\" doubles the Sending Rate Table row index, on every second Clean Interval in Fast Mode. Row 0 goes to row 1 on the first Fast Mode pass. Row N is N Mbps up to row 1000, so doubling the row doubles the rate there."
+rfc = "RFC 9946 §5.1"
+reference = []
+tests = [
+    "crates/udpstp-core/tests/algorithm_c.rs::fast_mode_doubles_the_row_on_every_second_clean_interval",
+    "crates/udpstp-core/tests/algorithm_c.rs::doubling_the_row_doubles_the_rate",
+]
+
+[[record]]
+id = "retry-thresh-grows-by-5-after-a-step-up"
+kind = "interpretation"
+summary = "RetryThresh starts at 5 and grows by 5 after a Fast-Mode Retry reached from a single step up (5, 10, 15, ...), as the flowchart footer's RETRY_THRESH_ALGOC and OB-UDPST have it; a retry reached from a single step down leaves it as it is. TR-471's table text says it doubles (5, 10, 20, 40)."
+rfc = "RFC 9946 §5.1"
+reference = ["docs/spec.md"]
+tests = [
+    "crates/udpstp-core/tests/algorithm_c.rs::retries_come_after_5_then_10_then_15_single_steps_up",
+    "crates/udpstp-core/tests/algorithm_c.rs::a_retry_from_a_step_down_keeps_retry_thresh",
+]
+
+[[record]]
+id = "retry-count-counts-actual-single-steps"
+kind = "interpretation"
+summary = "Only a single step that moves the row counts toward RetryThresh: a Clean Interval at the Test's highest row, or an Errored Interval at row 0, is none, and neither is the confirming drop. A Lost Status Backoff that moves the row one down counts. Y.1540 Amd 2 Table B.3 counts every status report; OB-UDPST counts as we do."
+rfc = "RFC 9946 §5.1"
+reference = []
+tests = [
+    "crates/udpstp-core/tests/algorithm_c.rs::clean_intervals_at_the_last_row_are_not_steps",
+    "crates/udpstp-core/tests/algorithm_c.rs::a_confirming_step_above_the_gigabit_row_can_retry",
+]
+
+[[record]]
+id = "fast-mode-retry-resets-the-errored-run"
+kind = "interpretation"
+summary = "A Fast-Mode Retry clears Congestion Confirmed and also resets the count of back-to-back Errored Intervals, as the flowchart resets SlowAdjCount. This is a reset beyond ADR 0005's reset by any Clean or Hold Interval: a retry reached on an Errored Interval starts the next run from 0."
+rfc = "RFC 9946 §5.1"
+reference = ["ADR 0005"]
+tests = [
+    "crates/udpstp-core/tests/algorithm_c.rs::random_interval_sequences_follow_the_flowchart",
+    "crates/udpstp-core/tests/algorithm_c.rs::a_confirming_step_above_the_gigabit_row_can_retry",
+]
+
+[[record]]
+id = "update-persists-across-a-fast-mode-retry"
+kind = "interpretation"
+summary = "Algorithm C's Update flag toggles on each Fast Mode pass that doesn't jump to the 1 Gbps row, and keeps its value across a Fast-Mode Retry, so the first pass after a retry may double the row or hold it. The documents don't say whether a retry resets it; OB-UDPST keeps it too."
+rfc = "RFC 9946 §5.1"
+reference = []
+tests = [
+    "crates/udpstp-core/tests/algorithm_c.rs::update_persists_across_a_retry",
+    "crates/udpstp-core/tests/algorithm_c.rs::the_jump_to_1_gbps_leaves_update_as_it_was",
+]
+
+# Lost Status Backoff
+
+[[record]]
+id = "lost-status-backoff-is-an-errored-interval"
+kind = "interpretation"
+summary = "A Lost Status Backoff counts as an Errored Interval, following RFC 9097 §8.1's \"same process\" with the algorithm's variables \"in their current state\": it adds to the back-to-back run, can confirm Congestion with the one-time drop of 3 × highSpeedDelta rows, and otherwise takes one row off. RFC 9097 describes it for algorithm B only; under algorithm C a backoff that moves the row also counts toward RetryThresh, so a long feedback outage can cycle through confirmation, drop and Fast-Mode Retry. At the defaults the third backoff, about 290 ms without a Status PDU, confirms Congestion."
+rfc = "RFC 9097 §8.1"
+requirements = ["RFC9097-8.1-13", "RFC9097-8.1-L21"]
+obudpst = "Has no Lost Status Backoff: it keeps its rate until its no-traffic timeouts."
+reference = ["ADR 0005"]
+tests = [
+    "crates/udpstp-core/tests/lost_status_backoff.rs::a_backoff_counts_as_an_errored_interval",
+    "crates/udpstp-core/tests/lost_status_backoff.rs::lost_status_pdus_back_the_rate_off_and_confirm_congestion",
+    "crates/udpstp-core/tests/lost_status_backoff.rs::backoffs_stop_at_row_0_and_two_in_a_row_leave_fast_mode_on",
+]
+
+[[record]]
+id = "lost-status-backoff-initial-w"
+kind = "interpretation"
+summary = "RFC 9097 §8.1 lets a path whose RTT is longer than trialInt start w above 0. The Server starts w at the Setup Response's round trip (from sending it to the Activation Request's arrival) divided by trialInt, rounded up, capped so the first Lost Status Backoff still comes before the 1 s Status PDU timeout. Without it a path with an RTT above about 140 ms backs off three times before its first Status PDU can arrive and confirms Congestion at the start. Once a Status PDU arrives, w starts over at 0."
+rfc = "RFC 9097 §8.1"
+requirements = ["RFC9097-8.1-14", "RFC9097-8.1-L20"]
+reference = []
+tests = [
+    "crates/udpstp-core/tests/lost_status_backoff.rs::a_long_path_gets_no_backoff_before_its_first_status_pdu",
+    "crates/udpstp-core/src/algorithm.rs::the_initial_w_covers_the_round_trip",
+    "crates/udpstp-core/src/algorithm.rs::the_initial_w_keeps_the_first_backoff_before_the_status_pdu_timeout",
+]
+
+# Status PDU sequencing
+
+[[record]]
+id = "stale-status-pdus-count-only-as-heard"
+kind = "interpretation"
+summary = "A Status PDU whose spduSeqNo isn't greater than the last one processed, or is 0, is stale, in both roles: it isn't fed to the Load Rate Adjustment Algorithm, can't change the Sending Rate Structure or deliver STOP, and isn't echoed for RTT. It still counts as heard for the Watchdog and Lost Status Backoff, its Sub-Interval statistics still count, and it is counted (DataEvent::StaleStatusPdus). RFC 9097 runs the algorithm on each \"new status report\" without saying whether a reordered or duplicated one is new; this rule keeps a replayed Status PDU from steering or stopping a Test."
+rfc = "RFC 9946 §8.2"
+requirements = ["RFC9946-8.2-4", "RFC9946-8.2-L2"]
+obudpst = "Feeds every Status PDU, reordered or duplicated ones included, to the algorithm in a Downstream Test."
+reference = ["docs/spec.md story 92"]
+tests = [
+    "crates/udpstp-core/tests/stale_status_pdus.rs::a_stale_status_pdu_does_not_steer_the_server",
+    "crates/udpstp-core/tests/stale_status_pdus.rs::a_stale_status_pdu_does_not_steer_the_client",
+    "crates/udpstp-core/tests/stale_status_pdus.rs::a_stale_stop_does_not_end_the_test",
+    "crates/udpstp-core/tests/stale_status_pdus.rs::a_stale_status_pdu_still_counts_as_heard",
+]
+
+[[record]]
+id = "spdu-seq-err-is-the-gap-before-the-latest"
+kind = "interpretation"
+summary = "The Load Sender's spduSeqErr is the number of Status PDUs missing just before the latest one processed, not a running total, as OB-UDPST counts it; a gap above 0xFFFE is sent as 0xFFFE. RFC 9946 §8.1 calls it \"the Status PDU loss count\" without saying over what span."
+rfc = "RFC 9946 §8.1"
+requirements = ["RFC9946-8.1-L8"]
+obudpst = "Sends 0xFFFF for a reordered Status PDU; udpstp treats that one as stale and never sends 0xFFFF."
+reference = []
+tests = [
+    "crates/udpstp-core/tests/stale_status_pdus.rs::spdu_seq_err_reports_the_status_pdus_missing_before_the_latest",
+    "crates/udpstp-core/tests/status_loss.rs::a_load_sender_counts_the_status_pdus_it_never_received",
+]
+
+# Trial Interval classification
+
+[[record]]
+id = "delay-var-is-the-maximum-by-default"
+kind = "obudpst-difference"
+summary = "With useOwDelVar True, a Trial Interval's DelayVar is its maximum one-way delay variation (delayVarMax), the \"delay range\" RFC 9946 §5.1(6) and RFC 9097 §8.1 judge. A Server setting makes it the average, delayVarSum / delayVarCnt rounded half up, as OB-UDPST uses. With useOwDelVar False it is the Status PDU's rttVarSample, as in OB-UDPST."
+rfc = "RFC 9946 §5.1; RFC 9097 §8.1"
+obudpst = "Classifies by the rounded average one-way delay variation, which is lower than the maximum, so an OB-UDPST Server sees fewer Errored Intervals and can search higher on a jittery path."
+default = "on"
+setting = "`--delay-var-statistic`, `delay_var_statistic` in TOML"
+reference = []
+tests = [
+    "crates/udpstp-core/tests/interval_classification.rs::the_maximum_is_the_default_and_the_average_a_setting",
+    "crates/udpstp-core/tests/interval_classification.rs::the_average_rounds_and_clean_is_strictly_below_the_low_threshold",
+    "crates/udpstp-core/tests/interval_classification.rs::without_one_way_delay_the_latest_rtt_sample_is_delay_var",
+]
+
+[[record]]
+id = "clean-needs-delay-var-below-low-thresh"
+kind = "interpretation"
+summary = "A Clean Interval needs DelayVar strictly below lowThresh, as RFC 9097's pseudocode and OB-UDPST have it; the Y.1540 and TR-471 flowcharts say `<=`. A DelayVar equal to lowThresh makes a Hold Interval."
+rfc = "RFC 9946 §5.1"
+requirements = ["RFC9946-5.1-9"]
+reference = []
+tests = ["crates/udpstp-core/tests/interval_classification.rs::the_average_rounds_and_clean_is_strictly_below_the_low_threshold"]
+
+[[record]]
+id = "seq-err-thresh-always-applied"
+kind = "interpretation"
+summary = "RFC 9946 §5.1(6) says Congestion MUST be indicated when Sequence Errors are detected, then recommends a threshold of 10. udpstp always applies seqErrThresh: a Trial Interval is errored only when its Sequence Errors exceed it, and 0 is honoured, so any Sequence Error is errored then. The flowcharts, RFC 9097's pseudocode and OB-UDPST do the same."
+rfc = "RFC 9946 §5.1"
+requirements = ["RFC9946-5.1-9"]
+reference = []
+tests = ["crates/udpstp-core/tests/interval_classification.rs::seq_err_thresh_is_always_applied"]
+
+[[record]]
+id = "no-delay-sample-is-never-clean"
+kind = "interpretation"
+summary = "A Trial Interval without a delay sample is never clean: it is a Hold Interval unless its Sequence Errors exceed seqErrThresh. A Trial Interval in which no Load PDU arrived is one too, since its loss shows only once a later Load PDU arrives. The documents don't cover the case; OB-UDPST also treats it as no change."
+rfc = "RFC 9946 §5.1"
+requirements = ["RFC9946-5.1-9"]
+reference = []
+tests = ["crates/udpstp-core/tests/interval_classification.rs::no_delay_samples_is_never_clean"]
+
+[[record]]
+id = "stop-status-pdus-are-not-classified"
+kind = "interpretation"
+summary = "A Status PDU whose testAction is STOP is not classified and doesn't move the rate: it ends the Test rather than reporting a Trial Interval to adjust on. This holds for the Status PDUs the Server receives in a Downstream Test and those it sends in an Upstream Test. Once the Server has sent STOP1 it classifies none, even those still marked TEST: the Test is ending, so the rate no longer matters. Everything else about the PDUs received then is processed normally (RFC 9946 §9): they count in the results, reset the Watchdog, and give sequence numbers and RTT samples."
+rfc = "RFC 9946 §8.2, §9"
+requirements = ["RFC9946-9-L2"]
+reference = []
+tests = [
+    "crates/udpstp-core/tests/interval_classification.rs::a_stop_status_pdu_is_not_classified",
+    "crates/udpstp-core/tests/interval_classification.rs::an_upstream_server_classifies_the_status_pdus_it_sends",
+    "crates/udpstp-core/tests/stop_exchange.rs::load_pdus_arriving_after_stop1_still_count",
+]
+
+# Sending Rate Structure sizes
+
+[[record]]
+id = "ipv4-based-sending-rate-structure-sizes"
+kind = "interpretation"
+summary = "The payload sizes in the Sending Rate Structure are IPv4-based (IP packet size minus 28 bytes), and a Load Sender on IPv6 sends each datagram 20 bytes smaller, unless that would leave less than a Load PDU header, so packet sizes and rates are the same on both address families. This reconciles RFC 9946 §8.1's \"use the parameters unchanged\" with §6.1's maximum IP packet sizes, which a literal reading breaks on IPv6. The IP version comes from each Test Connection's packets, never the socket family: an IPv4-mapped peer is IPv4. OB-UDPST uses the same convention, and our Client can't tell an OB-UDPST Server from another, so both roles always apply it."
+rfc = "RFC 9946 §6.1, §8.1"
+requirements = ["RFC9946-6.1-8", "RFC9946-6.1-9", "RFC9946-6.1-11", "RFC9946-6.1-12", "RFC9946-7.1-5", "RFC9946-8.1-1", "RFC9946-8.1-6"]
+reference = ["ADR 0004"]
+tests = [
+    "crates/udpstp-core/tests/upstream.rs::an_ipv6_client_sends_20_bytes_less",
+    "crates/udpstp-core/tests/upstream.rs::an_ipv6_client_draws_random_sizes_from_32",
+    "crates/udpstp-core/tests/sending_rate_table.rs::every_row_up_to_1_gbps_fits_the_rfc_sizes_and_ob_udpst_client_limits",
+]
+
+[[record]]
+id = "rate-changes-when-a-status-pdu-arrives"
+kind = "deviation"
+deviation = "unmet-should"
+summary = "The Load Sender changes its rate when a Status PDU arrives, as the algorithm decides, not at the next boundary of its own st: the Load Receiver's Trial Intervals, which the Status PDUs close, and the Load Sender's st are the same length but offset by the one-way delay. So one st can carry two rates, and its IP-Layer Sender Bit Rate is their mix."
+rfc = "RFC 9097 §7.3"
+requirements = ["RFC9097-7.3-4"]
+obudpst = "OB-UDPST changes the rate when a Status PDU arrives too."
+default = "on"
+revisit = "If per-st Sender Bit Rates were reported (sender-bit-rate-per-sub-interval) and a clean rate per st mattered: defer each change to the next st boundary."
+reference = []
+tests = ["crates/udpstp-core/tests/algorithm_b.rs::in_fast_mode_each_clean_interval_adds_high_speed_delta_rows"]

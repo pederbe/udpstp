@@ -1,0 +1,141 @@
+name: Package repository
+
+# Adds a published release's .deb and .rpm packages to the signed apt and dnf
+# repository at packages.udpstp.com (contrib/package-repository/README.md).
+# It uses the release assets as published, after checking them against the
+# release's SHA256SUMS and their attestations from release.yml, and never
+# rebuilds the programs. Dispatch on a version tag to retry its publication.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Published release tag, such as v0.1.0
+        required: true
+
+permissions:
+  contents: read
+  attestations: read
+
+# One run at a time. GitHub keeps only the newest pending run in the group, so
+# dispatch backfills one after another, each after the previous has finished.
+concurrency:
+  group: package-repository
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 30
+    # The signing key and storage credentials live only in this environment,
+    # restricted to version-tag delivery.
+    environment: packages
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      GH_TOKEN: ${{ github.token }}
+      BUCKET: udpstp-packages
+      # The account ID isn't sensitive, but it stays out of the repository.
+      AWS_ENDPOINT_URL_S3: https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
+      AWS_DEFAULT_REGION: auto
+      AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+      AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Check the release
+        run: |
+          [[ $TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "not a release tag: $TAG" >&2; exit 1; }
+          test -f contrib/package-repository/udpstp.asc ||
+            { echo "contrib/package-repository/udpstp.asc is not committed" >&2; exit 1; }
+          # The tags endpoint does not return drafts.
+          state=$(gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" --jq '"\(.draft) \(.prerelease)"')
+          test "$state" = "false false" || { echo "$TAG is not a published full release" >&2; exit 1; }
+      - name: Download and verify the packages
+        run: |
+          version=${TAG#v}
+          mkdir "$RUNNER_TEMP/assets"
+          cd "$RUNNER_TEMP/assets"
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern SHA256SUMS
+          for name in "udpstp_${version}-1_amd64.deb" "udpstp_${version}-1_arm64.deb" \
+            "udpstp-${version}-1.x86_64.rpm" "udpstp-${version}-1.aarch64.rpm"; do
+            gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern "$name"
+            grep -E "^[0-9a-f]{64}  \*?$name$" SHA256SUMS | sha256sum -c -
+            gh attestation verify "$name" --repo "$GITHUB_REPOSITORY" --source-ref "refs/tags/$TAG" \
+              --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/release.yml"
+          done
+      - name: Install the repository tools
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -qy --no-install-recommends apt-utils createrepo-c rpm
+      - name: Import the signing key
+        env:
+          PACKAGE_SIGNING_KEY: ${{ secrets.PACKAGE_SIGNING_KEY }}
+        run: |
+          export GNUPGHOME="$RUNNER_TEMP/gnupg"
+          echo "GNUPGHOME=$GNUPGHOME" >> "$GITHUB_ENV"
+          mkdir -m 700 "$GNUPGHOME"
+          printf '%s\n' "$PACKAGE_SIGNING_KEY" | gpg --batch --import
+      - name: Fetch the published repository
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          mkdir "$RUNNER_TEMP/repository"
+          aws s3 sync --only-show-errors "s3://$BUCKET" "$RUNNER_TEMP/repository"
+      # Storage access is weaker than the signing key: every .deb already in
+      # the pool must still be the one its release published before it is
+      # signed into the metadata again. Published RPMs carry the signing key's
+      # signature, which package-repository.sh checks.
+      - name: Check the published packages
+        run: |
+          cd "$RUNNER_TEMP/repository"
+          test -d apt/pool/main/u/udpstp || exit 0
+          for file in apt/pool/main/u/udpstp/*.deb; do
+            name=$(basename "$file")
+            [[ $name =~ ^udpstp_([0-9]+\.[0-9]+\.[0-9]+)-1_(amd64|arm64)\.deb$ ]] ||
+              { echo "unexpected package $name" >&2; exit 1; }
+            expected=$(curl --proto '=https' -fsSL \
+              "https://github.com/$GITHUB_REPOSITORY/releases/download/v${BASH_REMATCH[1]}/SHA256SUMS" |
+              awk -v name="$name" '$2 == name || $2 == "*" name {print $1}')
+            test -n "$expected" && test "$expected" = "$(sha256sum < "$file" | cut -d' ' -f1)" ||
+              { echo "$name differs from its release" >&2; exit 1; }
+          done
+      - name: Add the packages and sign the repository
+        run: |
+          version=${TAG#v}
+          bash contrib/package-repository/package-repository.sh "$RUNNER_TEMP/repository" \
+            contrib/package-repository/udpstp.asc \
+            "$RUNNER_TEMP/assets/udpstp_${version}-1_amd64.deb" "$RUNNER_TEMP/assets/udpstp_${version}-1_arm64.deb" \
+            "$RUNNER_TEMP/assets/udpstp-${version}-1.x86_64.rpm" "$RUNNER_TEMP/assets/udpstp-${version}-1.aarch64.rpm"
+      - name: Install, upgrade and remove from the repository
+        run: |
+          version=${TAG#v}
+          # When this is the newest version, the next one down is upgraded from;
+          # an older release added later is installed directly.
+          versions=$(find "$RUNNER_TEMP/repository/apt/pool" -name 'udpstp_*_amd64.deb' -printf '%f\n' |
+            sed 's/^udpstp_\(.*\)-1_amd64\.deb$/\1/' | sort -V)
+          previous=
+          if [ "$(tail -n 1 <<<"$versions")" = "$version" ]; then
+            previous=$(grep -vxF "$version" <<<"$versions" | tail -n 1 || true)
+          fi
+          bash contrib/package-repository/test.sh "$RUNNER_TEMP/repository" "$version" ${previous:+"$previous"}
+      # Publish all immutable references before advancing InRelease and the
+      # dnf mirrorlist. Clients already reading the old generation keep working.
+      - name: Upload
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: bash contrib/package-repository/publish.sh "$RUNNER_TEMP/repository" "$BUCKET"
+      - name: Check the published repository
+        run: |
+          cd "$RUNNER_TEMP/repository"
+          snapshot=$(cat rpm/mirrorlist)
+          snapshot=${snapshot#https://packages.udpstp.com/}
+          snapshot=${snapshot%/}
+          for path in apt/dists/stable/InRelease rpm/mirrorlist \
+              "$snapshot/repodata/repomd.xml" "$snapshot/repodata/repomd.xml.asc" udpstp.asc; do
+            curl --proto '=https' -fsSL "https://packages.udpstp.com/$path" | cmp - "$path"
+          done

@@ -1,0 +1,9 @@
+# RFC 9946 section 2: Conventions and Terminology.
+# Format and ID convention: docs/conformance/README.md.
+
+[[requirement]]
+id = "RFC9946-2-1"
+text = "The key words \"MUST\", \"MUST NOT\", \"REQUIRED\", \"SHALL\", \"SHALL NOT\", \"SHOULD\", \"SHOULD NOT\", \"RECOMMENDED\", \"NOT RECOMMENDED\", \"MAY\", and \"OPTIONAL\" in this document are to be interpreted as described in BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all capitals, as shown here."
+text_sha256 = "94df4f85c1ebff2b"
+state = "not-applicable"
+note = "BCP 14 boilerplate: it defines the keywords and requires nothing of an endpoint."

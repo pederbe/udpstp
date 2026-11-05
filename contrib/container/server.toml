@@ -1,0 +1,5 @@
+# The container image's default configuration: udpstp's defaults.
+# Mount your own at /etc/udpstp/server.toml; `udpstp server
+# --print-config` lists every setting. Set max_hops from the expected
+# path length (RFC 9946 §10). The key file comes from the secret
+# /run/secrets/keys.toml, not from here.

@@ -1,0 +1,39 @@
+# RFC 9946 section 10: Operational Considerations for the Measurement Method.
+# Format and ID convention: docs/conformance/README.md.
+# Section 10.1 has no normative sentences.
+
+[[requirement]]
+id = "RFC9946-10-1"
+text = "The nominal duration of a measurement interval at the Destination, parameter testIntTime, MUST be constrained in a production network, since this is an active test method and it will likely cause congestion on the Src to Dst host path during a test."
+text_sha256 = "a092bc3c5bb26839"
+state = "pending"
+note = "The Server bounds testIntTime; a Consumer's Test Interval is at most 60 s."
+
+[[requirement]]
+id = "RFC9946-10-2"
+text = "It is RECOMMENDED to locate test endpoints as close to the intended measured link(s) as practical."
+text_sha256 = "e4918f70636f7d66"
+state = "operational"
+note = "Where the operator places Clients and Servers."
+
+[[requirement]]
+id = "RFC9946-10-3"
+text = "The testing operator MUST set a value for the MaxHops parameter, based on the expected path length."
+text_sha256 = "08446ad17a6b2189"
+state = "operational"
+note = "The operator sets it; udpstp provides the MaxHops setting (`max_hops`)."
+
+[[requirement]]
+id = "RFC9946-10-4"
+text = "The number of concurrent, independent tests of a path SHALL be limited to one."
+text_sha256 = "bf87cc3728d88b0e"
+state = "deviation"
+reference = "tests-per-source-above-one"
+note = "Tests per source; see also Section 4.2."
+
+[[requirement]]
+id = "RFC9946-10-5"
+text = "It is RECOMMENDED to discontinue non-measurement traffic that shares a subscriber's dedicated resources while testing: measurements may not be accurate, and throughput of competing elastic traffic may be greatly reduced."
+text_sha256 = "b6d230ae378d7681"
+state = "operational"
+note = "What the Consumer does while testing."

@@ -1,0 +1,48 @@
+[package]
+name = "bench-rounds"
+version = "0.0.0"
+description = "The general machinery of a benchmark Round, and Python's semantics for porting a Python tool exactly"
+edition.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+# The bench tooling is never published: its interface is internal
+# until another project uses it.
+publish = false
+
+[dependencies]
+flate2.workspace = true
+getrandom.workspace = true
+indexmap.workspace = true
+serde.workspace = true
+# float_roundtrip: floats parsed exactly, as Python's float() parses them;
+# without it, serde_json misreads about a third of the 17-digit timestamps
+# the sampler writes by one bit.
+serde_json = { workspace = true, features = ["float_roundtrip"] }
+tar.workspace = true
+# signal: the signals and console events that interrupt a Round only
+# raise a flag (interrupt.rs).
+tokio = { workspace = true, features = ["signal"] }
+# A secret's output wiped from memory (process::Runner::run_secret).
+zeroize.workspace = true
+
+# signal: the three signals unblocked at install, and a killed command's
+# whole process group.
+[target."cfg(unix)".dependencies]
+nix = { workspace = true, features = ["signal"] }
+
+# Its own main: the signal tests need a process whose handlers were
+# installed first, as a Round's are, and start it again as a probe.
+[[test]]
+name = "interrupt"
+harness = false
+
+# Its own main: the runner's tests on every platform start the test binary
+# again as the child.
+[[test]]
+name = "runner"
+harness = false
+
+[lints]
+workspace = true

@@ -1,0 +1,49 @@
+[round]
+kind = "server-scale"
+test_interval = 5
+warm_up = 1
+engines = ["udpstp"]
+calibration = []
+runs_at_target = { udpstp = 5 }
+runs_elsewhere = 5
+probe_stop_engines = []
+probe_stop_cases = []
+close_call_runs = 0
+close_call_most = 0
+client_env = { UDPSTP_ENGINE_HOLD_OFF_US = "250" }
+
+[[case]]
+name = "S5d"
+direction = "downstream"
+row = 4
+counts = [150]
+target = 150
+judged = false
+stagger = 0.005
+
+[[case]]
+name = "S20d"
+direction = "downstream"
+row = 4
+counts = [150]
+target = 150
+judged = false
+stagger = 0.02
+
+[[case]]
+name = "S5u"
+direction = "upstream"
+row = 4
+counts = [150]
+target = 150
+judged = false
+stagger = 0.005
+
+[[case]]
+name = "S20u"
+direction = "upstream"
+row = 4
+counts = [150]
+target = 150
+judged = false
+stagger = 0.02

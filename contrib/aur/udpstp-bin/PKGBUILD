@@ -1,0 +1,35 @@
+# The AUR's `udpstp-bin`, from the release's binary archives. The
+# maintainer publishes it to the AUR with each release: set pkgver, run
+# updpkgsums, makepkg --printsrcinfo > .SRCINFO (docs/releasing.md). The
+# checksums must match the release's SHA256SUMS.
+# Maintainer: Peder Bergan <https://pederbe.dev>
+
+pkgname=udpstp-bin
+_pkgname=udpstp
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='udpstp: IP-Layer Capacity measurement with UDPSTP (RFC 9946) (release binary)'
+arch=('x86_64' 'aarch64')
+url='https://udpstp.com'
+license=('MIT OR Apache-2.0')
+depends=('gcc-libs' 'glibc')
+provides=('udpstp')
+conflicts=('udpstp')
+_release="https://github.com/pederbe/udpstp/releases/download/v$pkgver"
+source=("udpstp-server-$pkgver.service::https://raw.githubusercontent.com/pederbe/udpstp/v$pkgver/contrib/systemd/udpstp-server.service")
+source_x86_64=("$_release/udpstp-v$pkgver-x86_64-unknown-linux-gnu.tar.gz")
+source_aarch64=("$_release/udpstp-v$pkgver-aarch64-unknown-linux-gnu.tar.gz")
+sha256sums=('SKIP')
+sha256sums_x86_64=('SKIP')
+sha256sums_aarch64=('SKIP')
+
+package() {
+    cd "udpstp-v$pkgver-$CARCH-unknown-linux-gnu"
+    install -Dm755 udpstp "$pkgdir/usr/bin/udpstp"
+    # The example unit, disabled: the Server needs /etc/udpstp/server.toml
+    # and keys.toml first (docs/guides/hosting-a-server.md).
+    sed 's|/usr/local/bin/udpstp|/usr/bin/udpstp|' "$srcdir/udpstp-server-$pkgver.service" |
+        install -Dm644 /dev/stdin "$pkgdir/usr/lib/systemd/system/udpstp-server.service"
+    install -Dm644 LICENSE-MIT LICENSE-APACHE -t "$pkgdir/usr/share/licenses/$pkgname"
+    install -Dm644 README.md -t "$pkgdir/usr/share/doc/$_pkgname"
+}

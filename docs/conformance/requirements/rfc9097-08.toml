@@ -1,0 +1,350 @@
+# RFC 9097 section 8: Method of Measurement.
+# Imported by RFC 9946 section 5.1 item 12.
+# Format and ID convention: docs/conformance/README.md.
+# Section 8.2 has no BCP 14 keywords.
+# Table 1's "other values NOT RECOMMENDED" (section 8.1) is split across table cells and can't be quoted.
+
+[[requirement]]
+id = "RFC9097-8-1"
+text = "It is REQUIRED per the architecture of the method that two cooperating hosts operate in the roles of Src (test packet Sender) and Dst (Receiver) with a measured path and return path between them."
+text_sha256 = "12d002b6e7331c95"
+state = "pending"
+note = "Load Sender and Load Receiver."
+
+[[requirement]]
+id = "RFC9097-8-2"
+text = "The duration of a test, Parameter I, MUST be constrained in a production network, since this is an active test method and it will likely cause congestion on the path from the Src host to the Dst host during a test."
+text_sha256 = "b38be12ce9f2542c"
+state = "pending"
+note = "testIntTime's maximum."
+
+[[requirement]]
+id = "RFC9097-8.1-1"
+text = "The algorithm described in this section MUST NOT be used as a general Congestion Control Algorithm (CCA)."
+text_sha256 = "a3911d4c1601c803"
+state = "operational"
+note = "RFC 9946 section 5.1 item 1 says the same."
+
+[[requirement]]
+id = "RFC9097-8.1-2"
+text = "A table SHALL be pre-built (by the test administrator), defining all the offered load rates that will be supported (R1 through Rn, in ascending order, corresponding to indexed rows in the table)."
+text_sha256 = "7513a876e31c08c8"
+state = "pending"
+note = "Sending Rate Table."
+
+[[requirement]]
+id = "RFC9097-8.1-3"
+text = "It is RECOMMENDED that rates begin with 0.5 Mbps at index zero, use 1 Mbps at index one, and then continue in 1 Mbps increments to 1 Gbps."
+text_sha256 = "f030dea61ba1ca95"
+state = "deviation"
+reference = "row-zero-below-half-a-megabit"
+note = "Sending Rate Table."
+
+[[requirement]]
+id = "RFC9097-8.1-4"
+text = "Above 1 Gbps, and up to 10 Gbps, it is RECOMMENDED that 100 Mbps increments be used."
+text_sha256 = "599b3c8f40646eb8"
+state = "deviation"
+reference = "table-steps-above-1-gbps"
+note = "Sending Rate Table."
+
+[[requirement]]
+id = "RFC9097-8.1-5"
+text = "Above 10 Gbps, increments of 1 Gbps are RECOMMENDED."
+text_sha256 = "f35ef9a552ddbed6"
+state = "deviation"
+reference = "table-steps-above-1-gbps"
+note = "Sending Rate Table."
+
+[[requirement]]
+id = "RFC9097-8.1-L1"
+text = "A higher initial IP-Layer Sender Bit Rate might be configured when the test operator is certain that the Maximum IP- Layer Capacity is well above the initial IP-Layer Sender Bit Rate and factors such as test duration and total test traffic play an important role."
+text_sha256 = "4ad137e4214b395e"
+state = "pending"
+note = "A Search Test may start at a requested srIndexConf row."
+
+[[requirement]]
+id = "RFC9097-8.1-6"
+text = "The sending rate table SHOULD bracket the Maximum Capacity where it will make measurements, including constrained rates less than 500 kbps if applicable."
+text_sha256 = "54fb998b6959fe53"
+state = "pending"
+note = "Sending Rate Table."
+
+[[requirement]]
+id = "RFC9097-8.1-L2"
+text = "Each rate is defined as datagrams of size ss, sent as a burst of count cc, each time interval tt (the default for tt is 100 microsec, a likely system tick interval)."
+text_sha256 = "b4e1f31894fb7fe7"
+state = "pending"
+note = "Sending Rate Structure: txInterval, udpPayload, burstSize."
+
+[[requirement]]
+id = "RFC9097-8.1-L3"
+text = "While it is advantageous to use datagrams of as large a size as possible, it may be prudent to use a slightly smaller maximum that allows for secondary protocol headers and/or tunneling without resulting in IP-Layer fragmentation."
+text_sha256 = "c425ec368fb75e4d"
+state = "pending"
+note = "Server MTU; the 1250-byte default (RFC9946-6.1-8)."
+
+[[requirement]]
+id = "RFC9097-8.1-L4"
+text = "At the beginning of a test, the Sender begins sending at rate R1 and the Receiver starts a feedback timer of duration FT (while awaiting inbound datagrams)."
+text_sha256 = "b4ec072c12742f65"
+state = "pending"
+note = "Trial Interval."
+
+[[requirement]]
+id = "RFC9097-8.1-L5"
+text = "As datagrams are received, they are checked for sequence number anomalies (loss, out-of-order, duplication, etc.) and the delay range is measured (one-way or round-trip)."
+text_sha256 = "1449a078d5b568ce"
+state = "pending"
+note = "Sequence Errors and delay variation (useOwDelVar)."
+
+[[requirement]]
+id = "RFC9097-8.1-L6"
+text = "This information is accumulated until the feedback timer FT expires and a status feedback message is sent from the Receiver back to the Sender, to communicate this information."
+text_sha256 = "39cbd2b3a2bbc2ab"
+state = "pending"
+note = "Status PDU."
+
+[[requirement]]
+id = "RFC9097-8.1-L7"
+text = "The accumulated statistics are then reset by the Receiver for the next feedback interval."
+text_sha256 = "66af00cd277f8dec"
+state = "pending"
+
+[[requirement]]
+id = "RFC9097-8.1-L8"
+text = "As feedback messages are received back at the Sender, they are evaluated to determine how to adjust the current offered load rate (Rx)."
+text_sha256 = "595fb039aa728c57"
+state = "pending"
+
+[[requirement]]
+id = "RFC9097-8.1-L9"
+text = "If the feedback indicates that no sequence number anomalies were detected AND the delay range was below the lower threshold, the offered load rate is increased."
+text_sha256 = "5eefe348df3a729e"
+state = "pending"
+note = "Clean Interval."
+
+[[requirement]]
+id = "RFC9097-8.1-L10"
+text = "If congestion has not been confirmed up to this point (see below for the method for declaring congestion), the offered load rate is increased by more than one rate setting (e.g., Rx+10)."
+text_sha256 = "38af6b01d60da28d"
+state = "pending"
+note = "Fast Mode."
+
+[[requirement]]
+id = "RFC9097-8.1-L11"
+text = "Conversely, if congestion has been previously confirmed, the offered load rate is only increased by one (Rx+1)."
+text_sha256 = "3a9953f3fa9d56d6"
+state = "pending"
+note = "Single-Step Mode."
+
+[[requirement]]
+id = "RFC9097-8.1-L12"
+text = "However, if a rate threshold above a high sending rate (such as 1 Gbps) is exceeded, the offered load rate is only increased by one (Rx+1) in any congestion state."
+text_sha256 = "87143adc9fc2c568"
+state = "pending"
+
+[[requirement]]
+id = "RFC9097-8.1-L13"
+text = "If the feedback indicates that sequence number anomalies were detected OR the delay range was above the upper threshold, the offered load rate is decreased."
+text_sha256 = "393cd85bf1177cec"
+state = "pending"
+note = "Errored Interval."
+
+[[requirement]]
+id = "RFC9097-8.1-7"
+text = "The RECOMMENDED threshold values are 10 for sequence number gaps and 30 msec for lower and 90 msec for upper delay thresholds, respectively."
+text_sha256 = "96978ac3eaf5f4fa"
+state = "pending"
+note = "seqErrThresh, lowThresh, upperThresh; RFC 9946 section 5.1 item 6."
+
+[[requirement]]
+id = "RFC9097-8.1-L14"
+text = "Also, if congestion is now confirmed for the first time by the current feedback message being processed, then the offered load rate is decreased by more than one rate setting (e.g., Rx-30)."
+text_sha256 = "275df13cc5108678"
+state = "pending"
+note = "Congestion Confirmed."
+
+[[requirement]]
+id = "RFC9097-8.1-L15"
+text = "In all other cases, the offered load rate is only decreased by one (Rx-1)."
+text_sha256 = "a20946b99a79d5e0"
+state = "pending"
+
+[[requirement]]
+id = "RFC9097-8.1-L16"
+text = "If the feedback indicates that there were no sequence number anomalies AND the delay range was above the lower threshold but below the upper threshold, the offered load rate is not changed."
+text_sha256 = "9821878915db63a2"
+state = "pending"
+note = "Hold Interval."
+
+[[requirement]]
+id = "RFC9097-8.1-L17"
+text = "Lastly, the method for inferring congestion is that there were sequence number anomalies AND/OR the delay range was above the upper threshold for three consecutive feedback intervals."
+text_sha256 = "9c83966af588caed"
+state = "pending"
+note = "Congestion; slowAdjThresh."
+
+[[requirement]]
+id = "RFC9097-8.1-8"
+text = "The load rate adjustment algorithm MUST include timers that stop the test when received packet streams cease unexpectedly."
+text_sha256 = "a513653621ae4c14"
+state = "pending"
+note = "ADR 0002; RFC 9946 section 5.1 item 7."
+
+[[requirement]]
+id = "RFC9097-8.1-9"
+text = "The load packet timeout SHALL be reset to the configured value each time a load packet is received."
+text_sha256 = "a001684445c4289c"
+state = "pending"
+note = "ADR 0002; RFC 9946 section 5.1 item 8."
+
+[[requirement]]
+id = "RFC9097-8.1-10"
+text = "If the timeout expires, the Receiver SHALL be closed and no further feedback sent."
+text_sha256 = "8e569e27fefa5540"
+state = "pending"
+note = "Load packet timeout. ADR 0002."
+
+[[requirement]]
+id = "RFC9097-8.1-11"
+text = "The feedback message timeout SHALL be reset to the configured value each time a feedback message is received."
+text_sha256 = "895846c4982d7ab9"
+state = "pending"
+note = "ADR 0002; RFC 9946 section 5.1 item 9."
+
+[[requirement]]
+id = "RFC9097-8.1-12"
+text = "If the timeout expires, the Sender SHALL be closed and no further load packets sent."
+text_sha256 = "cc5c6771cdda2bca"
+state = "pending"
+note = "The Status PDU timeout, RFC 9097's \"feedback message\" timeout. ADR 0002."
+
+[[requirement]]
+id = "RFC9097-8.1-L18"
+text = "If no status feedback messages arrive at the Sender for the interval greater than the Lost Status Backoff timeout:"
+text_sha256 = "6ce13be6d77510c0"
+state = "pending"
+note = "Lost Status Backoff: UDRT + (2+w)*FT, from the last message of any type received."
+
+[[requirement]]
+id = "RFC9097-8.1-L19"
+text = "Beginning when the last message (of any type) was successfully received at the Sender:"
+text_sha256 = "5f12d105e3e5c035"
+state = "pending"
+note = "Lost Status Backoff timer start."
+
+[[requirement]]
+id = "RFC9097-8.1-13"
+text = "The offered load SHALL then be decreased, following the same process as when the feedback indicates the presence of one or more sequence number anomalies OR the delay range was above the upper threshold (as described above), with the same load rate adjustment algorithm variables in their current state."
+text_sha256 = "c176bfff9ff2de7c"
+state = "deviation"
+reference = "no-lost-status-backoff-upstream"
+note = "Lost Status Backoff."
+
+[[requirement]]
+id = "RFC9097-8.1-14"
+text = "The RECOMMENDED initial value for w is 0, taking a Round-Trip Time (RTT) of less than FT into account."
+text_sha256 = "70de38f66aab176c"
+state = "pending"
+note = "Lost Status Backoff."
+
+[[requirement]]
+id = "RFC9097-8.1-L20"
+text = "A test with an RTT longer than FT is a valid reason to increase the initial value of w appropriately."
+text_sha256 = "d2ff9878bc4929f1"
+state = "pending"
+note = "Lost Status Backoff."
+
+[[requirement]]
+id = "RFC9097-8.1-15"
+text = "Variable w SHALL be incremented by one whenever the Lost Status Backoff timeout is exceeded."
+text_sha256 = "e74ef383594e2018"
+state = "pending"
+note = "Lost Status Backoff."
+
+[[requirement]]
+id = "RFC9097-8.1-L21"
+text = "Also, if congestion is now confirmed for the first time by a Lost Status Backoff timeout, then the offered load rate is decreased by more than one rate setting (e.g., Rx-30)."
+text_sha256 = "7297327d51baf7bc"
+state = "pending"
+note = "Lost Status Backoff."
+
+[[requirement]]
+id = "RFC9097-8.1-L22"
+text = "In all other cases, the offered load rate is only decreased by one (Rx-1)."
+text_sha256 = "a20946b99a79d5e0"
+state = "pending"
+note = "Lost Status Backoff."
+
+[[requirement]]
+id = "RFC9097-8.2-L1"
+text = "It is of course necessary to calibrate the equipment performing the IP-Layer Capacity measurement, to ensure that the expected capacity can be measured accurately and that equipment choices (processing speed, interface bandwidth, etc.) are suitably matched to the measurement range."
+text_sha256 = "817f414df9053660"
+state = "operational"
+note = "Deployment of the measurement hosts."
+
+[[requirement]]
+id = "RFC9097-8.2-L2"
+text = "Samples exhibiting supra-threshold packet losses or increasing queue occupation require a repeated search and/or test at a reduced fixed Sender rate for Qualification."
+text_sha256 = "464a9ebc1ba1eab1"
+state = "operational"
+note = "The Operator repeats the Test; a Fixed-Rate Test serves for Qualification."
+
+[[requirement]]
+id = "RFC9097-8.3-1"
+text = "In general, it is RECOMMENDED to locate test endpoints as close to the intended measured link(s) as practical (for reasons of scale, this is not always possible; there is a limit on the number of test endpoints coming from many perspectives -- for example, management and measurement traffic)."
+text_sha256 = "1824b8d5b9125195"
+state = "operational"
+note = "Deployment of the measurement hosts."
+
+[[requirement]]
+id = "RFC9097-8.3-2"
+text = "The testing operator MUST set a value for the MaxHops Parameter, based on the expected path length."
+text_sha256 = "f48cdd4a1aecef65"
+state = "pending"
+note = "MaxHops setting; RFC 9946 section 10."
+
+[[requirement]]
+id = "RFC9097-8.3-3"
+text = "Both load packets and status feedback messages MUST contain sequence numbers; this helps with measurements based on those packets."
+text_sha256 = "5a8f9395f1f4e72e"
+state = "pending"
+note = "lpduSeqNo and spduSeqNo; RFC 9946 section 5.1 item 3."
+
+[[requirement]]
+id = "RFC9097-8.3-4"
+text = "Methods MUST be prepared to provide a short preamble transmission to activate on-demand communications access and to discard the preamble from subsequent test results."
+text_sha256 = "00c3511bc138348f"
+state = "deviation"
+reference = "no-preamble-transmission"
+note = "RFC 9946 defines no preamble; OB-UDPST's JSON reports PreambleDuration 0."
+
+[[requirement]]
+id = "RFC9097-8.3-5"
+text = "If this condition is suspected, alternate configurations SHOULD be used."
+text_sha256 = "3eca56d41505d226"
+state = "operational"
+note = "A shaper or policer whose burst size exceeds the Burst; the user changes the configuration."
+
+[[requirement]]
+id = "RFC9097-8.3-L1"
+text = "Each flow would be controlled using its own implementation of the load rate adjustment (search) algorithm."
+text_sha256 = "73a2bce1f38d72fc"
+state = "pending"
+note = "Each Test Connection of a Multi-Connection Test runs its own Load Rate Adjustment Algorithm."
+
+[[requirement]]
+id = "RFC9097-8.3-6"
+text = "The number of concurrent, independent tests of a path SHALL be limited to one."
+text_sha256 = "bf87cc3728d88b0e"
+state = "deviation"
+reference = "tests-per-source-above-one"
+note = "RFC 9946 section 4.2 says the same."
+
+[[requirement]]
+id = "RFC9097-8.3-L2"
+text = "As long as both IPv4 packets and IPv6 packets sent/received are standard-formed, this should be allowed (and the change in header size easily accounted for on a per-packet basis)."
+text_sha256 = "358e033d46ebaf5f"
+state = "operational"
+note = "Testing a v4-v6 transition mechanism; nothing in udpstp prevents it."

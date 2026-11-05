@@ -1,0 +1,12 @@
+ErrorStatus 200, not completed: exit 200
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: TestInitiationTimedOut
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: Test Connection 0: no answer from 192.0.2.1:24601 within 3 s
+udpstp: the Test was aborted: fewer than 2 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted

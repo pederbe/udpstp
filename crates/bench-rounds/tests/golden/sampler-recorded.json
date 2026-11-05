@@ -1,0 +1,67 @@
+[
+  {
+    "client_ns": "789",
+    "files": {
+      "123/net/snmp": "Udp: InDatagrams NoPorts InErrors OutDatagrams RcvbufErrors SndbufErrors\nUdp: 12 0 1 22 2 3\n",
+      "123/stat": "123 (udpstp (core)) S 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20\n",
+      "123/task/7/stat": "7 (udpstp-engine-0) S 0 0 0 0 0 0 0 0 0 0 30 20 0 0 0 0 0 0 1 0 0\n",
+      "123/task/7/status": "Name:\tudpstp-engine-0\nvoluntary_ctxt_switches:\t9\nnonvoluntary_ctxt_switches:\t3\n",
+      "123/task/99/stat": "a malformed thread that disappears\n",
+      "123/task/99/status": "voluntary_ctxt_switches: 0\n",
+      "456/stat": "456 (control) S 1 2 3 4 5 6 7 8 9 10 5 6 13 14 15 16 17 18 19 20\n",
+      "456/task/8/stat": "8 (control (worker)) S 0 0 0 0 0 0 0 0 0 0 5 6 0 0 0 0 0 0 1 0 0\n",
+      "456/task/8/status": "voluntary_ctxt_switches: 4\nnonvoluntary_ctxt_switches: 2\n",
+      "789/net/snmp": "Udp: InDatagrams NoPorts InErrors OutDatagrams RcvbufErrors SndbufErrors\nUdp: 44 0 0 66 4 5\n",
+      "stat": "cpu 1 2 3 4 5 6 7 8\ncpu0 10 20 30 40 50 60 70 80 90 100\ncpu2 5 0 1 10 1 1 1 0\nintr 55\n"
+    },
+    "pids": [
+      "123",
+      "456",
+      "999"
+    ],
+    "python": "{\"t\": 1790000000.0, \"cpus\": {\"0\": [10, 20, 30, 40, 50, 60, 70, 80], \"2\": [5, 0, 1, 10, 1, 1, 1, 0]}, \"process\": 34, \"threads\": {\"123/7\": [\"udpstp-engine-0\", 50, 9, 3], \"456/8\": [\"control (worker)\", 11, 4, 2]}, \"udp_server\": {\"InDatagrams\": 12, \"NoPorts\": 0, \"InErrors\": 1, \"OutDatagrams\": 22, \"RcvbufErrors\": 2, \"SndbufErrors\": 3}, \"udp_clients\": {\"InDatagrams\": 44, \"NoPorts\": 0, \"InErrors\": 0, \"OutDatagrams\": 66, \"RcvbufErrors\": 4, \"SndbufErrors\": 5}}\n",
+    "t": 1790000000.0
+  },
+  {
+    "client_ns": "222",
+    "files": {
+      "123/net/snmp": "Udp: InDatagrams NoPorts InErrors OutDatagrams RcvbufErrors SndbufErrors\nUdp: 12 0 1 22 2 3\n",
+      "123/stat": "123 (udpstp (core)) S 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20\n",
+      "123/task/7/stat": "7 (udpstp-engine-0) S 0 0 0 0 0 0 0 0 0 0 30 20 0 0 0 0 0 0 1 0 0\n",
+      "123/task/7/status": "Name:\tudpstp-engine-0\nvoluntary_ctxt_switches:\t9\nnonvoluntary_ctxt_switches:\t3\n",
+      "123/task/99/stat": "a malformed thread that disappears\n",
+      "123/task/99/status": "voluntary_ctxt_switches: 0\n",
+      "456/stat": "456 (control) S 1 2 3 4 5 6 7 8 9 10 5 6 13 14 15 16 17 18 19 20\n",
+      "456/task/8/stat": "8 (control (worker)) S 0 0 0 0 0 0 0 0 0 0 5 6 0 0 0 0 0 0 1 0 0\n",
+      "456/task/8/status": "voluntary_ctxt_switches: 4\nnonvoluntary_ctxt_switches: 2\n",
+      "789/net/snmp": "Udp: InDatagrams NoPorts InErrors OutDatagrams RcvbufErrors SndbufErrors\nUdp: 44 0 0 66 4 5\n",
+      "stat": "cpu 1 2 3 4 5 6 7 8\ncpu0 10 20 30 40 50 60 70 80 90 100\ncpu2 5 0 1 10 1 1 1 0\nintr 55\n"
+    },
+    "pids": [
+      "123"
+    ],
+    "python": "{\"t\": 1790000000.0, \"cpus\": {\"0\": [10, 20, 30, 40, 50, 60, 70, 80], \"2\": [5, 0, 1, 10, 1, 1, 1, 0]}, \"process\": 23, \"threads\": {\"7\": [\"udpstp-engine-0\", 50, 9, 3]}, \"udp_server\": {\"InDatagrams\": 12, \"NoPorts\": 0, \"InErrors\": 1, \"OutDatagrams\": 22, \"RcvbufErrors\": 2, \"SndbufErrors\": 3}, \"udp_clients\": null}\n",
+    "t": 1790000000.0
+  },
+  {
+    "client_ns": null,
+    "files": {
+      "123/net/snmp": "Udp: InDatagrams NoPorts InErrors OutDatagrams RcvbufErrors SndbufErrors\nUdp: 12 0 1 22 2 3\n",
+      "123/stat": "123 (udpstp (core)) S 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20\n",
+      "123/task/7/stat": "7 (udpstp-engine-0) S 0 0 0 0 0 0 0 0 0 0 30 20 0 0 0 0 0 0 1 0 0\n",
+      "123/task/7/status": "Name:\tudpstp-engine-0\nvoluntary_ctxt_switches:\t9\nnonvoluntary_ctxt_switches:\t3\n",
+      "123/task/99/stat": "a malformed thread that disappears\n",
+      "123/task/99/status": "voluntary_ctxt_switches: 0\n",
+      "456/stat": "456 (control) S 1 2 3 4 5 6 7 8 9 10 5 6 13 14 15 16 17 18 19 20\n",
+      "456/task/8/stat": "8 (control (worker)) S 0 0 0 0 0 0 0 0 0 0 5 6 0 0 0 0 0 0 1 0 0\n",
+      "456/task/8/status": "voluntary_ctxt_switches: 4\nnonvoluntary_ctxt_switches: 2\n",
+      "789/net/snmp": "Udp: InDatagrams NoPorts InErrors OutDatagrams RcvbufErrors SndbufErrors\nUdp: 44 0 0 66 4 5\n",
+      "stat": "cpu 1 2 3 4 5 6 7 8\ncpu0 10 20 30 40 50 60 70 80 90 100\ncpu2 5 0 1 10 1 1 1 0\nintr 55\n"
+    },
+    "pids": [
+      "999"
+    ],
+    "python": "",
+    "t": 1790000000.0
+  }
+]

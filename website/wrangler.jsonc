@@ -1,0 +1,23 @@
+// udpstp.com: a static site served by Cloudflare Workers static assets, as
+// configured in this file. There is no Worker script; `wrangler deploy` uploads
+// target/site/public (built by scripts/build-site.sh) and attach the custom
+// domain. Headers come from website/_headers.
+//
+// www.udpstp.com -> udpstp.com needs a Cloudflare Redirect Rule, set in the
+// dashboard (docs/website.md).
+{
+  "name": "udpstp",
+  "compatibility_date": "2026-09-26",
+  "assets": {
+    "directory": "../target/site/public",
+    "html_handling": "none",
+    "not_found_handling": "404-page"
+  },
+  // Only the custom domain serves the site: no *.workers.dev or preview URLs
+  // that search engines could index.
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [
+    { "pattern": "udpstp.com", "custom_domain": true }
+  ]
+}

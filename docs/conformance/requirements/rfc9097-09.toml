@@ -1,0 +1,103 @@
+# RFC 9097 section 9: Reporting Formats.
+# Imported by RFC 9946 section 5.1 item 12.
+# Format and ID convention: docs/conformance/README.md.
+# Section 9.1 has no normative sentences.
+
+[[requirement]]
+id = "RFC9097-9-1"
+text = "The Singleton IP-Layer Capacity results SHOULD be accompanied by the context under which they were measured. * Timestamp (especially the time when the maximum was observed in dtn). * Source and Destination (by IP or other meaningful ID). * Other inner Parameters of the test case (Section 4). * Outer Parameters, such as \"test conducted in motion\" or other factors belonging to the context of the measurement. * Result validity (indicating cases where the process was somehow interrupted or the attempt failed). * A field where unusual circumstances could be documented, and another one for \"ignore / mask out\" purposes in further processing."
+text_sha256 = "f9dd2acac95a0862"
+state = "pending"
+
+[[requirement]]
+id = "RFC9097-9-2"
+text = "The Maximum IP-Layer Capacity results SHOULD be reported in tabular format."
+text_sha256 = "587f7ea582e4f018"
+state = "deviation"
+reference = "compact-human-final-metrics"
+
+[[requirement]]
+id = "RFC9097-9-3"
+text = "There SHOULD be a column that identifies the test Phase."
+text_sha256 = "004482f2651de886"
+state = "deviation"
+reference = "compact-human-final-metrics"
+note = "Maximum IP-Layer Capacity table."
+
+[[requirement]]
+id = "RFC9097-9-4"
+text = "There SHOULD be a column listing the number of flows used in that Phase."
+text_sha256 = "7e76cfd6cdbca6a1"
+state = "deviation"
+reference = "compact-human-final-metrics"
+
+[[requirement]]
+id = "RFC9097-9-5"
+text = "The remaining columns SHOULD report the following results for the aggregate of all flows, including the Maximum IP-Layer Capacity, the Loss Ratio, the RTT minimum, RTT maximum, and other metrics tested having similar relevance."
+text_sha256 = "8cce5b85279fdff3"
+state = "deviation"
+reference = "compact-human-final-metrics"
+
+[[requirement]]
+id = "RFC9097-9-6"
+text = "As mentioned in Section 6.6, bimodal (or multi-modal) maxima SHALL be reported for each mode separately."
+text_sha256 = "331d52697c1957a8"
+state = "pending"
+note = "Capacity Modes; restates RFC9097-6.6-3."
+
+[[requirement]]
+id = "RFC9097-9-7"
+text = "The sub-interval time, dt, MUST accompany a report of Maximum IP- Layer Capacity results, as well as the remaining Parameters from Section 4 (\"General Parameters and Definitions\")."
+text_sha256 = "64738491fe2567c0"
+state = "pending"
+
+[[requirement]]
+id = "RFC9097-9-8"
+text = "The PM list metrics corresponding to the sub-interval where the Maximum Capacity occurred MUST accompany a report of Maximum IP-Layer Capacity results, for each test Phase."
+text_sha256 = "6ac4bb1472fb6c7a"
+state = "pending"
+
+[[requirement]]
+id = "RFC9097-9-9"
+text = "The IP-Layer Sender Bit Rate results SHOULD be reported in tabular format."
+text_sha256 = "62253d80f7a21a9b"
+state = "pending"
+
+[[requirement]]
+id = "RFC9097-9-10"
+text = "There SHOULD be a column that identifies the test Phase."
+text_sha256 = "004482f2651de886"
+state = "pending"
+note = "The table of IP-Layer Sender Bit Rates."
+
+[[requirement]]
+id = "RFC9097-9-11"
+text = "There SHOULD be a column listing each individual (numbered) flow used in that Phase, or the aggregate of flows in that Phase."
+text_sha256 = "e6ea66bccb16c249"
+state = "deviation"
+reference = "sender-bit-rate-per-sub-interval"
+
+[[requirement]]
+id = "RFC9097-9-12"
+text = "A corresponding column SHOULD identify the specific sending rate sub- interval, stn, for each flow and aggregate."
+text_sha256 = "15067fc7f261d815"
+state = "deviation"
+reference = "sender-bit-rate-per-sub-interval"
+
+[[requirement]]
+id = "RFC9097-9-13"
+text = "A final column SHOULD report the IP-Layer Sender Bit Rate results for each flow used, or the aggregate of all flows."
+text_sha256 = "a9e3fb42e36fc63d"
+state = "pending"
+
+[[requirement]]
+id = "RFC9097-9-14"
+text = "The sub-interval duration, st, MUST accompany a report of Sender IP- Layer Bit Rate results."
+text_sha256 = "ea2334f69911b805"
+state = "pending"
+
+[[requirement]]
+id = "RFC9097-9-15"
+text = "Also, the values of the remaining Parameters from Section 4 (\"General Parameters and Definitions\") MUST be reported."
+text_sha256 = "2b777ad62f515ac0"
+state = "pending"

@@ -1,0 +1,339 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  queue: ${{ github.event_name == 'pull_request' && 'single' || 'max' }}
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  select:
+    name: Select checks
+    if: github.event_name == 'workflow_dispatch' || !github.event.repository.private
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    outputs:
+      full: ${{ steps.paths.outputs.full }}
+      website: ${{ steps.paths.outputs.website }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: paths
+        shell: bash
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          set -euo pipefail
+          full=false
+          website=false
+          if [ "$EVENT" = workflow_dispatch ] || [ -z "$BASE" ] || ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+            full=true
+            website=true
+          else
+            git diff --no-renames --name-only -z "$BASE" HEAD > "$RUNNER_TEMP/changed-paths"
+            while IFS= read -r -d '' path; do
+              # Keep the full-input boundary from scripts/check-commit.sh.
+              case "$path" in
+                crates/*|scripts/*|xtask/*|fuzz/*|tools/*|tests/*|fixtures/*|examples/*|contrib/*|.github/*|docs/adr/*|docs/conformance/*|docs/rfc/*|docs/guides/windows.md) full=true ;;
+                *.md|docs/*|website/*) ;;
+                *) full=true ;;
+              esac
+              case "$path" in
+                website/*|docs/*|GLOSSARY.md|README.md|CONTRIBUTING.md|CHANGELOG.md|SECURITY.md|Cargo*|rust-toolchain.toml|crates/udpstp/*|crates/udpstp-core/src/*|crates/udpstp-runtime/src/*|xtask/*|scripts/build-site.sh|install/*|.github/workflows/ci.yml|.github/workflows/website.yml) website=true ;;
+              esac
+            done < "$RUNNER_TEMP/changed-paths"
+          fi
+          printf 'full=%s\nwebsite=%s\n' "$full" "$website" >> "$GITHUB_OUTPUT"
+
+  docs:
+    name: Documentation
+    needs: select
+    if: needs.select.outputs.full == 'false'
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo run --locked --package xtask -- links
+      - run: cargo run --locked --package xtask -- glossary
+
+  release-changelog:
+    name: Release changelog tooling
+    if: github.event_name == 'workflow_dispatch' || !github.event.repository.private
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: rustup toolchain install
+      - run: bash scripts/check-release-changelog.sh
+
+  check:
+    name: ${{ matrix.os }}
+    needs: select
+    if: needs.select.outputs.full == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-26.04, ubuntu-26.04-arm, windows-2025, macos-15, macos-15-intel]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      # Installs the toolchain pinned in rust-toolchain.toml.
+      - run: rustup toolchain install
+      # Caches the dependencies' builds; saved from main only.
+      - uses: Swatinem/rust-cache@v2
+        with:
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+      - run: cargo fmt --all --check
+      - run: cargo clippy --locked --workspace --all-targets -- -D warnings
+      - name: Initialize Windows PowerShell fixtures
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSVersionTable.PSVersion
+          Get-Command Get-Acl | Select-Object Name, Source
+          [Security.AccessControl.FileSecurity]::new() | Out-Null
+      - run: cargo test --locked --workspace
+      - name: Traceability check
+        run: cargo run --locked --package xtask -- req
+      - name: Conformance summary is up to date
+        shell: bash
+        run: |
+          if [ -n "$(git status --porcelain -- docs/conformance/summary.md docs/conformance/interop-masks.toml)" ]; then
+            git diff -- docs/conformance/summary.md docs/conformance/interop-masks.toml
+            echo "docs/conformance/summary.md or interop-masks.toml is stale: run cargo xtask req and commit them"
+            exit 1
+          fi
+      - name: Documentation links
+        run: cargo run --locked --package xtask -- links
+      - name: Glossary terms
+        run: cargo run --locked --package xtask -- glossary
+      # The network-namespace tier (docs/testing.md), rootless: Ubuntu
+      # restricts unprivileged user namespaces, which the VM can lift.
+      - name: Documentation and a dry-run publish
+        if: runner.os == 'Linux'
+        env:
+          RUSTDOCFLAGS: -D warnings
+        run: |
+          cargo doc --locked --workspace --no-deps
+          cargo publish --locked --workspace --dry-run
+      - name: Fuzz targets build
+        if: runner.os == 'Linux'
+        run: cargo clippy --locked --manifest-path fuzz/Cargo.toml --all-targets -- -D warnings
+      # The example unit: verified, its exposure checked, and run
+      # as a system service, with DynamicUser= and its key credential,
+      # serving a Test. Its ProcSubset=pid hides /proc/net, which only a
+      # system service gets: the Server must still read each Test
+      # Connection's Receive Buffer Overflows and log them.
+      - name: systemd unit
+        if: runner.os == 'Linux'
+        run: |
+          scripts/systemd-check.sh
+          sudo install -m 755 target/debug/udpstp /usr/local/bin/udpstp
+          sudo install -d -m 755 /etc/udpstp
+          printf '[[key]]\nadmin_key_name = "ci"\nkey_id = 1\nkey_text = "ci-unit-key"\n' > "$RUNNER_TEMP/keys.toml"
+          chmod 600 "$RUNNER_TEMP/keys.toml"
+          sudo install -m 600 "$RUNNER_TEMP/keys.toml" /etc/udpstp/keys.toml
+          printf 'max_hops = 8\nlog_format = "json"\n' | sudo tee /etc/udpstp/server.toml > /dev/null
+          sudo install -m 644 contrib/systemd/udpstp-server.service /etc/systemd/system/
+          sudo systemctl daemon-reload
+          sudo systemctl start udpstp-server
+          sleep 1
+          systemctl is-active udpstp-server || { sudo journalctl -u udpstp-server --no-pager; exit 1; }
+          udpstp client --key-file "$RUNNER_TEMP/keys.toml" --test-interval 5 127.0.0.1 || { sudo journalctl -u udpstp-server --no-pager; exit 1; }
+          sleep 1
+          sudo journalctl -u udpstp-server -o cat --no-pager | grep '"event":"DataPhaseEnded"' | grep -q '"receive_buffer_overflows":' || { echo "No Receive Buffer Overflows under the unit"; sudo journalctl -u udpstp-server --no-pager; exit 1; }
+      # The Server's container image: built, serving a Test with
+      # the host's network, and stopping on SIGTERM.
+      - name: Container image
+        if: runner.os == 'Linux'
+        run: scripts/container-check.sh target/debug/udpstp
+      - name: Network-namespace tier
+        if: runner.os == 'Linux'
+        run: |
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+          scripts/netns-test.sh --strict
+      # The install scripts, against a fake release served from
+      # 127.0.0.1; the install job runs install.sh on other distributions.
+      - name: Install script
+        if: runner.os != 'Windows'
+        run: sh scripts/install-test.sh
+      - name: Install script (Windows PowerShell and PowerShell 7)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install-test.ps1
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          pwsh -NoProfile -File scripts/install-test.ps1
+      # The Server as a Windows service, installed with
+      # contrib/windows/udpstp-server.ps1 on the runner, which may be
+      # changed: its configuration, a Test, its stop during a Test, a
+      # failed start, and its removal.
+      - name: Windows service
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File scripts/windows-service-check.ps1 -Udpstp target/debug/udpstp.exe -AllowMachineChanges
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+  # install.sh on the Linux distributions it is meant for, against
+  # a fake release served from 127.0.0.1 (scripts/install-test.sh): glibc
+  # (Debian, Fedora, Arch), and musl (Alpine), where it installs the static
+  # musl build, with or without gcompat's glibc loader.
+  install:
+    name: Install script (${{ matrix.distribution }})
+    needs: select
+    if: needs.select.outputs.full == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - distribution: Debian
+            image: debian:stable-slim
+            setup: apt-get update && apt-get install -y --no-install-recommends python3 curl ca-certificates
+          - distribution: Fedora
+            image: fedora:latest
+            setup: dnf install -y python3 tar gzip diffutils
+          - distribution: Arch
+            image: archlinux:latest
+            setup: pacman -Syu --noconfirm python diffutils
+          - distribution: Alpine
+            image: alpine:latest
+            setup: apk add --no-cache python3
+    container: ${{ matrix.image }}
+    steps:
+      - uses: actions/checkout@v7
+      - run: ${{ matrix.setup }}
+        shell: sh
+      - run: sh scripts/install-test.sh
+        shell: sh
+      - name: With gcompat
+        if: matrix.distribution == 'Alpine'
+        run: apk add --no-cache gcompat && test -e /lib64/ld-linux-x86-64.so.2 && sh scripts/install-test.sh
+        shell: sh
+
+  # The dependencies' advisories, licences and sources (deny.toml).
+  audit:
+    name: Dependency audit
+    needs: select
+    if: needs.select.outputs.full == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check
+
+  # The oldest Rust the workspace supports (rust-version in Cargo.toml;
+  # CONTRIBUTING.md "Rust versions"): build and test with it, on Linux.
+  msrv:
+    name: Oldest supported Rust
+    needs: select
+    if: needs.select.outputs.full == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build and test with rust-version
+        run: |
+          msrv=$(sed -n 's/^rust-version = "\(.*\)"/\1/p' Cargo.toml)
+          rustup toolchain install "$msrv" --profile minimal
+          cargo "+$msrv" test --locked --workspace
+
+  # The OB-UDPST v9.1.0 build interop tests run against (docs/testing.md,
+  # "The pinned OB-UDPST build"), on Linux only.
+  obudpst:
+    name: OB-UDPST
+    needs: select
+    if: needs.select.outputs.full == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - run: sudo apt-get update && sudo apt-get install -y cmake libssl-dev
+      - run: scripts/obudpst-build.sh --check
+
+  website:
+    name: Website
+    needs: select
+    if: needs.select.outputs.website == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - run: rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '26.13.0'
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: mdbook@0.5.4
+      - name: Build and check the website without deployment
+        run: UDPSTP_SITE_REF="$GITHUB_SHA" bash scripts/build-site.sh
+      - name: Check the committed social image against its source
+        run: node website/render.mjs "$RUNNER_TEMP/social-check" --check-social
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: website-${{ github.sha }}
+          path: target/site/public
+          if-no-files-found: error
+          retention-days: 7
+
+  ci:
+    name: CI
+    if: always() && (github.event_name == 'workflow_dispatch' || !github.event.repository.private)
+    needs: [select, docs, release-changelog, check, install, audit, msrv, obudpst, website]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require every intended check to succeed
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          printf '%s\n' "$RESULTS" | jq -e '
+            all(.[]; .result == "success" or .result == "skipped") and
+            .select.result == "success" and .["release-changelog"].result == "success" and
+            (if .select.outputs.full == "true" then
+              [.check, .install, .audit, .msrv, .obudpst] | all(.[]; .result == "success")
+            else .docs.result == "success" end) and
+            (if .select.outputs.website == "true" then .website.result == "success"
+             else .website.result == "skipped" end)'
+
+  deploy-website:
+    needs: [ci, select, website]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.select.outputs.website == 'true' && vars.WEBSITE_ENABLED == 'true' && !github.event.repository.private
+    uses: ./.github/workflows/website.yml
+    with:
+      source: ${{ github.sha }}
+      artifact: website-${{ github.sha }}
+      deploy: true
+    secrets: inherit

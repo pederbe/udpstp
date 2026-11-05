@@ -1,0 +1,76 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/udpstp-wire",
+    "crates/udpstp-core",
+    "crates/udpstp-req",
+    "crates/udpstp-runtime",
+    "crates/udpstp",
+    "crates/udpstp-key-permissions",
+    # The benchmark round tooling, never published.
+    "crates/bench-rounds",
+    "crates/udpstp-bench",
+    "xtask",
+]
+# Its own workspace, built with nightly Rust.
+exclude = ["fuzz"]
+
+[workspace.package]
+edition = "2024"
+authors = ["Peder Bergan"]
+rust-version = "1.98"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/pederbe/udpstp"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+
+[workspace.dependencies]
+udpstp-wire = { path = "crates/udpstp-wire", version = "0.1.0" }
+udpstp-core = { path = "crates/udpstp-core", version = "0.1.0" }
+# Tests only: never published, so cargo drops it from the packages.
+udpstp-req = { path = "crates/udpstp-req" }
+udpstp-runtime = { path = "crates/udpstp-runtime", version = "0.1.0" }
+udpstp-key-permissions = { path = "crates/udpstp-key-permissions", version = "0.1.0" }
+# The bench tooling's general machinery: never published, and only
+# udpstp-bench uses it.
+bench-rounds = { path = "crates/bench-rounds" }
+hmac = { version = "0.13.0", features = ["zeroize"] }
+sha2 = "0.11.1"
+zeroize = { version = "1.9.1", features = ["derive", "serde"] }
+clap = { version = "4.6.7", features = ["derive"] }
+serde = { version = "1.0.229", features = ["derive"] }
+toml = "1.1.8"
+serde_json = "1.0.154"
+# The bench tooling's JSON objects, in document order.
+indexmap = "2.14.2"
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", default-features = false, features = ["fmt", "json", "std"] }
+# The Server's log file, rotated daily.
+tracing-appender = "0.2.5"
+# A Windows service's dispatcher and control handler, without its
+# define_windows_service! macro, which expands `unsafe` into the caller
+# (ADR 0014).
+windows-service = "0.8.1"
+tokio = { version = "1.54.1", features = ["rt", "net", "time", "sync", "macros"] }
+socket2 = { version = "0.6.5", features = ["all"] }
+nix = { version = "0.31.3", default-features = false }
+# `time` only because rustix 1.1.5 fails to build `net` alone on Linux
+# (its socket timeouts need the `timespec` module that `time` enables).
+rustix = { version = "1.1.6", features = ["net", "time"] }
+quinn-udp = { version = "0.6.3", default-features = false }
+# The bench tooling's fetched directories, unpacked in-process:
+# flate2's pure-Rust back end, and tar without xattrs.
+flate2 = "1.1.10"
+tar = { version = "0.4.46", default-features = false }
+# The bench tooling's random names and keys, from the OS's
+# generator.
+getrandom = "0.4.3"
+# Optional measurement-tool profiling, absent from normal builds.
+hotpath = { version = "0.30.3", default-features = false }
+# Tests only: a counting global allocator, for the Data Phase Engine's
+# steady-state allocation check (ADR 0008).
+stats_alloc = "0.1.10"

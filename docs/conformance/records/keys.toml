@@ -1,0 +1,151 @@
+# Conformance records: the key table, key files and key derivation.
+# Format: docs/conformance/README.md; checked by `cargo xtask req`.
+
+[[record]]
+id = "kdf-appendix-a-layout"
+kind = "interpretation"
+summary = "The KDF's fixed input is laid out as RFC 9946 Appendix A's OpenSSL call builds it: BE32(counter), \"UDPSTP\", a zero byte, the decimal authUnixTime of the first Setup Request, BE32(512). §5.4.1's prose fits at least five layouts; Appendix A is the only one the RFC pins down, and OB-UDPST uses it too. The Shared Key goes in as raw bytes, never cut at a zero byte as Appendix A's strlen(Kin) would; for text keys the two agree."
+rfc = "RFC 9946 §5.4.1"
+requirements = ["RFC9946-5.4.1-3"]
+reference = ["ADR 0001"]
+tests = [
+  "crates/udpstp-wire/tests/kdf_kat.rs::derived_keys_match_every_openssl_vector",
+  "crates/udpstp-wire/tests/kdf_kat.rs::vectors_cover_authunixtime_extremes_and_zero_bytes_in_keys",
+]
+
+[[record]]
+id = "key-table-lifetimes"
+kind = "interpretation"
+summary = "The Server finds a key by keyId among the rows whose accept lifetime includes its own wall clock; a keyId with rows but none in its accept lifetime is an authentication failure. The Client sends with the row whose send lifetime includes its wall clock, preferring the newest SendLifetimeStart. Bounds are inclusive and no clock-skew grace is added. Rows may share a keyId only if neither their accept nor their send lifetimes overlap, so a keyId always selects at most one row. Established Test Connections keep their Derived Keys when a lifetime ends."
+rfc = "RFC 9946 §5.4, RFC 7210 §3"
+requirements = ["RFC9946-5.4-3"]
+reference = ["ADR 0010"]
+tests = [
+  "crates/udpstp-core/tests/key_table.rs::a_key_outside_its_accept_lifetime_is_an_authentication_failure",
+  "crates/udpstp-core/tests/key_table.rs::a_key_is_accepted_on_the_edges_of_its_accept_lifetime",
+  "crates/udpstp-core/tests/key_table.rs::a_shared_key_id_uses_the_row_valid_at_the_time",
+  "crates/udpstp-core/tests/key_table.rs::rows_sharing_a_key_id_must_not_overlap",
+  "crates/udpstp-core/tests/key_table.rs::the_client_sends_with_the_newest_valid_key",
+  "crates/udpstp-core/tests/key_table.rs::a_client_without_a_valid_send_key_does_not_start",
+  "crates/udpstp/tests/loopback.rs::the_server_ignores_a_key_past_its_accept_lifetime",
+]
+
+[[record]]
+id = "key-table-alg-id"
+kind = "interpretation"
+summary = "A Key Table row's KDF is `HMAC-SHA-256`, its IANA \"KeyTable KDFs\" name, standing for §5.4.1's counter-mode construction. The \"KeyTable AlgIDs\" registry has no value for the authDigest algorithm, so the AlgID is the unregistered name `HMAC-SHA-256`, mirroring the KDF. Both may be left out, and no other value is accepted. LocalKeyName is the keyId."
+rfc = "RFC 9946 §5.4, RFC 7210 §2"
+requirements = ["RFC9946-5.4-3", "RFC9946-5.4-4"]
+reference = ["ADR 0010", "docs/spec.md"]
+tests = [
+  "crates/udpstp/tests/key_files.rs::the_server_loads_a_toml_key_table",
+  "crates/udpstp/tests/key_files.rs::an_invalid_key_file_exits_with_51_and_says_where",
+]
+
+[[record]]
+id = "key-table-operator-extension"
+kind = "interpretation"
+summary = "A TOML Key Table row may carry `operator = true`, making it an Operator Key, and an Operator Key may carry `max_test_interval`, its own maximum Test Interval of at least 60 s. RFC 7210 has no column for either; RFC 9946 §5.4 asks for \"(at least)\" its fields, so these are extensions of our key file format. Operator-only Fixed-Rate Tests and Tests longer than 60 s need them."
+rfc = "RFC 9946 §5.4, RFC 7210 §2"
+requirements = ["RFC9946-5.4-3"]
+obudpst = "OB-UDPST key files have only a keyId and a key: no role and no per-key Test Interval."
+reference = ["ADR 0010", "docs/spec.md"]
+tests = [
+  "crates/udpstp/tests/key_files.rs::the_server_loads_a_toml_key_table",
+  "crates/udpstp/tests/key_files.rs::an_invalid_key_file_exits_with_51_and_says_where",
+  "crates/udpstp/tests/loopback.rs::fixed_rate_tests_complete_over_loopback",
+]
+
+[[record]]
+id = "key-lifetime-format"
+kind = "interpretation"
+summary = "Lifetimes are written `YYYYMMDDHHMMSSZ`, in UTC, as RFC 7210's prose describes (year, month, day, hour, minute, second), although its format line says `YYYYMMDDHHSSZ`. Leap seconds (second 60) and years before 1970 are refused."
+rfc = "RFC 7210 §2"
+reference = ["ADR 0010"]
+tests = ["crates/udpstp-core/tests/key_table.rs::rfc7210_times_convert_to_unix_seconds"]
+
+[[record]]
+id = "key-text-extension"
+kind = "interpretation"
+summary = "A TOML Key Table row gives its key as exactly one of `key_hex` or `key_text`. `key_hex` accepts upper- and lowercase digits; `key_text` is an extension that takes the key as its UTF-8 bytes, so a text key shared with OB-UDPST needs no conversion. RFC 7210 writes Key as a lowercase hexadecimal string."
+rfc = "RFC 7210 §2"
+reference = ["docs/spec.md"]
+tests = [
+  "crates/udpstp/tests/key_files.rs::the_server_loads_a_toml_key_table",
+  "crates/udpstp/tests/loopback.rs::a_mode1_test_runs_with_a_toml_key_table_and_an_obudpst_key_file",
+]
+
+[[record]]
+id = "obudpst-key-file-reading"
+kind = "obudpst-difference"
+summary = "An OB-UDPST `udpst.keys` file is read as OB-UDPST reads it (comma, space and tab separators; a line ends at `#`, `\\r` or a NUL byte; keyIds as C's strtol reads them; keys of up to 64 bytes), with two exceptions. Lines aren't split at 1023 bytes. A keyId with a `-` sign, or one above 255 before narrowing, is refused."
+obudpst = "OB-UDPST reads lines with fgets into a 1024-byte buffer, so a longer line continues as a new one, and narrows strtol's result to int, so a signed or oversized keyId can wrap into 0-255."
+reference = []
+tests = [
+  "crates/udpstp/tests/key_files.rs::the_server_loads_an_obudpst_key_file",
+  "crates/udpstp/tests/key_files.rs::an_invalid_key_file_exits_with_51_and_says_where",
+  "crates/udpstp/tests/loopback.rs::a_mode1_test_runs_with_a_toml_key_table_and_an_obudpst_key_file",
+  "crates/udpstp/tests/loopback.rs::an_obudpst_key_need_not_be_utf8",
+]
+
+[[record]]
+id = "several-valid-keys-need-key-id"
+kind = "interpretation"
+summary = "When several rows are valid for sending now and tie for the newest SendLifetimeStart (every row of an OB-UDPST key file, which has no lifetimes), the Client doesn't guess: it doesn't start unless `--key-id` pins one. RFC 7210 §3 selects by the newest start and leaves a tie open."
+rfc = "RFC 7210 §3"
+obudpst = "OB-UDPST's Client uses keyId 0 (DEF_KEY_ID) unless `-y` names another, or the only key when the file has one."
+setting = "`--key-id`"
+default = "on"
+reference = ["ADR 0010"]
+tests = [
+  "crates/udpstp-core/tests/key_table.rs::equally_new_send_keys_need_a_pinned_key_id",
+  "crates/udpstp/tests/key_files.rs::an_ambiguous_key_file_asks_for_a_key_id",
+]
+
+[[record]]
+id = "key-file-private"
+kind = "obudpst-difference"
+summary = "On Unix unsafe key-file permissions are refused. Windows assesses and reads the same read-shared file under ADR 0015's supported local-NTFS policy, trusting only the running account, SYSTEM and built-in Administrators. Only a supported policy match proceeds to content reading; mismatches and unverified permissions are distinct key file errors (51), with accurate reasons and remediation, without claiming effective exposure. Server errors reach stderr and any configured startup log; Client failures leave stdout empty. The native unsafe boundary, descriptor bounds, read-only sharing and content wiping remain unchanged. The settings-only preview loads no keys; ordinary print-config still validates them. The manual reconstruction removes explicit outsider grants. The installer validates keys through a real virtual-account trial and contains failures with disabled startup, stopped service and cleared recovery. Protected containing storage remains a deployment assumption. RFC 9946 prescribes no storage algorithm."
+obudpst = "OB-UDPST reads a key file whatever its permissions."
+reference = ["docs/spec.md", "ADR 0015"]
+tests = [
+  "crates/udpstp/tests/key_files.rs::a_key_file_others_can_read_is_refused",
+  "crates/udpstp/tests/key_files.rs::a_key_file_must_be_a_regular_file",
+  "crates/udpstp/tests/key_files.rs::a_private_key_file_loads_on_windows",
+  "crates/udpstp/tests/windows_key_permissions.rs::native_acl_matrix_uses_the_production_assessment",
+  "crates/udpstp/tests/windows_key_permissions.rs::both_roles_refuse_mismatch_and_unverified_without_key_material",
+  "crates/udpstp/tests/windows_key_permissions.rs::native_inspection_failure_and_read_sharing",
+  "crates/udpstp/tests/windows_key_permissions.rs::a_private_file_supports_a_successful_authenticated_test",
+  "crates/udpstp/tests/windows_key_permissions.rs::manual_setup_removes_pre_existing_outsider_grants",
+  "crates/udpstp/tests/windows_key_permissions.rs::refused_server_keys_reach_stderr_and_the_daily_log",
+  "crates/udpstp/tests/cli.rs::settings_only_prints_settings_without_loading_keys_or_opening_logs",
+  "crates/udpstp/tests/cli.rs::settings_only_requires_printing_and_cannot_run_as_a_service",
+]
+
+[[record]]
+id = "key-file-owner"
+kind = "obudpst-difference"
+summary = "On Unix a key file must be owned by the effective user running udpstp or by root; another owner could replace the keys. Running udpstp setuid isn't supported."
+obudpst = "OB-UDPST doesn't check who owns a key file."
+reference = []
+tests = ["crates/udpstp/tests/key_files.rs::a_key_file_owned_by_another_user_is_refused"]
+
+[[record]]
+id = "key-file-size-limit"
+kind = "obudpst-difference"
+summary = "A key file larger than 1 MiB is refused, so it can be read into one buffer that is wiped after parsing."
+obudpst = "OB-UDPST reads a key file of any length, line by line."
+reference = []
+tests = ["crates/udpstp/tests/key_files.rs::an_oversized_key_file_is_refused"]
+
+[[record]]
+id = "derived-keys-depend-only-on-the-row-and-time"
+kind = "interpretation"
+summary = "The Derived Keys are the KDF of a Key Table row's Shared Key and the first Setup Request's authUnixTime, nothing else, so the Server keeps them by row and time and reuses them for the next request with both (a flood costs one KDF run). A Setup Request whose authDigest fails leaves nothing of its own: it is dropped, admits nothing, and no key from it is used for it; a later request with a valid digest would derive the same keys."
+rfc = "RFC 9946 §5.4.1"
+requirements = ["RFC9946-5.4.1-7"]
+reference = []
+tests = [
+  "crates/udpstp-core/src/budget.rs::requests_sharing_a_row_and_time_cost_one_kdf_run",
+  "crates/udpstp-core/tests/setup_mode1.rs::server_silently_drops_a_setup_signed_from_a_different_shared_key",
+]

@@ -1,0 +1,47 @@
+ErrorStatus 0, completed: exit 0
+--- stdout
+--------------------------------------------------------------------------------
+Endpoints
+  Test Connection 0: Client unknown; Server 192.0.2.1:24601
+Results Summary
+  Downstream Search Test with 192.0.2.1:24601, started 2026-09-21T14:13:20Z (T0)
+  Test Interval (I) 5 s · 5 Sub-Intervals (dt) 1000 ms · Trial Interval (FT) and
+    st 50 ms
+  1 Test Connection (F) · MaxHops 16 · DSCP 0 agreed
+  Performance Criterion: loss ≤ 1% or one Load PDU · Tmax ≤ 1000 ms
+  Late Load PDUs count in the Sub-Interval where their gap was seen.
+  The Server set testIntTime to 5 (asked for 10)
+
+  Sub-Interval results
+  SI  C (Mbps)  Loss Ratio  Lost  Reordered  Duplicates  DV (ms)  RTTV (ms)
+   1     40.00    0.000000     0          0           0   0/7/12    0-12, 8
+   2     60.00    0.000000     0          0           0   0/7/12    0-12, 8
+   3     61.00    0.080037    87          0           0   0/7/12    0-12, 8
+   4     28.00    0.082569    90          0           0   0/7/12    0-12, 8
+   5     27.00    0.082569    90          0           0   0/7/12    0-12, 8
+  SI: Sub-Interval · C: IP-Layer Capacity
+  DV: delay variation (min/avg/max) · RTTV: RTT variation (min-max, avg) · -: no
+    measurement
+
+Final metrics
+  Maximum IP-Layer Capacity: 60.00 Mbps (Sub-Interval 2)
+  Maximum Sub-Interval result received at 2026-09-21T14:13:22.017000000Z
+  Loss Ratio 0.000000, RTT minimum 1 ms, maximum 13 ms; Highest IP-Layer
+    Capacity 61.00 Mbps in Sub-Interval 3 (Loss Ratio 0.080037)
+  RTT minimum 1 ms
+  Minimum one-way delay 0 ms (clockDeltaMin; valid only if the clocks are
+    synchronized)
+
+  Warnings
+    Sub-Interval 5, the last, ran at 27.00 Mbps, 45.0% of the Maximum IP-Layer
+      Capacity of 60.00 Mbps, with a Loss Ratio of 0.082569, and no Sub-Interval
+      after the Maximum's met the Performance Criterion (--max-loss-ratio 0.01):
+      a queue may have kept dropping after it overflowed (such as CAKE with one
+      Test Connection), the path may have slowed during the Test, or the Server
+      may have fallen behind, so the Maximum may be well below the path, or no
+      longer what it carries
+
+  This host: DF set, socket buffers receive 4194304 and send 4194304 bytes;
+    portable Data Phase Engine, no fast paths
+--------------------------------------------------------------------------------
+Test outcome: completed with warnings or qualified results

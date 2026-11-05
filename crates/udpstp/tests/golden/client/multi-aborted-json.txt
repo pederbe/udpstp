@@ -1,0 +1,245 @@
+ErrorStatus 203, not completed: exit 203
+--- stderr
+udpstp: WARNING: Test Connection 0 to 192.0.2.1:24601: Stopped
+udpstp: WARNING: Test Connection 1 to 192.0.2.2:24601: Stopped
+udpstp: ERROR: the Test was aborted: the Server gave Test Connection 1 other parameters than the first
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"Input":	{
+		"Interface":	"",
+		"Role":	"Receiver",
+		"ID":	45366,
+		"Host":	"192.0.2.1",
+		"HostIPAddress":	"192.0.2.1",
+		"Port":	51646,
+		"NumberOfHosts":	2,
+		"HostList":	[{
+				"Host":	"192.0.2.1",
+				"HostIPAddress":	"192.0.2.1",
+				"ControlPort":	24601
+			}, {
+				"Host":	"192.0.2.2",
+				"HostIPAddress":	"192.0.2.2",
+				"ControlPort":	24601
+			}],
+		"ClientIPAddress":	"",
+		"ClientPort":	40000,
+		"JumboFramesPermitted":	1,
+		"NumberOfConnections":	2,
+		"MinNumOfConnections":	2,
+		"DSCP":	0,
+		"ECN":	0,
+		"CEThreshold":	0,
+		"ProtocolVersion":	"Any",
+		"UDPPayloadMin":	52,
+		"UDPPayloadMax":	8972,
+		"UDPPayloadDefault":	1222,
+		"UDPPayloadContent":	"zeroes",
+		"TestType":	"Search",
+		"IPDVEnable":	1,
+		"IPRREnable":	1,
+		"RIPREnable":	1,
+		"PreambleDuration":	0,
+		"MaxRequiredBandwidth":	0,
+		"StartSendingRateIndex":	0,
+		"SendingRateIndex":	-1,
+		"NumberTestSubIntervals":	5,
+		"NumberFirstModeTestSubIntervals":	0,
+		"NumberFirstModeSuppSubIntervals":	0,
+		"TestSubInterval":	1000,
+		"StatusFeedbackInterval":	50,
+		"TimeoutNoTestTraffic":	1000,
+		"TimeoutNoStatusMessage":	1000,
+		"Tmax":	1000,
+		"TmaxRTT":	3000,
+		"TimestampResolution":	1,
+		"SeqErrThresh":	10,
+		"ReordDupIgnoreEnable":	1,
+		"LowerThresh":	30,
+		"UpperThresh":	90,
+		"HighSpeedDelta":	10,
+		"SlowAdjThresh":	3,
+		"HSpeedThresh":	1000000000,
+		"RateAdjAlgorithm":	"B",
+		"InterfaceDeterminesMax":	0
+	},
+	"Output":	{
+		"BOMTime":	"2026-09-21T14:13:20.000000Z",
+		"TmaxUsed":	1000,
+		"TestInterval":	5,
+		"TmaxRTTUsed":	3000,
+		"TimestampResolutionUsed":	1,
+		"EOMTime":	"2026-09-21T14:13:36.000000Z",
+		"Status":	"Error_Other"
+	},
+	"ErrorStatus":	203,
+	"ErrorMessage":	"ERROR: the Test was aborted: the Server gave Test Connection 1 other parameters than the first",
+	"ErrorMessage2":	"WARNING: Test Connection 1 to 192.0.2.2:24601: Stopped",
+	"udpstp":	{
+		"Warnings":	[{
+				"Code":	"InvalidLoadPdus",
+				"Count":	4,
+				"Message":	"4 invalid Load PDUs ignored"
+			}, {
+				"Code":	"DataPhaseEnded",
+				"Count":	1,
+				"Message":	"Test Connection 0 ended without the Server's STOP: Stopped"
+			}, {
+				"Code":	"DataPhaseEnded",
+				"Count":	1,
+				"Message":	"Test Connection 1 ended without the Server's STOP: Stopped"
+			}, {
+				"Code":	"ReceiveBufferOverflows",
+				"Count":	3,
+				"Message":	"3 datagrams discarded by this host before udpstp read them: its receive buffer overflowed (Receive Buffer Overflows), and a Load Receiver counts them as lost"
+			}],
+		"EndReason":	"ParametersDiffer",
+		"ControlPhaseFailure":	null,
+		"Coercions":	[{
+				"McIndex":	0,
+				"Parameter":	"testIntTime",
+				"Requested":	10,
+				"Coerced":	5
+			}, {
+				"McIndex":	1,
+				"Parameter":	"testIntTime",
+				"Requested":	10,
+				"Coerced":	5
+			}],
+		"DontFragment":	true,
+		"SocketBuffers":	{
+			"Requested":	2097152,
+			"Receive":	4194304,
+			"Send":	4194304
+		},
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[],
+		"PerformanceCriterion":	{
+			"MaxLossRatio":	0.010000000
+		},
+		"CapacityModes":	[{
+				"Mode":	1,
+				"SubIntervals":	[1, 5],
+				"Valid":	true,
+				"MaximumIPLayerCapacity":	{
+					"SubInterval":	2,
+					"IPLayerCapacity":	94.00,
+					"LossRatio":	0.0
+				},
+				"HighestIPLayerCapacity":	{
+					"SubInterval":	2,
+					"IPLayerCapacity":	94.00,
+					"LossRatio":	0.0
+				}
+			}],
+		"MissingSubIntervals":	[3, 4, 5],
+		"NoSamples":	[],
+		"IPLayerSenderBitRate":	[{
+				"SubInterval":	1,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}, {
+				"SubInterval":	2,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}],
+		"SubIntervals":	[{
+				"Interval":	1,
+				"Seconds":	1.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:21.023000Z",
+				"ActiveConnections":	2,
+				"DeliveredPercent":	100.00,
+				"LossRatio":	0.0,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	0,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	92.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}, {
+				"Interval":	2,
+				"Seconds":	2.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:22.023000Z",
+				"ActiveConnections":	2,
+				"DeliveredPercent":	100.00,
+				"LossRatio":	0.0,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	0,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	94.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}],
+		"MinRTT":	0.001,
+		"TestConnections":	[{
+				"McIndex":	0,
+				"Server":	"192.0.2.1:24601",
+				"EndReason":	"Stopped",
+				"ControlPhaseFailure":	null,
+				"CapacityModes":	[{
+						"Mode":	1,
+						"SubIntervals":	[1, 5],
+						"Valid":	true,
+						"MaximumIPLayerCapacity":	{
+							"SubInterval":	2,
+							"IPLayerCapacity":	62.00,
+							"LossRatio":	0.0
+						},
+						"HighestIPLayerCapacity":	{
+							"SubInterval":	2,
+							"IPLayerCapacity":	62.00,
+							"LossRatio":	0.0
+						}
+					}]
+			}, {
+				"McIndex":	1,
+				"Server":	"192.0.2.2:24601",
+				"EndReason":	"Stopped",
+				"ControlPhaseFailure":	null,
+				"CapacityModes":	[{
+						"Mode":	1,
+						"SubIntervals":	[1, 5],
+						"Valid":	true,
+						"MaximumIPLayerCapacity":	{
+							"SubInterval":	2,
+							"IPLayerCapacity":	32.00,
+							"LossRatio":	0.0
+						},
+						"HighestIPLayerCapacity":	{
+							"SubInterval":	2,
+							"IPLayerCapacity":	32.00,
+							"LossRatio":	0.0
+						}
+					}]
+			}]
+	}
+}

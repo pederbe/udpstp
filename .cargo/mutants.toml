@@ -1,0 +1,14 @@
+# cargo-mutants' settings: the Nightly workflow mutates the sans-IO
+# core and runs its tests against each mutant; docs/testing.md ("Mutation
+# testing") says how to read the result.
+
+# The core and its tests: its behaviour is what the S1 tests prove.
+examine_globs = ["crates/udpstp-core/src/**/*.rs"]
+test_package = ["udpstp-core"]
+
+# Debug formatting and Display only render events; no test reads their text.
+exclude_re = ["impl.*fmt::Debug", "impl.*fmt::Display"]
+
+# A mutant whose tests run longer than this is counted as a timeout, not
+# a survivor (the unmutated tests take about a minute).
+timeout_multiplier = 3.0

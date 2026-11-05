@@ -1,0 +1,9 @@
+# RFC 9946 section 3: Scope, Goals, and Applicability.
+# Format and ID convention: docs/conformance/README.md.
+
+[[requirement]]
+id = "RFC9946-3-L1"
+text = "Per [RFC9097], that algorithm must not be used as a general Congestion Control Algorithm (CCA)."
+text_sha256 = "2dbddff5ccff1966"
+state = "operational"
+note = "A usage statement; RFC9946-5.1-3 says it with a keyword."

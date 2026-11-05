@@ -1,0 +1,9 @@
+ErrorStatus 157, not completed: exit 157
+--- stdout
+--------------------------------------------------------------------------------
+--- stderr
+udpstp: 192.0.2.1:24601: the Activation exchange didn't complete within 3 s
+udpstp: a response failed verification; check the key
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: failed

@@ -1,0 +1,12 @@
+[alias]
+xtask = "run --package xtask --"
+
+# The C runtime linked into the Windows exe, so it runs on a Windows without
+# the Visual C++ Redistributable (a fresh install, Windows Server, Windows
+# Sandbox): the MSVC target's standard library otherwise needs
+# VCRUNTIME140.dll, which Windows doesn't ship. udpstp's own code and its
+# dependencies have no C. A RUSTFLAGS set in the environment replaces these
+# flags, so it must carry `-C target-feature=+crt-static` too; a test in
+# crates/udpstp/tests/cli.rs and the release workflow check the exe.
+[target.'cfg(all(target_os = "windows", target_env = "msvc"))']
+rustflags = ["-C", "target-feature=+crt-static"]

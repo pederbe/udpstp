@@ -1,0 +1,33 @@
+0	SUCCESS	completed: exit 0
+2	STATUS_PDUS_MISSING	completed: exit 0
+3	PEER_MISSED_STATUS_PDUS	completed: exit 0
+4	TRAFFIC_STOPPED	completed: exit 0
+5	PEER_STOPPED_RECEIVING	completed: exit 0
+6	INVALID_PDUS	completed: exit 0
+49	NO_VALID_MAXIMUM	completed: exit 0
+50	CONFIGURATION_ERROR	exit 50
+51	KEY_FILE_ERROR	exit 51
+75	INITIALIZATION_ERROR	exit 75
+100	SETUP_ERROR_BASE (an undefined cmdResponse)	exit 100
+102	Setup cmdResponse 2	exit 102
+103	Setup cmdResponse 3	exit 103
+104	Setup cmdResponse 4	exit 104
+105	Setup cmdResponse 5	exit 105
+106	Setup cmdResponse 6	exit 106
+107	Setup cmdResponse 7	exit 107
+108	Setup cmdResponse 8	exit 108
+109	Setup cmdResponse 9	exit 109
+110	Setup cmdResponse 10	exit 110
+111	Setup cmdResponse 11	exit 111
+112	Setup cmdResponse 12	exit 112
+113	Setup cmdResponse 13	exit 113
+150	ACTIVATION_ERROR_BASE (an undefined cmdResponse)	exit 150
+152	Activation BADPARAM	exit 152
+157	Activation Response failed verification	exit 157
+158	Activation Response outside the time window	exit 158
+200	CONNECTIONS_UNAVAILABLE	exit 200
+201	COERCION_REFUSED	exit 201
+202	UNRUNNABLE_PARAMETER	exit 202
+203	PARAMETERS_DIFFER	exit 203
+204	INTERRUPTED	exit 204
+255	GENERIC_ERROR	exit 255

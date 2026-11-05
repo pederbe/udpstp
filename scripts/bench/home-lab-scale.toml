@@ -1,0 +1,79 @@
+
+[round]
+kind = "server-scale"
+test_interval = 10
+warm_up = 2
+engines = ["udpstp", "obudpst"]
+calibration = []
+obudpst_pinned = true
+must_have = "obudpst"
+reading = "home-lab"
+runs_at_target = { udpstp = 10, obudpst = 10 }
+runs_elsewhere = 5
+probe_stop_engines = ["udpstp"]
+probe_stop_cases = ["H4", "H4u"]
+close_call_runs = 3
+close_call_most = 20
+client_env = { UDPSTP_ENGINE_HOLD_OFF_US = "250" }
+
+[confine]
+candidates = ["1,5", "1"]
+count = 150
+runs = 5
+
+[[case]]
+name = "H4"
+direction = "downstream"
+row = 4
+counts = [150]
+target = 150
+runs = 5
+
+[[case]]
+name = "H4u"
+direction = "upstream"
+row = 4
+counts = [150]
+target = 150
+runs = 5
+
+[[case]]
+name = "H4c"
+direction = "downstream"
+row = 4
+counts = [25, 50, 75, 100, 125, 150]
+target = 150
+confined = true
+
+[[case]]
+name = "H4uc"
+direction = "upstream"
+row = 4
+counts = [25, 50, 75, 100, 125, 150]
+target = 150
+confined = true
+
+[hold_off_ab]
+fix = "H4uab"
+old = "H4uab250"
+
+[[case]]
+name = "H4uab"
+direction = "upstream"
+row = 4
+counts = [150]
+target = 150
+judged = false
+runs = 18
+engines = ["udpstp"]
+
+[[case]]
+name = "H4uab250"
+direction = "upstream"
+row = 4
+counts = [150]
+target = 150
+judged = false
+runs = 18
+engines = ["udpstp"]
+server_env = { UDPSTP_ENGINE_HOLD_OFF_US = "250" }

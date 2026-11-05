@@ -1,0 +1,45 @@
+# cargo-deny's checks of the dependencies: `cargo deny check`.
+# docs/technology.md ("Dependency audit") says when it runs.
+
+[graph]
+# Every platform udpstp builds for, so a platform-only dependency is
+# checked too.
+targets = [
+    "x86_64-unknown-linux-gnu",
+    "aarch64-unknown-linux-gnu",
+    "x86_64-unknown-linux-musl",
+    "aarch64-unknown-linux-musl",
+    "armv7-unknown-linux-musleabihf",
+    "x86_64-pc-windows-msvc",
+    "aarch64-apple-darwin",
+]
+all-features = true
+
+[advisories]
+# RustSec: a vulnerability, or an unmaintained or unsound crate, fails
+# the check; an exception names the advisory and why it doesn't apply.
+ignore = []
+
+[licenses]
+# Licences compatible with udpstp's MIT OR Apache-2.0, as the
+# dependencies use them today: a new one is reviewed before it is added.
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "Unicode-3.0",
+]
+confidence-threshold = 0.9
+
+[bans]
+# Two versions of one crate are reported, not refused: some come from
+# dependencies' own dependencies.
+multiple-versions = "warn"
+wildcards = "deny"
+# The workspace's own crates depend on each other by path.
+allow-wildcard-paths = true
+
+[sources]
+# crates.io only: no git or other registries.
+unknown-registry = "deny"
+unknown-git = "deny"

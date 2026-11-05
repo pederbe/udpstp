@@ -1,0 +1,12 @@
+ErrorStatus 107, not completed: exit 107
+--- stdout
+--------------------------------------------------------------------------------
+--- stderr
+udpstp: 192.0.2.1:24601 probably doesn't support mode 2: it rejected it,
+  unverified; use --auth-mode 1 (the Client never falls back by itself)
+udpstp: 192.0.2.1:24601: the Setup exchange didn't complete within 3 s
+udpstp: an unverified Setup Response said: it doesn't run this Authentication
+  Mode
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: failed

@@ -1,0 +1,186 @@
+# The colour pairs udpstp.com uses, checked by `cargo xtask site contrast`
+# (and by `cargo xtask site check`) against WCAG 2.2 AA: 4.5:1 for text,
+# 3:1 for large text (the H1) and for UI such as borders and focus rings.
+# Each palette's tokens are read from its stylesheet, from the block after
+# `/* tokens: <name> */`.
+
+[[palette]]
+name = "landing dark"
+file = "website/landing.css"
+pairs = [
+  { fg = "text", bg = "bg", min = 4.5, use = "body text" },
+  { fg = "text", bg = "surface", min = 4.5, use = "text on panels, tabs, terminal" },
+  { fg = "muted", bg = "bg", min = 4.5, use = "secondary text" },
+  { fg = "muted", bg = "surface", min = 4.5, use = "secondary text on panels" },
+  { fg = "signal", bg = "bg", min = 4.5, use = "links, eyebrow, H1, key figures" },
+  { fg = "signal", bg = "surface", min = 4.5, use = "terminal prompt and headings, key figures on the proof panel" },
+  { fg = "terminal-success", bg = "surface", min = 4.5, use = "terminal Maximum IP-Layer Capacity result" },
+  { fg = "accent-text", bg = "surface", min = 4.5, use = "terminal not measured markers" },
+  { fg = "signal-hover", bg = "bg", min = 4.5, use = "hovered links" },
+  { fg = "accent-text", bg = "bg", min = 4.5, use = "the footnote star" },
+  { fg = "on-accent", bg = "accent", min = 4.5, use = "primary button and Copy text" },
+  { fg = "on-accent", bg = "accent-hover", min = 4.5, use = "hovered primary button" },
+  { fg = "edge", bg = "bg", min = 3, use = "coral outer lines" },
+  { fg = "accent", bg = "bg", min = 3, use = "accent-edge button border" },
+  { fg = "signal", bg = "surface", min = 3, use = "install box stroke, focus ring" },
+  { fg = "text", bg = "table-row-bg", min = 4.5, use = "table text, inline code and numbers" },
+  { fg = "muted", bg = "table-row-bg", min = 4.5, use = "table descriptions and comparison text" },
+  { fg = "signal", bg = "table-row-bg", min = 4.5, use = "table links and focus" },
+  { fg = "signal-hover", bg = "table-row-bg", min = 4.5, use = "hovered table links" },
+  { fg = "text", bg = "table-row-alternate", min = 4.5, use = "table text, inline code and numbers" },
+  { fg = "muted", bg = "table-row-alternate", min = 4.5, use = "table descriptions and comparison text" },
+  { fg = "signal", bg = "table-row-alternate", min = 4.5, use = "table links and focus" },
+  { fg = "signal-hover", bg = "table-row-alternate", min = 4.5, use = "hovered table links" },
+]
+
+[[palette]]
+name = "landing light"
+file = "website/landing.css"
+pairs = [
+  { fg = "text", bg = "bg", min = 4.5, use = "body text" },
+  { fg = "text", bg = "surface", min = 4.5, use = "text on panels, tabs, terminal" },
+  { fg = "muted", bg = "bg", min = 4.5, use = "secondary text" },
+  { fg = "muted", bg = "surface-2", min = 4.5, use = "secondary text on tinted panels" },
+  { fg = "signal", bg = "bg", min = 4.5, use = "links, eyebrow, H1, key figures" },
+  { fg = "signal", bg = "surface", min = 4.5, use = "terminal prompt and headings, key figures on the proof panel" },
+  { fg = "terminal-success", bg = "surface", min = 4.5, use = "terminal Maximum IP-Layer Capacity result" },
+  { fg = "accent-text", bg = "surface", min = 4.5, use = "terminal not measured markers" },
+  { fg = "signal-hover", bg = "bg", min = 4.5, use = "hovered links" },
+  { fg = "accent-text", bg = "bg", min = 4.5, use = "the footnote star" },
+  { fg = "on-accent", bg = "accent", min = 4.5, use = "primary button and Copy text" },
+  { fg = "on-accent", bg = "accent-hover", min = 4.5, use = "hovered primary button" },
+  { fg = "edge", bg = "bg", min = 3, use = "coral outer lines" },
+  { fg = "accent", bg = "bg", min = 3, use = "accent-edge button border" },
+  { fg = "signal", bg = "surface", min = 3, use = "install box stroke, focus ring" },
+  { fg = "text", bg = "table-row-bg", min = 4.5, use = "table text, inline code and numbers" },
+  { fg = "muted", bg = "table-row-bg", min = 4.5, use = "table descriptions and comparison text" },
+  { fg = "signal", bg = "table-row-bg", min = 4.5, use = "table links and focus" },
+  { fg = "signal-hover", bg = "table-row-bg", min = 4.5, use = "hovered table links" },
+  { fg = "text", bg = "table-row-alternate", min = 4.5, use = "table text, inline code and numbers" },
+  { fg = "muted", bg = "table-row-alternate", min = 4.5, use = "table descriptions and comparison text" },
+  { fg = "signal", bg = "table-row-alternate", min = 4.5, use = "table links and focus" },
+  { fg = "signal-hover", bg = "table-row-alternate", min = 4.5, use = "hovered table links" },
+]
+
+[[palette]]
+name = "docs dark"
+file = "website/theme/udpstp.css"
+pairs = [
+  { fg = "fg", bg = "bg", min = 4.5, use = "body text" },
+  { fg = "fg", bg = "code-bg", min = 4.5, use = "code blocks, notes" },
+  { fg = "links", bg = "bg", min = 4.5, use = "links, the masthead's Docs label" },
+  { fg = "links", bg = "code-bg", min = 4.5, use = "terminal labels" },
+  { fg = "accent-text", bg = "bg", min = 4.5, use = "third-level headings" },
+  { fg = "accent-text", bg = "code-bg", min = 4.5, use = "configuration file labels" },
+  { fg = "inline-code-color", bg = "bg", min = 4.5, use = "inline code" },
+  { fg = "inline-code-color", bg = "inline-code-bg", min = 4.5, use = "inline code on its panel" },
+  { fg = "muted", bg = "bg", min = 4.5, use = "captions, footer" },
+  { fg = "sidebar-fg", bg = "sidebar-bg", min = 4.5, use = "chapter list" },
+  { fg = "sidebar-active", bg = "sidebar-bg", min = 4.5, use = "part labels" },
+  { fg = "sidebar-active", bg = "sidebar-current-bg", min = 4.5, use = "current chapter" },
+  { fg = "edge", bg = "sidebar-current-bg", min = 3, use = "current chapter rail" },
+  { fg = "sidebar-non-existant", bg = "sidebar-bg", min = 4.5, use = "chapter without a page" },
+  { fg = "searchbar-fg", bg = "searchbar-bg", min = 4.5, use = "search box" },
+  { fg = "icons", bg = "bg", min = 3, use = "menu icons" },
+  { fg = "edge", bg = "bg", min = 3, use = "coral edges of tables and code" },
+  { fg = "rail", bg = "sidebar-bg", min = 3, use = "chapter list edge" },
+  { fg = "table-row-text", bg = "table-row-bg", min = 4.5, use = "table text and numbers" },
+  { fg = "table-row-link", bg = "table-row-bg", min = 4.5, use = "table links" },
+  { fg = "table-row-code", bg = "table-row-bg", min = 4.5, use = "table inline code" },
+  { fg = "table-row-focus", bg = "table-row-bg", min = 3, use = "table keyboard focus" },
+  { fg = "table-row-text", bg = "table-alternate-bg", min = 4.5, use = "table text and numbers" },
+  { fg = "table-row-link", bg = "table-alternate-bg", min = 4.5, use = "table links" },
+  { fg = "table-row-code", bg = "table-alternate-bg", min = 4.5, use = "table inline code" },
+  { fg = "table-row-focus", bg = "table-alternate-bg", min = 3, use = "table keyboard focus" },
+  { fg = "table-row-text", bg = "table-header-bg", min = 4.5, use = "table text and numbers" },
+  { fg = "table-row-link", bg = "table-header-bg", min = 4.5, use = "table links" },
+  { fg = "table-row-code", bg = "table-header-bg", min = 4.5, use = "table inline code" },
+  { fg = "table-row-focus", bg = "table-header-bg", min = 3, use = "table keyboard focus" },
+]
+
+[[palette]]
+name = "docs light"
+file = "website/theme/udpstp.css"
+pairs = [
+  { fg = "fg", bg = "bg", min = 4.5, use = "body text" },
+  { fg = "fg", bg = "code-bg", min = 4.5, use = "code blocks" },
+  { fg = "links", bg = "bg", min = 4.5, use = "links, the masthead's Docs label" },
+  { fg = "links", bg = "code-bg", min = 4.5, use = "terminal labels" },
+  { fg = "accent-text", bg = "bg", min = 4.5, use = "third-level headings" },
+  { fg = "accent-text", bg = "code-bg", min = 4.5, use = "configuration file labels" },
+  { fg = "inline-code-color", bg = "bg", min = 4.5, use = "inline code" },
+  { fg = "inline-code-color", bg = "inline-code-bg", min = 4.5, use = "inline code on its panel" },
+  { fg = "muted", bg = "bg", min = 4.5, use = "captions, footer" },
+  { fg = "sidebar-fg", bg = "sidebar-bg", min = 4.5, use = "chapter list" },
+  { fg = "sidebar-active", bg = "sidebar-bg", min = 4.5, use = "part labels" },
+  { fg = "sidebar-active", bg = "sidebar-current-bg", min = 4.5, use = "current chapter" },
+  { fg = "edge", bg = "sidebar-current-bg", min = 3, use = "current chapter rail" },
+  { fg = "edge", bg = "bg", min = 3, use = "coral edges of tables and code" },
+  { fg = "rail", bg = "sidebar-bg", min = 3, use = "chapter list edge" },
+  { fg = "table-row-text", bg = "table-row-bg", min = 4.5, use = "table text and numbers" },
+  { fg = "table-row-link", bg = "table-row-bg", min = 4.5, use = "table links" },
+  { fg = "table-row-code", bg = "table-row-bg", min = 4.5, use = "table inline code" },
+  { fg = "table-row-focus", bg = "table-row-bg", min = 3, use = "table keyboard focus" },
+  { fg = "table-row-text", bg = "table-alternate-bg", min = 4.5, use = "table text and numbers" },
+  { fg = "table-row-link", bg = "table-alternate-bg", min = 4.5, use = "table links" },
+  { fg = "table-row-code", bg = "table-alternate-bg", min = 4.5, use = "table inline code" },
+  { fg = "table-row-focus", bg = "table-alternate-bg", min = 3, use = "table keyboard focus" },
+  { fg = "table-row-text", bg = "table-header-bg", min = 4.5, use = "table text and numbers" },
+  { fg = "table-row-link", bg = "table-header-bg", min = 4.5, use = "table links" },
+  { fg = "table-row-code", bg = "table-header-bg", min = 4.5, use = "table inline code" },
+  { fg = "table-row-focus", bg = "table-header-bg", min = 3, use = "table keyboard focus" },
+]
+
+[[palette]]
+name = "docs coal tables"
+file = "website/theme/udpstp.css"
+pairs = [
+  { fg = "table-row-text", bg = "table-row-bg", min = 4.5, use = "table text and numbers" },
+  { fg = "table-row-link", bg = "table-row-bg", min = 4.5, use = "table links" },
+  { fg = "table-row-code", bg = "table-row-bg", min = 4.5, use = "table inline code" },
+  { fg = "table-row-focus", bg = "table-row-bg", min = 3, use = "table keyboard focus" },
+  { fg = "table-row-text", bg = "table-alternate-bg", min = 4.5, use = "table text and numbers" },
+  { fg = "table-row-link", bg = "table-alternate-bg", min = 4.5, use = "table links" },
+  { fg = "table-row-code", bg = "table-alternate-bg", min = 4.5, use = "table inline code" },
+  { fg = "table-row-focus", bg = "table-alternate-bg", min = 3, use = "table keyboard focus" },
+  { fg = "table-row-text", bg = "table-header-bg", min = 4.5, use = "table text and numbers" },
+  { fg = "table-row-link", bg = "table-header-bg", min = 4.5, use = "table links" },
+  { fg = "table-row-code", bg = "table-header-bg", min = 4.5, use = "table inline code" },
+  { fg = "table-row-focus", bg = "table-header-bg", min = 3, use = "table keyboard focus" },
+]
+
+[[palette]]
+name = "docs ayu tables"
+file = "website/theme/udpstp.css"
+pairs = [
+  { fg = "table-row-text", bg = "table-row-bg", min = 4.5, use = "table text and numbers" },
+  { fg = "table-row-link", bg = "table-row-bg", min = 4.5, use = "table links" },
+  { fg = "table-row-code", bg = "table-row-bg", min = 4.5, use = "table inline code" },
+  { fg = "table-row-focus", bg = "table-row-bg", min = 3, use = "table keyboard focus" },
+  { fg = "table-row-text", bg = "table-alternate-bg", min = 4.5, use = "table text and numbers" },
+  { fg = "table-row-link", bg = "table-alternate-bg", min = 4.5, use = "table links" },
+  { fg = "table-row-code", bg = "table-alternate-bg", min = 4.5, use = "table inline code" },
+  { fg = "table-row-focus", bg = "table-alternate-bg", min = 3, use = "table keyboard focus" },
+  { fg = "table-row-text", bg = "table-header-bg", min = 4.5, use = "table text and numbers" },
+  { fg = "table-row-link", bg = "table-header-bg", min = 4.5, use = "table links" },
+  { fg = "table-row-code", bg = "table-header-bg", min = 4.5, use = "table inline code" },
+  { fg = "table-row-focus", bg = "table-header-bg", min = 3, use = "table keyboard focus" },
+]
+
+[[palette]]
+name = "docs rust tables"
+file = "website/theme/udpstp.css"
+pairs = [
+  { fg = "table-row-text", bg = "table-row-bg", min = 4.5, use = "table text and numbers" },
+  { fg = "table-row-link", bg = "table-row-bg", min = 4.5, use = "table links" },
+  { fg = "table-row-code", bg = "table-row-bg", min = 4.5, use = "table inline code" },
+  { fg = "table-row-focus", bg = "table-row-bg", min = 3, use = "table keyboard focus" },
+  { fg = "table-row-text", bg = "table-alternate-bg", min = 4.5, use = "table text and numbers" },
+  { fg = "table-row-link", bg = "table-alternate-bg", min = 4.5, use = "table links" },
+  { fg = "table-row-code", bg = "table-alternate-bg", min = 4.5, use = "table inline code" },
+  { fg = "table-row-focus", bg = "table-alternate-bg", min = 3, use = "table keyboard focus" },
+  { fg = "table-row-text", bg = "table-header-bg", min = 4.5, use = "table text and numbers" },
+  { fg = "table-row-link", bg = "table-header-bg", min = 4.5, use = "table links" },
+  { fg = "table-row-code", bg = "table-header-bg", min = 4.5, use = "table inline code" },
+  { fg = "table-row-focus", bg = "table-header-bg", min = 3, use = "table keyboard focus" },
+]

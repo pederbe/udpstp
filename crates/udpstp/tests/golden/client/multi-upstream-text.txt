@@ -1,0 +1,76 @@
+ErrorStatus 0, completed: exit 0
+--- stdout
+--------------------------------------------------------------------------------
+Endpoints
+  Test Connection 0: Client unknown; Server 192.0.2.1:24601
+  Test Connection 1: Client unknown; Server 192.0.2.1:24601
+All 2 Test Connections together:
+Results Summary
+  Upstream Search Test with 192.0.2.1:24601, started 2026-09-21T14:13:20Z (T0)
+  Test Interval (I) 5 s · 5 Sub-Intervals (dt) 1000 ms · Trial Interval (FT) and
+    st 50 ms
+  2 Test Connections (F) · MaxHops 16 · DSCP 0 agreed
+  Performance Criterion: loss ≤ 1% or one Load PDU · Tmax ≤ 1000 ms
+  Late Load PDUs count in the Sub-Interval where their gap was seen.
+  The Server set testIntTime to 5 (asked for 10)
+
+  Sub-Interval results
+  Active = Test Connections that received in the Sub-Interval.
+  SI  C (Mbps)  Loss Ratio  Lost  Reordered  Duplicates
+   1     88.00    0.000000     0          0           0
+   2     86.00    0.000000     0          0           0
+   3     84.00    0.000000     0          0           0
+   4     82.00    0.000000     0          0           0
+   5     80.00    0.000000     0          0           0
+
+  SI  DV (ms)  RTTV (ms)  Active  B (Mbps)*
+   1   0/7/12    0-12, 8       2      90.00
+   2   0/7/12    0-12, 8       2      90.00
+   3   0/7/12    0-12, 8       2      90.00
+   4   0/7/12    0-12, 8       2      90.00
+   5   0/7/12    0-12, 8       2      90.00
+
+  SI: Sub-Interval · C: IP-Layer Capacity · B: IP-Layer Sender Bit Rate
+  DV: delay variation (min/avg/max) · RTTV: RTT variation (min-max, avg) · -: no
+    measurement
+  * Approximate sum by st number across Test Connections. Each st grid
+  starts one one-way delay before its Load Receiver's grid.
+
+Final metrics
+  Maximum IP-Layer Capacity: 88.00 Mbps (Sub-Interval 1)
+  Maximum Sub-Interval result received at 2026-09-21T14:13:21.317000000Z
+  Loss Ratio 0.000000, RTT minimum 1 ms, maximum 13 ms, IP-Layer Sender Bit Rate
+    90.00 Mbps
+  RTT minimum 1 ms
+  Minimum one-way delay 0 ms (clockDeltaMin; valid only if the clocks are
+    synchronized)
+
+  Warnings
+    Upstream results are approximate: each Test Connection's Load Receiver keeps
+      its own Sub-Intervals, summed by number, up to 300 ms apart
+
+  This host: DF set, socket buffers receive 4194304 and send 4194304 bytes;
+    portable Data Phase Engine, sending with sendmmsg, receiving with recvmmsg
+    and kernel timestamps, waking on arrival with ppoll
+Test Connection 0 to 192.0.2.1:24601: Completed
+
+Final metrics
+  Maximum IP-Layer Capacity: 59.00 Mbps (Sub-Interval 1)
+  Maximum Sub-Interval result received at 2026-09-21T14:13:21.017000000Z
+  Loss Ratio 0.000000, RTT minimum 1 ms, maximum 13 ms, IP-Layer Sender Bit Rate
+    60.00 Mbps
+  RTT minimum 1 ms
+  Minimum one-way delay 0 ms (clockDeltaMin; valid only if the clocks are
+    synchronized)
+Test Connection 1 to 192.0.2.1:24601: Completed
+
+Final metrics
+  Maximum IP-Layer Capacity: 29.00 Mbps (Sub-Interval 1)
+  Maximum Sub-Interval result received at 2026-09-21T14:13:21.317000000Z
+  Loss Ratio 0.000000, RTT minimum 1 ms, maximum 13 ms, IP-Layer Sender Bit Rate
+    30.00 Mbps
+  RTT minimum 1 ms
+  Minimum one-way delay 0 ms (clockDeltaMin; valid only if the clocks are
+    synchronized)
+--------------------------------------------------------------------------------
+Test outcome: completed with warnings or qualified results

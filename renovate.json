@@ -1,0 +1,50 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "enabledManagers": [
+    "cargo",
+    "rust-toolchain",
+    "npm",
+    "github-actions",
+    "dockerfile"
+  ],
+  "ignorePaths": [
+    "**/target/**",
+    "**/node_modules/**"
+  ],
+  "rangeStrategy": "bump",
+  "ignoreUnstable": true,
+  "minimumReleaseAge": "0 days",
+  "separateMajorMinor": false,
+  "separateMinorPatch": false,
+  "prConcurrentLimit": 1,
+  "prHourlyLimit": 0,
+  "dependencyDashboard": false,
+  "automerge": true,
+  "automergeType": "pr",
+  "platformAutomerge": true,
+  "packageRules": [
+    {
+      "matchPackageNames": [
+        "*"
+      ],
+      "groupName": "daily dependencies",
+      "groupSlug": "daily-dependencies",
+      "separateMajorMinor": false
+    }
+  ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": [
+      "at any time"
+    ],
+    "automerge": true
+  },
+  "schedule": [
+    "at any time"
+  ],
+  "updateNotScheduled": true,
+  "ignoreTests": false
+}

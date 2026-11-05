@@ -1,0 +1,52 @@
+# RFC 9097 section 10: Security Considerations.
+# Imported by RFC 9946 section 5.1 item 12.
+# Format and ID convention: docs/conformance/README.md.
+
+[[requirement]]
+id = "RFC9097-10-1"
+text = "Cooperating Source and Destination hosts and agreements to test the path between the hosts are REQUIRED."
+text_sha256 = "093048b24cfa8e8b"
+state = "operational"
+note = "Agreements between the parties that run the hosts."
+
+[[requirement]]
+id = "RFC9097-10-2"
+text = "It is REQUIRED to have a user client-initiated setup handshake between cooperating hosts that allows firewalls to control inbound unsolicited UDP traffic that goes to either a control port (expected and with authentication) or ephemeral ports that are only created as needed."
+text_sha256 = "31b0208200a9a87c"
+state = "pending"
+note = "Setup exchange on the Standard Port; Test Connections on Ephemeral Ports."
+
+[[requirement]]
+id = "RFC9097-10-3"
+text = "Client-server authentication and integrity protection for feedback messages conveying measurements are RECOMMENDED."
+text_sha256 = "39f2c1156e5070b8"
+state = "pending"
+note = "Authentication Mode 2 (RFC 9946 section 5.3.2)."
+
+[[requirement]]
+id = "RFC9097-10-4"
+text = "Hosts MUST limit the number of simultaneous tests to avoid resource exhaustion and inaccurate results."
+text_sha256 = "be66441ddf35a65e"
+state = "pending"
+note = "Admission."
+
+[[requirement]]
+id = "RFC9097-10-5"
+text = "Senders MUST be rate limited."
+text_sha256 = "9d1208232c180cb3"
+state = "pending"
+note = "Sending Rate Table; Admitted Rate Cap."
+
+[[requirement]]
+id = "RFC9097-10-L1"
+text = "The recommended load control search algorithm results in \"ramp-up\" from the lowest rate in the table."
+text_sha256 = "ccf18a8c70ef4650"
+state = "pending"
+note = "A Search Test starts at row 0 unless srIndexConf asks otherwise."
+
+[[requirement]]
+id = "RFC9097-10-6"
+text = "Testing with the Service Provider's measurement hosts SHOULD be limited in frequency and/or overall volume of test traffic (for example, the range of duration values, I, SHOULD be limited)."
+text_sha256 = "f93b3d2c7eb32dfd"
+state = "pending"
+note = "testIntTime's maximum."

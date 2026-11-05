@@ -1,0 +1,294 @@
+# RFC 9946 section 7: Test Activation Request and Response.
+# Format and ID convention: docs/conformance/README.md.
+# Section 7 itself (before 7.1) has no normative sentences.
+
+[[requirement]]
+id = "RFC9946-7.1-1"
+text = "Upon a successful setup exchange, the client SHALL compose and send the Test Activation Request to the UDP port number the server communicated in the Test Setup Response (the new ephemeral port, and not the standard UDPSTP port)."
+text_sha256 = "cf119702e5609e1f"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-7.1-2"
+text = "This specification does not provide an ECN-capable transport; therefore, the sender SHALL set the ECN field to not_ECT."
+text_sha256 = "11b1a85a95f5e25c"
+state = "pending"
+note = "dscpEcn field. What a Server does with ECT bits in a request is unspecified; record dscp-from-an-allowed-set-never-ect."
+
+[[requirement]]
+id = "RFC9946-7.1-3"
+text = "Because a value of zero is a valid fixed or starting sending rate index, the field SHALL be set to its maximum (CHTA_SRIDX_DEF) when requesting the default behavior of the server (starting with the selected load rate adjustment algorithm at its minimum/zero index)."
+text_sha256 = "fffe68754fa3580d"
+state = "pending"
+note = "srIndexConf field."
+
+[[requirement]]
+id = "RFC9946-7.1-4"
+text = "This SHALL be equivalent to setting srIndexConf to zero and setting the CHTA_SRIDX_ISSTART bit."
+text_sha256 = "7c08aeef4ecd639d"
+state = "pending"
+note = "srIndexConf field."
+
+[[requirement]]
+id = "RFC9946-7.1-5"
+text = "Used by the server in a Test Activation Response for an upstream test to communicate the (initial) Load PDU transmission parameters the client SHALL use."
+text_sha256 = "f8385610687ea726"
+state = "pending"
+note = "srStruct field. Sizes are IPv4-based and an IPv6 Load Sender subtracts 20 bytes (ADR 0004); the interpretation belongs on the Section 8.1 entry."
+
+[[requirement]]
+id = "RFC9946-7.1-6"
+text = "For a Test Activation Request or a downstream test, this structure SHALL be zeroed."
+text_sha256 = "00bc8f4a4fd57a0c"
+state = "pending"
+note = "srStruct field."
+
+[[requirement]]
+id = "RFC9946-7.1-7"
+text = "The Test Activation Request/Response message PDU (as well as the included Sending Rate structure) SHALL be organized as follows:"
+text_sha256 = "21c1721eac8c5148"
+state = "pending"
+note = "Figure 7's struct sendingRate and struct controlHdrTA follow."
+
+[[requirement]]
+id = "RFC9946-7.1-L1"
+text = "The authentication and checkSum fields follow the same methodology as with the Setup Request and Response."
+text_sha256 = "33780c109b559d5b"
+state = "pending"
+note = "Test Activation PDU."
+
+[[requirement]]
+id = "RFC9946-7.1-L2"
+text = "Set to CHTA_CREQ_TESTACTUS to indicate an upstream test activation or alternatively to CHTA_CREQ_TESTACTDS to indicate a downstream test activation."
+text_sha256 = "4e9e75b2ad47ae99"
+state = "pending"
+note = "cmdRequest field."
+
+[[requirement]]
+id = "RFC9946-7.1-L3"
+text = "Note that CHTA_CREQ_NONE remains unused."
+text_sha256 = "7cb51e0d0df4f8d6"
+state = "pending"
+note = "cmdRequest field."
+
+[[requirement]]
+id = "RFC9946-7.1-L4"
+text = "Boolean, default True (if False, use RTT=round-trip delay variation in the load rate adjustment algorithm; if True, use EnableIPDV, which uses one-way delay variation for the load rate adjustment algorithm)."
+text_sha256 = "457b6f76d2d8e992"
+state = "pending"
+note = "useOwDelVar field. The default differs from OB-UDPST and TR-471; record use-ow-del-var-defaults-to-true."
+
+[[requirement]]
+id = "RFC9946-7.1-L5"
+text = "When True, only loss counts toward received packet sequence number errors."
+text_sha256 = "b4bb5e6647868489"
+state = "pending"
+note = "ignoreOooDup field."
+
+[[requirement]]
+id = "RFC9946-7.1-L6"
+text = "When False, loss, out-of-order, and duplicate totals are all counted as sequence number errors."
+text_sha256 = "b1bc82736480bd73"
+state = "pending"
+note = "ignoreOooDup field."
+
+[[requirement]]
+id = "RFC9946-7.1-L7"
+text = "Default is True (see also Table 3 of [TR-471])."
+text_sha256 = "f9d66d6273a2b42a"
+state = "pending"
+note = "ignoreOooDup field."
+
+[[requirement]]
+id = "RFC9946-7.1-L8"
+text = "A 100 us granularity is recommended for optimal rate selection."
+text_sha256 = "a8a52279424a5ffa"
+state = "pending"
+note = "txInterval fields; the Sending Rate Table uses multiples of 100 us."
+
+[[requirement]]
+id = "RFC9946-7.1-L9"
+text = "A four-octet field indicating the size of a single Load PDU to be sent at the end of the txInterval2 send sequence, even when udpPayload2 or burstSize2 are zero and result in no transmission of their own."
+text_sha256 = "763280bd080e32b1"
+state = "pending"
+note = "udpAddon2 field."
+
+[[requirement]]
+id = "RFC9946-7.1-L10"
+text = "Trials with subIntPeriod in a range of 100 to 10000 ms resulted in a default value of 1000 ms."
+text_sha256 = "0394bfd08c50a1d1"
+state = "pending"
+note = "subIntPeriod field."
+
+[[requirement]]
+id = "RFC9946-7.2-1"
+text = "When the server replies to the Test Activation Request message, the Test Activation Response PDU is structured identically to the Request PDU and SHALL retain the original values received in it unless they are explicitly coerced to a server-acceptable value."
+text_sha256 = "7bf0da9234222c22"
+state = "pending"
+note = "Reserved fields are still zeroed (RFC9946-6.1-4), although OB-UDPST carries data in reserved2 and reserved4. Coercions are reported at both ends."
+
+[[requirement]]
+id = "RFC9946-7.2-2"
+text = "When the server receives the Test Activation Request message, it SHALL first follow the Message Verification Procedure listed in Section 6.2, Paragraph 2."
+text_sha256 = "3102d6cca0e8b189"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-7.2-L1"
+text = "After the server receives the Test Activation Request on the new connection, it chooses to accept, ignore, or modify any of the test parameters."
+text_sha256 = "ebe152aeae59473a"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-7.2.1-1"
+text = "When evaluating the Test Activation Request, the server MAY allow the client to specify its own fixed or starting send rate via srIndexConf."
+text_sha256 = "6d48905abc7a64cc"
+state = "pending"
+note = "Fixed-Rate Tests only with an Operator Key; record fixed-rate-needs-operator-key."
+
+[[requirement]]
+id = "RFC9946-7.2.1-2"
+text = "Alternatively, the server MAY enforce a maximum limit of the fixed or starting send rate, which the client can successfully request."
+text_sha256 = "cb0088ba25b1a5c9"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-7.2.1-3"
+text = "If the client's Test Activation Request exceeds the server's configured maximum, the server MUST either reject the request or coerce the value to the configured maximum bit rate, and communicate that maximum to the client in the Test Activation Response."
+text_sha256 = "c59ade612d86abdd"
+state = "pending"
+note = "srIndexConf is a row index, not a bit rate; records sr-index-conf-beyond-the-top-row-coerced and row-above-max-bandwidth-coerced."
+
+[[requirement]]
+id = "RFC9946-7.2.1-4"
+text = "In these cases, the Command Response value SHALL be CHTA_CRSP_ACKOK."
+text_sha256 = "ba260820b94418a7"
+state = "pending"
+note = "Coercion of the parameters listed before it (RFC9946-7.2.1-L1); the list names useOwDelayVar (meaning useOwDelVar) and highSpeedDelta twice."
+
+[[requirement]]
+id = "RFC9946-7.2.1-5"
+text = "If the authDigest is valid, a Test Activation Response SHALL be sent back to the client with a corresponding Command Response value indicating the reason for the rejection."
+text_sha256 = "afffac793bf4ac52"
+state = "pending"
+note = "The bullet under \"If the Test Activation Request must be rejected (due to the Command Response value being CHTA_CRSP_BADPARAM), and\"."
+
+[[requirement]]
+id = "RFC9946-7.2.1-6"
+text = "If the authDigest is invalid, the Test Activation Request SHOULD fail silently."
+text_sha256 = "d81a4e8107203da0"
+state = "pending"
+note = "The RFC permits server administrators to send an Activation Response anyway, for operations and troubleshooting. Troubleshooting Mode answers Setup Requests only: an Activation Request that fails verification stays silent even then."
+
+[[requirement]]
+id = "RFC9946-7.2.1-7"
+text = "The additional circumstances when a server SHALL NOT communicate the appropriate Command Response code for an error condition (fail silently) are when: * the Test Activation Request PDU size is not equal to the 'struct controlHdrTA' size shown in Figure 7, * the PDU ID is not 0xACE2 (Test Activation PDU), or * a directed attack has been detected."
+text_sha256 = "4655fe9352567f19"
+state = "pending"
+note = "Attack detection is out of scope per the RFC, so the third case is not testable."
+
+[[requirement]]
+id = "RFC9946-7.2.1-L1"
+text = "Other parameters where the server has the OPTION to coerce the client to use values other than those in the Test Activation Request are (grouped by role): * Load rate adjustment algorithm: lowThresh, upperThresh, useOwDelayVar, highSpeedDelta, slowAdjThresh, seqErrThresh, highSpeedDelta, ignoreOooDup, and rateAdjAlgo * Test duration/intervals: trialInt, testIntTime, and subIntPeriod * Packet marking: dscpEcn"
+text_sha256 = "442aca4b81461a10"
+state = "pending"
+note = "\"OPTION\" is not a BCP 14 keyword."
+
+[[requirement]]
+id = "RFC9946-7.2.1-L2"
+text = "Note that the server also has the option of completely rejecting the request and sending back an appropriate cmdResponse field value (currently only CHTA_CRSP_BADPARAM; see Section 12.3.9)."
+text_sha256 = "7d586a6867bb3489"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-7.2.1-L3"
+text = "Whether this error response is sent or not depends on the security mode of operation and the outcome of authDigest validation."
+text_sha256 = "c6a122b8b8ce03bf"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-7.2.1-L4"
+text = "The exception is for operations support: server administrators are permitted to send an Activation Response to support operations and troubleshooting."
+text_sha256 = "f0ab01ffca924ba6"
+state = "pending"
+note = "Troubleshooting Mode."
+
+[[requirement]]
+id = "RFC9946-7.2.2-1"
+text = "When the server sends the Test Activation Response, it SHALL set the cmdResponse field to CHTA_CRSP_ACKOK (see Section 12.3.9)."
+text_sha256 = "03fc9ebc2190422b"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-7.2.2-2"
+text = "If the client has requested an upstream test, the server SHALL: * include the transmission parameters from the first row of the Sending Rate Table in the Sending Rate structure (if requested by setting srIndexConf to a value of CHTA_SRIDX_DEF), or * include the transmission parameters from the designated Configured Sending Rate Table index (srIndexConf) of the Sending Rate Table where, if CHTA_SRIDX_ISSTART is set in modifierBitmap, this will be used as the starting rate for the load rate adjustment algorithm; else, it will be considered a fixed-rate test."
+text_sha256 = "feee02fa4a56e6b3"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-7.2.2-3"
+text = "When generating the Test Activation Response (acceptance) for a downstream test, the server SHALL set all octets of the Sending Rate structure to zero."
+text_sha256 = "9e4df54153391457"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-7.2.2-4"
+text = "In the case of an upstream test, the server SHALL prepare to use a single timer to send Status PDUs at the specified interval."
+text_sha256 = "11ee29a95561344b"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-7.2.2-5"
+text = "For a downstream test, the server SHALL prepare to utilize dual timers to send Load PDUs based on: * the transmission parameters directly from the first row of the Sending Rate Table (if requested by srIndexConf having been set to CHTA_SRIDX_DEF), or * the transmission parameters from the designated Configured Sending Rate Table index (srIndexConf) of the Sending Rate Table where, if CHTA_SRIDX_ISSTART is set in modifierBitmap, this will be used as the starting rate for the load rate adjustment algorithm; else, it will be considered a fixed-rate test."
+text_sha256 = "453c5600cffa87f7"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-7.2.2-6"
+text = "The server SHALL then send the Test Activation Response back to the client, update the watchdog timer with a new timeout value, and set a test duration timer to eventually stop the test."
+text_sha256 = "d828306d720b1c7a"
+state = "pending"
+note = "The new watchdog timeout is unspecified; timeouts per ADR 0002."
+
+[[requirement]]
+id = "RFC9946-7.3-1"
+text = "When the client receives the Test Activation Response message, it SHALL first follow the Message Verification Procedure listed in Section 6.2, Paragraph 2."
+text_sha256 = "5a83bc8b20c3de8e"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-7.3-2"
+text = "If the client receives a Test Activation cmdResponse field value that indicates an error, the client SHALL display/report a relevant message to the user or measurement system and exit."
+text_sha256 = "2a2d5d9d9580c3ee"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-7.3-3"
+text = "If the client receives a Test Activation cmdResponse field value that is not equal to one of the codes defined in Section 12.3.9, the client MUST terminate the connection and terminate operation of the current setup procedure."
+text_sha256 = "ce5b53ff515dcd48"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-7.3-4"
+text = "If the client receives a Test Activation Command Response value that indicates success (e.g., CHTA_CRSP_ACKOK; see Section 12.3.9), the client SHALL update its configuration to use any test parameters modified by the server."
+text_sha256 = "15efdb6760bb7b23"
+state = "pending"
+note = "The RFC continues: if the coerced parameters are not acceptable to the client, the client ends the test."
+
+[[requirement]]
+id = "RFC9946-7.3-5"
+text = "To finalize an accepted test activation, the client SHALL prepare its connection for either an upstream test with dual timers set to send Load PDUs (based on the starting transmission parameters sent by the server) OR a downstream test with a single timer to send Status PDUs at the specified interval."
+text_sha256 = "e8561d103426e589"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-7.3-6"
+text = "Then, the client SHALL stop the test initiation timer and start a watchdog timer to detect if the server goes quiet."
+text_sha256 = "4b18b770a2488c80"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-7.3-L1"
+text = "If the setup parameters coerced by the server are not acceptable to the client, the client ends the test."
+text_sha256 = "6eb36640c7514134"
+state = "pending"

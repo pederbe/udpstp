@@ -1,0 +1,17 @@
+[package]
+name = "udpstp-req"
+version = "0.1.0"
+description = "The #[req(\"ID\")] attribute that ties tests to UDPSTP requirements"
+edition.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+# Only the workspace's tests use it.
+publish = false
+
+[lib]
+proc-macro = true
+
+[lints]
+workspace = true

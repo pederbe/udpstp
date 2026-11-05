@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1220"/><stop offset="1" stop-color="#131c2e"/>
+    </linearGradient>
+    <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f2994a" stop-opacity="0.35"/><stop offset="1" stop-color="#f2994a" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="640" fill="url(#bg)"/>
+  <g font-family="Segoe UI, Helvetica, Arial, sans-serif">
+    <text x="80" y="250" fill="#f8fafc" font-size="108" font-weight="700" letter-spacing="-2">udpstp</text>
+    <text x="84" y="318" fill="#cbd5e1" font-size="34">The UDP Speed Test Protocol</text>
+    <text x="84" y="362" fill="#cbd5e1" font-size="34">(RFC 9946) in Rust</text>
+    <text x="84" y="440" fill="#94a3b8" font-size="24">Measures Maximum IP-Layer Capacity (RFC 9097)</text>
+    <text x="84" y="476" fill="#94a3b8" font-size="24">Memory-safe · conformance-tested</text>
+  </g>
+  <g>
+    <line x1="700" y1="500" x2="1200" y2="500" stroke="#334155" stroke-width="2"/>
+    <line x1="700" y1="500" x2="700" y2="120" stroke="#334155" stroke-width="2"/>
+    <line x1="910.53" y1="120" x2="910.53" y2="500" stroke="#334155" stroke-width="1.5" stroke-dasharray="4 6"/>
+    <path d="M700,500 V486.0 H726.3 V465.0 H752.6 V430.0 H778.9 V381.0 H805.3 V318.0 H831.6 V248.0 H857.9 V174.5 H884.2 V192.0 H910.5 V209.5 H936.8 V227.0 H963.2 V216.5 H989.5 V206.0 H1015.8 V220.0 H1042.1 V209.5 H1068.4 V216.5 H1094.7 V206.0 H1121.1 V213.0 H1147.4 V220.0 H1173.7 V209.5 H1200.0 V500 Z" fill="url(#area)"/>
+    <path d="M700,500 V486.0 H726.3 V465.0 H752.6 V430.0 H778.9 V381.0 H805.3 V318.0 H831.6 V248.0 H857.9 V174.5 H884.2 V192.0 H910.5 V209.5 H936.8 V227.0 H963.2 V216.5 H989.5 V206.0 H1015.8 V220.0 H1042.1 V209.5 H1068.4 V216.5 H1094.7 V206.0 H1121.1 V213.0 H1147.4 V220.0 H1173.7 V209.5 H1200.0" fill="none" stroke="#f2994a" stroke-width="4" stroke-linejoin="round"/>
+    <line x1="700" y1="213.0" x2="1200" y2="213.0" stroke="#5eead4" stroke-width="2.5" stroke-dasharray="10 8"/>
+    <g font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="20">
+      <text x="712" y="110" fill="#94a3b8">Fast Mode</text>
+      <text x="922.53" y="110" fill="#94a3b8">Single-Step Mode</text>
+      <text x="1200" y="247.0" fill="#5eead4" text-anchor="end">capacity</text>
+      <text x="700" y="534" fill="#64748b">Trial Intervals →</text>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,419 @@
+# Conformance records: the Client's Control Phase, the Multi-Connection
+# Coordinator, results, exit statuses and JSON output.
+# Format: docs/conformance/README.md; checked by `cargo xtask req`.
+
+# Setup and Activation
+
+[[record]]
+id = "mc-ident-from-a-held-port"
+kind = "interpretation"
+summary = "The Client draws a Test's mcIdent from a UDP socket it holds until the Test ends, connected toward the first Server: the socket's port, XORed with a 16-bit hash of its local address, a mapping one-to-one over the non-zero ports. No other socket on the host holds that port meanwhile, so Clients on one host never share an mcIdent at once; a Server keys a Test on the Client's address and mcIdent, and two Clients drawing the same one at random (about a 26 % chance among 200) cost a Test: the Server merged them and refused one (MCINVPAR, MultiConnectionIndexInUse), or dropped an identical Setup Request, sent in the same second, as a replay. The replay cache is unchanged. Hosts behind one NAT have different local addresses, so their mcIdents are spread as a random draw's; hosts sharing one private address behind it (VMs on a hypervisor's NAT, cloned images) share the hash, and draw only as widely as the host's local port range, about 28,000 values on Linux. If the host gives no such socket, the draw is random."
+rfc = "RFC 9946 §6.1"
+requirements = ["RFC9946-6.1-L3"]
+obudpst = "OB-UDPST's Client draws mcIdent at random, and its Server doesn't check that an mcIndex is unused within a Test."
+reference = ["docs/spec.md story 93"]
+tests = [
+  "crates/udpstp-core/tests/mc_ident.rs::every_port_of_one_address_gives_its_own_non_zero_mc_ident",
+  "crates/udpstp-core/tests/mc_ident.rs::hosts_behind_a_nat_draw_from_the_whole_range",
+  "crates/udpstp-runtime/src/client.rs::clients_on_one_host_draw_different_mc_idents",
+  "crates/udpstp/tests/loopback.rs::many_clients_on_one_host_starting_together_all_run",
+  "crates/udpstp-core/tests/replay_cache.rs::a_replayed_setup_request_is_dropped",
+]
+
+[[record]]
+id = "setup-response-from-another-address"
+kind = "interpretation"
+summary = "The Client authorizes destinations from local Server selection before receiving PDUs. In authenticated modes a Setup Response must come from the selected Server address or an alternate IP address explicitly authorized for that Server with --allow-server-address SERVER=IP, using its Standard Port, address family and locally selected IPv6 scope. Its verified digest authorizes the Ephemeral Port, never a new IP address or interface. Other selected Servers, other DNS answers and Null Requests do not add authorization. Unauthenticated Mode still accepts only the selected Server endpoint. The Activation exchange and Data Phase use only the authorized endpoint."
+rfc = "RFC 9946 §6.3, §7.1"
+requirements = ["RFC9946-6.3-1", "RFC9946-7.1-1"]
+obudpst = "OB-UDPST's Client connects to whatever address the Setup Response came from, unauthenticated too."
+reference = ["ADR 0007", "ADR 0009", "ADR 0013"]
+tests = [
+  "crates/udpstp-core/tests/setup_responses.rs::a_verified_setup_response_from_an_unapproved_address_is_ignored",
+  "crates/udpstp-core/tests/setup_responses.rs::a_verified_setup_response_from_an_explicitly_authorized_address_is_accepted",
+  "crates/udpstp-core/tests/setup_responses.rs::alternate_authorization_is_scoped_to_the_selected_server",
+  "crates/udpstp-core/tests/setup_responses.rs::an_authorized_alternate_still_needs_a_verified_matching_response",
+  "crates/udpstp-core/tests/setup_responses.rs::an_alternate_keeps_the_locally_selected_ipv6_scope",
+  "crates/udpstp/tests/loopback.rs::only_locally_authorized_alternates_receive_activation_and_load",
+  "crates/udpstp-core/tests/setup_responses.rs::an_unverified_setup_response_from_another_address_leaves_no_trace",
+  "crates/udpstp-core/tests/setup_responses.rs::an_unauthenticated_setup_response_from_another_address_is_ignored",
+]
+
+[[record]]
+id = "unverified-setup-rejection-hint"
+kind = "interpretation"
+summary = "A Setup Response that fails verification is ignored and the Test initiation timer decides the outcome, so a forged datagram can't end a genuine Test (ADR 0009). When such a response comes from the Server's address and rejects this Test Connection's own request, its cmdResponse is still reported, marked unverified, as a hint to why the timer expired; an unsigned AUTHINV to a mode 2 request adds the diagnostic that the Server probably doesn't support mode 2."
+rfc = "RFC 9946 §5.3.1, §6.3"
+requirements = ["RFC9946-6.3-1"]
+obudpst = "OB-UDPST's Client ends the Test at once on a Setup Response that fails verification, with ErrorStatus 107 or 108."
+reference = ["ADR 0009"]
+tests = [
+  "crates/udpstp-core/tests/setup_responses.rs::an_unverified_rejection_is_reported_but_the_timer_decides",
+  "crates/udpstp-core/tests/setup_responses.rs::an_unverified_rejection_for_another_test_connection_is_not_reported",
+  "crates/udpstp-core/tests/auth_mode_default.rs::a_server_without_mode_2_is_reported_and_the_client_does_not_fall_back",
+]
+
+[[record]]
+id = "undefined-setup-cmd-response"
+kind = "interpretation"
+summary = "A verified Setup Response whose cmdResponse is neither ACKOK nor a code §12.3.5 defines as an error, CHSR_CRSP_NONE (0) included, ends the Setup attempt as an unknown response."
+rfc = "RFC 9946 §6.3, §12.3.5"
+requirements = ["RFC9946-6.3-3", "RFC9946-6.3-4"]
+reference = []
+tests = ["crates/udpstp-core/tests/setup_responses.rs::an_undefined_cmd_response_ends_the_setup_attempt"]
+
+[[record]]
+id = "setup-response-protocol-version"
+kind = "interpretation"
+summary = "The Client ignores a Setup Response whose protocolVer isn't 20, as it ignores one with another PDU ID or cmdRequest, except a BADVER rejection, which carries the version the Server expects (§6.2.1) and is reported as such. §6.3 says to begin with the protocol version but not what to do when it differs."
+rfc = "RFC 9946 §6.3"
+requirements = ["RFC9946-6.3-2"]
+obudpst = "OB-UDPST's Client checks neither the Setup Response's protocolVer nor its cmdRequest."
+reference = []
+tests = [
+  "crates/udpstp-core/tests/setup_responses.rs::a_setup_response_with_the_wrong_version_pdu_id_or_cmd_request_is_ignored",
+  "crates/udpstp-core/tests/setup_responses.rs::each_rejection_code_ends_the_setup_with_its_own_failure",
+]
+
+[[record]]
+id = "auth-mode-2-default"
+kind = "obudpst-difference"
+summary = "The Client authenticates in mode 2 by default, which also authenticates every Status PDU. Mode 1 is used only when chosen, for all Servers or per Server, never as a fallback."
+rfc = "RFC 9946 §5.3"
+obudpst = "OB-UDPST supports mode 1 only: its Client sends mode 1 with a key, and 0 without one."
+setting = "`--auth-mode`, `--mode-1-server`"
+default = "on"
+reference = ["docs/spec.md"]
+tests = [
+  "crates/udpstp-core/tests/auth_mode_default.rs::a_server_without_mode_2_is_reported_and_the_client_does_not_fall_back",
+  "crates/udpstp-core/tests/auth_mode_default.rs::mode_1_is_used_only_with_the_server_it_was_chosen_for",
+]
+
+# The Multi-Connection Coordinator
+
+[[record]]
+id = "minimum-test-connections"
+kind = "interpretation"
+summary = "A Multi-Connection Test may go on with fewer Test Connections than it asked for, down to the Minimum Test Connections the Client user sets. By default all are required, so one failed Setup aborts the Test before any Activation Request is sent. RFC 9946 §4 leaves handling connection setup successes and failures to the Client process."
+rfc = "RFC 9946 §4"
+requirements = ["RFC9946-4-L1"]
+setting = "`--min-test-connections`"
+default = "off"
+reference = ["docs/spec.md stories 56 and 57"]
+tests = [
+  "crates/udpstp-core/tests/multi_connection_start.rs::too_few_setups_abort_the_test_before_any_activation",
+  "crates/udpstp-core/tests/multi_connection_start.rs::a_lower_minimum_goes_on_with_the_setups_that_succeeded",
+]
+
+[[record]]
+id = "max-bandwidth-split-across-test-connections"
+kind = "interpretation"
+summary = "The maxBandwidth the Client user gives (`--max-bandwidth`) is the whole Test's: the Client splits it equally across the Test's Test Connections, each Setup Request stating its share rounded down to a whole Mbps, so together they state no more than was asked for, and a figure below 1 Mbps a Test Connection is refused. RFC 9946 §6.1 defines maxBandwidth as what the Client expects \"during the requested test\", which in a Multi-Connection Test could mean the Test or one Test Connection; a Server compares each Setup Request's maxBandwidth with what it has left to admit, and searches that Test Connection no higher."
+rfc = "RFC 9946 §6.1"
+requirements = ["RFC9946-6.1-L7", "RFC9946-6.1-6"]
+obudpst = "OB-UDPST's Client splits it the same way, but states at least 1 Mbps a Test Connection rather than refusing a smaller figure, so its Test Connections may together state more than was asked for."
+reference = ["docs/spec.md story 9"]
+tests = [
+  "crates/udpstp-core/tests/multi_connection_start.rs::the_max_bandwidth_is_shared_between_the_test_connections",
+  "crates/udpstp-core/tests/multi_connection_start.rs::a_max_bandwidth_below_1_mbps_a_test_connection_is_refused",
+  "crates/udpstp/tests/cli.rs::multi_connection_options_are_validated",
+]
+
+[[record]]
+id = "multi-connection-setup-deadline"
+kind = "interpretation"
+summary = "Every Setup Request goes out at once and the Activation Requests go out together. The Setup phase waits for every Setup until a deadline 1 s before the Client's time limit (or half the limit, if shorter), so the Activation exchange has time left within the Test initiation timer. Past it, Setups still unanswered are abandoned once at least the Minimum Test Connections have succeeded; with fewer, the Setup phase waits on to the time limit."
+rfc = "RFC 9946 §6.1"
+requirements = ["RFC9946-6.1-2"]
+reference = ["docs/spec.md story 57"]
+tests = [
+  "crates/udpstp-core/tests/multi_connection_start.rs::an_unanswered_setup_is_given_up_once_enough_have_succeeded",
+  "crates/udpstp-core/tests/multi_connection_start.rs::a_short_time_limit_still_activates_every_test_connection",
+]
+
+[[record]]
+id = "multi-connection-parameters-differ"
+kind = "interpretation"
+summary = "Each Test Connection's parameters, as its Activation Response sets them, are compared with the first activated Test Connection's. If they differ, the parameters aren't acceptable for one Test, and the Client aborts it (ErrorStatus 203)."
+rfc = "RFC 9946 §7.3"
+requirements = ["RFC9946-7.3-L1"]
+reference = ["docs/spec.md story 58"]
+tests = ["crates/udpstp-core/tests/multi_connection_start.rs::servers_that_set_different_parameters_abort_the_test"]
+
+[[record]]
+id = "multi-connection-isolated-failures"
+kind = "interpretation"
+summary = "A Test Connection fails when its Data Phase stops hearing its peer (the 1 s Load PDU or Status PDU timeout) or ends any way but complete. The Test goes on while at least the Minimum Test Connections haven't failed; below it, the healthy ones are stopped. RFC 9946 §4 makes cleaning up failed connections during a Test the Client process's responsibility."
+rfc = "RFC 9946 §4"
+requirements = ["RFC9946-4-L1"]
+reference = ["ADR 0002", "docs/spec.md story 59"]
+tests = [
+  "crates/udpstp-core/tests/multi_connection_failures.rs::the_test_goes_on_when_one_fails_and_enough_remain",
+  "crates/udpstp-core/tests/multi_connection_failures.rs::below_the_minimum_the_rest_are_stopped_and_released",
+  "crates/udpstp-core/tests/multi_connection_failures.rs::failures_are_counted_until_too_few_remain",
+]
+
+[[record]]
+id = "multi-connection-path-failure"
+kind = "interpretation"
+summary = "Two or more Test Connections falling silent within three Trial Intervals of each other are a path failure, and stop the Test even when at least the Minimum Test Connections remain. The Load Rate Adjustment Algorithm ends a Test on a loss of connectivity (§4.2), and a Test's connections to one Server share a path. Three Trial Intervals allow for a Load Sender hearing its peer once a Trial Interval, and for a lost last Status PDU."
+rfc = "RFC 9946 §4, §4.2"
+requirements = ["RFC9946-4.2-L5"]
+reference = ["docs/spec.md story 60"]
+tests = [
+  "crates/udpstp-core/tests/multi_connection_failures.rs::test_connections_that_fall_silent_together_stop_the_test",
+  "crates/udpstp-core/tests/multi_connection_failures.rs::failures_apart_are_isolated_ones",
+]
+
+# Results
+
+[[record]]
+id = "sub-interval-results-from-the-test-only"
+kind = "interpretation"
+summary = "Only Sub-Intervals that closed while testAction was TEST are results, up to the number the Test Interval holds (testIntTime / subIntPeriod). On the Load Sender the first sisSav received for a subIntSeqNo counts, from a stale Status PDU too; later copies replace nothing. A Sub-Interval never measured, such as a final one whose Status PDU was lost, is missing, never a zero."
+rfc = "RFC 9097 §5.3, RFC 9946 §8.2"
+reference = ["docs/spec.md"]
+tests = [
+  "crates/udpstp-core/tests/sub_interval_results.rs::no_more_sub_intervals_are_reported_than_the_test_interval_holds",
+  "crates/udpstp-core/tests/sub_interval_results.rs::an_upstream_client_reports_each_sub_interval_from_sis_sav_once",
+  "crates/udpstp-core/tests/sub_interval_results.rs::a_missing_final_sub_interval_is_missing",
+  "crates/udpstp-core/src/results.rs::a_missing_sub_interval_is_none",
+]
+
+[[record]]
+id = "duplicates-count-as-received"
+kind = "interpretation"
+summary = "For the Performance Criterion and the Loss Ratio reported, the Load PDUs sent in a Sub-Interval are those received plus those lost, and duplicates count as received: \"correctly received\" isn't read as excluding them. Duplicates are still reported apart from loss."
+rfc = "RFC 9097 §5.3, §6.3"
+requirements = ["RFC9097-5.3-L1", "RFC9097-6.3-L1"]
+reference = []
+
+[[record]]
+id = "loss-allowance-per-test-connection"
+kind = "interpretation"
+summary = "A Sub-Interval meets the Performance Criterion if it lost at most the configured ratio of the Load PDUs sent, or a single Load PDU, so one loss at a low rate doesn't disqualify it. In a Multi-Connection Test's aggregate the allowance is one Load PDU per active Test Connection, so the aggregate is judged no more harshly than its Test Connections alone."
+rfc = "RFC 9097 §6.3"
+requirements = ["RFC9097-6.3-3"]
+reference = []
+tests = [
+  "crates/udpstp-core/src/results.rs::one_loss_always_meets_the_criterion",
+  "crates/udpstp-core/src/results.rs::each_active_test_connection_may_lose_one",
+]
+
+[[record]]
+id = "empty-sub-interval-meets-no-criterion"
+kind = "interpretation"
+summary = "A Sub-Interval in which no Load PDU was received meets no Performance Criterion, so it is never the Maximum IP-Layer Capacity, even when the one-lost-Load-PDU allowance covers what was lost in it: the maximum is taken over bits transmitted and correctly received that meet the PM criteria, and none were received. With nothing lost either, its Loss Ratio is 0/0, undefined rather than zero. Otherwise a gap covering a whole Sub-Interval, such as a stall just under the 1 s traffic timeout, or an Upstream Load Receiver sending Status PDUs through a silence, made an empty Sub-Interval the only one to pass when every other failed the criterion, and the Test reported 0 Mbps as its maximum where it has none (ErrorStatus 49)."
+rfc = "RFC 9097 §6.3"
+requirements = ["RFC9097-6.3-L1"]
+reference = []
+tests = [
+  "crates/udpstp-core/src/results.rs::a_sub_interval_with_nothing_received_meets_no_criterion",
+  "crates/udpstp/src/test_results.rs::a_test_whose_only_passing_sub_interval_is_empty_has_no_maximum",
+]
+
+[[record]]
+id = "tmax-within-the-sub-interval"
+kind = "interpretation"
+summary = "Tmax, the longest a Load PDU may take and still count as received, is the rest of the Sub-Interval whose lpduSeqNo gap counted it as lost, so at most one Sub-Interval: a late Load PDU cancels that loss only within that Sub-Interval. TR-471 suggests 1000 ms; tying Tmax to the Sub-Interval keeps each Sub-Interval's loss final when it closes."
+rfc = "RFC 9097 §4, §5.3"
+requirements = ["RFC9097-4-L4", "RFC9097-5.3-4", "RFC9097-6.3-5"]
+reference = []
+tests = ["crates/udpstp-core/tests/sequence_errors.rs::a_load_pdu_later_than_its_sub_interval_stays_lost"]
+
+[[record]]
+id = "aggregate-clock-delta-min"
+kind = "interpretation"
+summary = "A Multi-Connection Test's aggregate Sub-Interval takes the smallest clockDeltaMin of its Test Connections, as it does rttMinimum. Several Servers' clocks differ, so clockDeltaMin is kept only when every Test Connection goes to one Server, and is left out otherwise. Each Test Connection fixes its wall-clock offset when it activates, so a wall-clock step between activations shifts the aggregate."
+rfc = "RFC 9946 §4, §8.2"
+requirements = ["RFC9946-4-L1"]
+obudpst = "OB-UDPST takes the smallest clockDeltaMin of all Test Connections, whatever Servers they go to."
+reference = ["docs/spec.md"]
+tests = ["crates/udpstp-core/src/results.rs::test_connections_sum_by_sub_interval"]
+
+[[record]]
+id = "multi-connection-common-grid"
+kind = "interpretation"
+summary = "In a Downstream Multi-Connection Test the Client's Load Receivers share one Sub-Interval grid, starting when the first Load PDUs should arrive: when the Activation Requests go out plus the shortest Setup round trip. The Test Connections' Sub-Intervals of one subIntSeqNo then cover the same time, and their sum is one Sub-Interval's IP-Layer Capacity. The last Sub-Interval ends before the Servers' STOP, half a second after the Test Interval. A single Test Connection keeps its own grid."
+obudpst = "OB-UDPST sums the Test Connections' Sub-Intervals by number, each on its own grid, in both directions."
+rfc = "RFC 9946 §8.2, RFC 9097 §5.3"
+requirements = ["RFC9097-5.3-L1"]
+reference = ["docs/spec.md"]
+tests = [
+  "crates/udpstp-core/tests/multi_connection_aggregation.rs::the_summed_capacity_never_exceeds_the_shared_bottleneck",
+  "crates/udpstp-core/tests/multi_connection_aggregation.rs::a_stalled_sub_interval_is_not_measured",
+  "crates/udpstp-core/src/results.rs::test_connections_sum_by_sub_interval",
+]
+
+[[record]]
+id = "approximate-upstream-aggregation"
+kind = "deviation"
+deviation = "non-conformance"
+summary = "In an Upstream Multi-Connection Test each Test Connection's Load Receiver, at the Server, keeps its own Sub-Interval grid, which the Client can't align. The Client sums the Test Connections' Sub-Intervals by subIntSeqNo, so an aggregate Sub-Interval's bits come from up to as many slightly different dt-long intervals as there are Test Connections, not from one contiguous interval. The results are marked approximate, with the largest offset between the Test Connections' Sub-Intervals shown."
+rfc = "RFC 9097 §5.3"
+requirements = ["RFC9097-5.3-L1"]
+default = "on"
+revisit = "When a Server can be told a common Sub-Interval grid (such as a start time in the Activation Request), or reports per-Trial-Interval counts the Client could re-bin as it does Downstream."
+reference = ["docs/spec.md", "docs/spec.md story 62"]
+tests = ["crates/udpstp-core/tests/multi_connection_aggregation.rs::upstream_sub_intervals_are_summed_by_number_and_their_offset_measured"]
+
+# Exit statuses
+
+[[record]]
+id = "exit-zero-with-warnings"
+kind = "obudpst-difference"
+summary = "A Test that completed with only warnings exits 0, so scripts treat it as a completed measurement. The JSON ErrorStatus still carries the warning."
+obudpst = "OB-UDPST exits with the warning's ErrorStatus."
+reference = ["docs/spec.md story 31"]
+tests = ["crates/udpstp/src/test_connection_end.rs::every_exit_status"]
+
+[[record]]
+id = "exit-own-error-statuses"
+kind = "obudpst-difference"
+summary = "udpstp adds ErrorStatus values OB-UDPST lacks, in numbers it leaves unused: 49, the last warning code, for a completed Test with no valid Maximum IP-Layer Capacity (JSON only); 201 for a coercion the Client was told to refuse; 202 for a parameter the Client can't run with; 203 for a Multi-Connection Test whose Servers set different parameters; 204 for a Test the Client user interrupted (record client-interrupt). These ErrorStatus values sit in OB-UDPST's connection-error range (200 plus an offset), away from the ranges that add an IANA-registered cmdResponse."
+obudpst = "OB-UDPST has none of these: it adds no warning for a missing maximum, and uses only 200 in its connection-error range."
+reference = ["docs/spec.md"]
+tests = [
+  "crates/udpstp/src/test_connection_end.rs::every_exit_status",
+  "crates/udpstp/src/exit.rs::a_tests_status_from_its_test_connections",
+]
+
+[[record]]
+id = "client-interrupt"
+kind = "obudpst-difference"
+summary = "On Ctrl-C (SIGINT), SIGTERM or SIGHUP (each unless the Client started with it ignored), or the Windows console's Ctrl-C, Ctrl-Break, close and shutdown events, while its Test runs, the Client stops the Test: each Test Connection in its Data Phase sends its STOP2 (record client-initiated-stop), so the Server ends its own at once, within 1 s, and the results so far are printed with ErrorStatus 204. On Unix the Client then dies of the same signal, so a shell sees 128 plus its number, even when every Test Connection had already ended (the JSON ErrorStatus then reflects the Test); on Windows it exits 204. A signal before the Test starts or after it ends, or a second one, ends the Client at once. A failed write to standard output is noticed when it fails: it stops a running Test the same way, and the Client exits 204, as when its final results can't be written."
+obudpst = "OB-UDPST on SIGINT or SIGTERM stops sending without a STOP, so the Server ends the Test by its Watchdog, and exits 255 (udpst.c signal_exit)."
+reference = []
+tests = [
+  "crates/udpstp-core/tests/multi_connection_failures.rs::an_interrupted_test_stops_every_test_connection_with_the_stop_exchange",
+  "crates/udpstp-core/tests/multi_connection_failures.rs::an_interrupt_after_the_test_ended_is_no_abort",
+  "crates/udpstp/src/exit.rs::a_tests_status_from_its_test_connections",
+  "crates/udpstp/tests/loopback.rs::an_interrupted_client_stops_the_test_and_reports_it",
+  "crates/udpstp/tests/loopback.rs::a_client_whose_stdout_closes_stops_cleanly",
+  "crates/udpstp/tests/loopback.rs::a_client_whose_stdout_closes_after_activation_stops_cleanly",
+  "crates/udpstp/tests/loopback.rs::a_client_started_with_sigint_ignored_keeps_running",
+]
+
+[[record]]
+id = "exit-most-severe-warning"
+kind = "obudpst-difference"
+summary = "A completed Test reports its most severe warning, in this order: 49 no valid maximum, 4 traffic stopped for 1 s, 5 the peer stopped receiving, 3 the peer missed Status PDUs, 2 Status PDUs never arrived, 6 invalid PDUs. A warning never replaces an error. A Multi-Connection Test reports success with the most severe warning of all once any Test Connection completed; otherwise the first Test Connection's error by mcIndex, or 200 when none had one of its own."
+obudpst = "OB-UDPST keeps the last status written: a later warning replaces an earlier, more severe one, and replaces an error too; 200 overwrites only success or a warning, and a Test Connection's normal stop turns any error into 0."
+reference = ["docs/spec.md"]
+tests = [
+  "crates/udpstp/src/test_connection_end.rs::every_exit_status",
+  "crates/udpstp/src/exit.rs::a_tests_status_from_its_test_connections",
+]
+
+# JSON output
+
+[[record]]
+id = "json-at-max-is-the-maximum"
+kind = "obudpst-difference"
+summary = "In the JSON results, `AtMax` and `ModalResult` describe the Maximum IP-Layer Capacity, the highest Sub-Interval that meets the Performance Criterion, as RFC 9097 defines the metric. A Capacity Mode with no such Sub-Interval has no `AtMax` (or `ModalResult` entry) and ErrorStatus 49. The Highest IP-Layer Capacity, with no loss criterion, is in the `udpstp` extension object."
+rfc = "RFC 9097 §6.3"
+requirements = ["RFC9097-6.3-L1"]
+obudpst = "OB-UDPST's `AtMax` is the Highest IP-Layer Capacity: the Sub-Interval with the greatest rate, whatever its loss."
+reference = []
+tests = ["crates/udpstp/src/json.rs::without_a_maximum_at_max_is_left_out"]
+
+[[record]]
+id = "json-summary-delays-from-samples"
+kind = "obudpst-difference"
+summary = "In the JSON results, the delay fields of a Sub-Interval without delay or RTT samples are 0, as OB-UDPST writes them, and the Sub-Interval is listed under `NoSamples` in the extension. `Summary` and `ModalSummary` are computed from real samples only."
+obudpst = "OB-UDPST's `Summary.PDVMin` and `RTTMin` take the minimum over Sub-Intervals including those zeros, and `PDVAvg` averages them in."
+reference = []
+
+[[record]]
+id = "json-missing-sub-intervals"
+kind = "obudpst-difference"
+summary = "In the JSON results, a Sub-Interval never measured is left out of `IncrementalResult` and listed under `MissingSubIntervals` in the extension, and `Interval` is each Sub-Interval's subIntSeqNo, so a gap shows."
+obudpst = "OB-UDPST's `Interval` counts the Sub-Intervals processed, so it has no notion of a missing one: the numbering runs on."
+reference = []
+
+[[record]]
+id = "json-incomplete-test-results-in-extension"
+kind = "obudpst-difference"
+summary = "When a Test activated but didn't complete (ErrorStatus 200 and up), `Output` has only its header and trailer, as OB-UDPST writes it. The extension's `SubIntervals` keeps every measured Sub-Interval with the same fields and units as `Output.IncrementalResult`, including loss and delay figures, or an empty array if none was measured. Its `MinRTT` is the smallest measured minimum RTT in seconds, or null if unavailable. Both are omitted with `--json-extension=false`."
+obudpst = "OB-UDPST drops every Sub-Interval result of a Test that ends with ErrorStatus 200."
+reference = []
+tests = ["crates/udpstp/src/test_results.rs::an_interrupted_tests_json_keeps_its_measured_sub_intervals", "crates/udpstp/src/test_results.rs::an_incomplete_tests_json_keeps_missing_measurements_explicit", "crates/udpstp/tests/loopback.rs::an_interrupted_client_stops_the_test_and_reports_it"]
+
+[[record]]
+id = "usdir-set-on-every-upstream-setup"
+kind = "interpretation"
+summary = "The Client sets CHSR_USDIR_BIT in every Upstream Setup Request, whether or not it states a maxBandwidth, since the bit says which direction the maxBandwidth field is for."
+rfc = "RFC 9946 §6.1"
+requirements = ["RFC9946-6.1-L8"]
+obudpst = "An OB-UDPST Client sets the bit only when it states a maxBandwidth (-B); otherwise the whole field is 0."
+reference = []
+tests = ["crates/udpstp-core/tests/admission_limits.rs::the_client_states_its_max_bandwidth_and_sets_usdir_for_upstream"]
+masks = [
+  { pdu = "setup-request", fields = ["max_bandwidth"], when = ["upstream", "no-max-bandwidth-stated"] },
+]
+
+[[record]]
+id = "client-keeps-to-its-max-bandwidth"
+kind = "deviation"
+deviation = "non-conformance"
+summary = "A Client that stated a maxBandwidth keeps to it as Load Sender: a Sending Rate Structure above it, IP-layer with IPv4 headers as the rows are rated, is sent with its intervals lengthened by the ratio, rounded up, so its packet sizes and Bursts stay as the Server chose them; the results say so. RFC 9946 §8.1 says the Client SHALL use the parameters the Server communicates, but maxBandwidth is the most the Client wants to send (§6.1), and a Server needn't honour it (§11 item 5 makes that optional). Lengthening intervals rather than shrinking Bursts or sizes keeps the packet sizes the Test measures with and works for a Burst of one."
+rfc = "RFC 9946 §6.1, §8.1, §11"
+requirements = ["RFC9946-8.1-6"]
+obudpst = "An OB-UDPST Client sends whatever the Server assigns; an OB-UDPST Server caps its rows at maxBandwidth only when built with RATE_LIMITING."
+default = "on"
+setting = "`--max-bandwidth`"
+revisit = "If every Server honoured the stated maxBandwidth, or RFC 9946 said what a Client should do with a Sending Rate Structure above it."
+reference = []
+tests = [
+  "crates/udpstp-core/tests/upstream.rs::a_client_keeps_to_its_max_bandwidth_against_a_server_that_assigns_more",
+  "crates/udpstp-core/tests/upstream.rs::a_structure_within_the_max_bandwidth_is_sent_as_given",
+  "crates/udpstp-core/tests/upstream.rs::our_server_never_makes_the_client_cap_its_rate",
+]
+
+[[record]]
+id = "no-preamble-transmission"
+kind = "deviation"
+deviation = "non-conformance"
+summary = "The Client can't send a short preamble to wake on-demand access (such as a cellular radio) and leave it out of the results. RFC 9946 defines no preamble, and its search starting from row 0 only ramps up. A slow wake-up shows in the first Sub-Intervals, which a user can put in a Capacity Mode of their own (`--first-mode-sub-intervals`)."
+rfc = "RFC 9097 §8.3"
+requirements = ["RFC9097-8.3-4"]
+obudpst = "OB-UDPST has none either; its JSON reports PreambleDuration 0."
+default = "on"
+revisit = "If a user tests over on-demand access and the first Sub-Intervals mislead, or a later UDPSTP version defines a preamble."
+reference = ["docs/conformance/requirements/rfc9097-08.toml"]
+
+
+[[record]]
+id = "results-name-the-phase-and-f"
+kind = "interpretation"
+summary = "A Test is one Phase of RFC 9097 §9's tables: a Search Test or a Fixed-Rate Test, with F Test Connections. The text names Phase and F once in its Results Summary heading and parameters (\"Downstream Search Test\", \"1 Test Connection (F)\"), for both the Maximum IP-Layer Capacity per Capacity Mode and the table of IP-Layer Sender Bit Rates. The whole Test's maxima aggregate all its Test Connections; individual maxima appear under each Test Connection's heading. The JSON names both in TestType and NumberOfConnections."
+rfc = "RFC 9097 §9"
+requirements = ["RFC9097-9-3", "RFC9097-9-4", "RFC9097-9-10"]
+reference = []
+tests = ["crates/udpstp/src/results.rs::a_completed_test", "crates/udpstp/src/results.rs::terminal_layout_preserves_measurements_context_and_validity"]
+
+[[record]]
+id = "compact-human-final-metrics"
+kind = "deviation"
+deviation = "unmet-should"
+summary = "Human results show labelled final metrics rather than a second table repeating the Maximum IP-Layer Capacity. Phase and F appear in the Results Summary parameters, and each Capacity Mode retains its Maximum IP-Layer Capacity, Loss Ratio and RTT bounds. This makes the main result prominent on wide and narrow terminals. The Sub-Interval table and structured JSON retain their measurement data."
+rfc = "RFC 9097 §9"
+requirements = ["RFC9097-9-2", "RFC9097-9-3", "RFC9097-9-4", "RFC9097-9-5"]
+default = "on"
+revisit = "If tabular final metrics become necessary for human comparison across Tests; machine consumers use JSON."
+tests = ["crates/udpstp/src/test_results.rs::report_layout_keeps_one_capacity_headline_and_one_aggregate_outcome", "crates/udpstp/src/results.rs::terminal_layout_preserves_measurements_context_and_validity"]
+
+[[record]]
+id = "sender-bit-rate-per-sub-interval"
+kind = "deviation"
+deviation = "unmet-should"
+summary = "The IP-Layer Sender Bit Rate is reported per Sub-Interval, for the aggregate of the Test Connections, in the text and the JSON, not as RFC 9097 §9's table of every st for each Test Connection and the aggregate: that table has 20 rows a second for each Test Connection at the default st of 50 ms. The per-st figures exist in the Data Phase's events."
+rfc = "RFC 9097 §9"
+requirements = ["RFC9097-9-11", "RFC9097-9-12"]
+default = "on"
+revisit = "If a user needs the per-st, per-Test-Connection rates, for example to study a sender's burstiness: add them to the JSON first."
+reference = []
+tests = [
+  "crates/udpstp/src/results.rs::an_upstream_test",
+  "crates/udpstp-core/tests/sub_interval_results.rs::an_upstream_client_reports_what_it_sent_per_st",
+]

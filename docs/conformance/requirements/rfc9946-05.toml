@@ -1,0 +1,490 @@
+# RFC 9946 section 5: Requirements, Security Operations, and Optional Checksum.
+# Section 5.2 has no normative sentences.
+# Format and ID convention: docs/conformance/README.md.
+
+[[requirement]]
+id = "RFC9946-5-L1"
+text = "Due to the additional complexities, and loss of the direct mapping of packets to datagrams between Layer 3 and Layer 4, it is recommended that Layer 3 fragmentation be avoided."
+text_sha256 = "49be0cb706a7fc08"
+state = "pending"
+note = "Default datagram sizes fit a traditional MTU."
+
+[[requirement]]
+id = "RFC9946-5-1"
+text = "Unless IP fragmentation is expected, and is one of the attributes being measured, the IPv4 Don't Fragment (DF) bit SHOULD be set for all tests."
+text_sha256 = "b48998796ea3953e"
+state = "deviation"
+reference = "windows-dont-fragment-unset"
+note = "The dont_fragment setting, on by default."
+
+[[requirement]]
+id = "RFC9946-5-L2"
+text = "Note: When this specification is used for network debugging, it may be useful for fragmentation to be under the control of the test administrator."
+text_sha256 = "49ad087857bce727"
+state = "pending"
+note = "The dont_fragment setting."
+
+[[requirement]]
+id = "RFC9946-5-2"
+text = "This section specifies generic requirements, which a measurement load rate adjustment algorithm conforming to this specification MUST fulfill."
+text_sha256 = "9acaa62b9676632d"
+state = "not-applicable"
+note = "An introduction to the section's Requirements, each recorded with its own ID; nothing to do beyond them."
+
+[[requirement]]
+id = "RFC9946-5.1-1"
+text = "Load rate adjustment algorithms for capacity measurement MUST comply with the requirements specified by this section."
+text_sha256 = "9c73cbce4fdaedcd"
+state = "not-applicable"
+note = "An introduction to the section's Requirements, each recorded with its own ID; nothing to do beyond them."
+
+[[requirement]]
+id = "RFC9946-5.1-2"
+text = "New standard load rate adjustment algorithms for capacity measurement MUST be reviewed by IETF designated experts prior to assignment of a code point in the \"Test Activation PDU Rate Adjustment Algo\" registry."
+text_sha256 = "11fdff76250454ab"
+state = "not-applicable"
+note = "An IANA registration process, not endpoint behaviour."
+
+[[requirement]]
+id = "RFC9946-5.1-3"
+text = "The measurement load rate adjustment algorithm described in this section MUST NOT be used as a general CCA."
+text_sha256 = "203191d00d3abe26"
+state = "operational"
+note = "A usage statement: udpstp runs the algorithm only within a Test."
+
+[[requirement]]
+id = "RFC9946-5.1-4"
+text = "This specification MUST only be used in the application of diagnostic and operations measurements."
+text_sha256 = "8a128f1f8cfc56dd"
+state = "operational"
+note = "A usage statement."
+
+[[requirement]]
+id = "RFC9946-5.1-5"
+text = "Both Load PDU messages and Status Feedback PDU messages MUST contain sequence numbers."
+text_sha256 = "26b3763c48199073"
+state = "pending"
+note = "lpduSeqNo and spduSeqNo fields."
+
+[[requirement]]
+id = "RFC9946-5.1-6"
+text = "The nominal duration of a measurement interval at the Destination, parameter testIntTime (\"I\" in [RFC9097]), MUST default to a value of no more than 10 seconds."
+text_sha256 = "88da4ea84fc67609"
+state = "pending"
+note = "testIntTime default."
+
+[[requirement]]
+id = "RFC9946-5.1-7"
+text = "A high-speed mode to achieve high sending rates quickly MUST reduce the measurement load below a level for which the first feedback interval inferred \"congestion\" from the measurements."
+text_sha256 = "a7e81e2118ccd4ea"
+state = "pending"
+note = "Fast Mode's drop when Congestion is confirmed."
+
+[[requirement]]
+id = "RFC9946-5.1-L1"
+text = "Consecutive feedback intervals that have a supra-threshold count of sequence number anomalies and/or contain an upper delay variation threshold exception in all of the consecutive intervals indicate \"congestion\" within a test."
+text_sha256 = "58899c0faba49243"
+state = "pending"
+note = "Congestion Confirmed after slowAdjThresh Errored Intervals back to back (ADR 0005)."
+
+[[requirement]]
+id = "RFC9946-5.1-8"
+text = "The threshold of consecutive feedback intervals SHALL be configurable with a default of 3 intervals and a maximum duration to infer congestion of 500 ms (milliseconds)."
+text_sha256 = "67de0f1cf3561466"
+state = "deviation"
+reference = "operator-keys-exempt-from-500-ms-congestion-inference"
+note = "slowAdjThresh and trialInt."
+
+[[requirement]]
+id = "RFC9946-5.1-9"
+text = "Congestion MUST be indicated if the Status Feedback PDUs indicate that either sequence number anomalies were detected OR the delay range was above the upper delay variation threshold."
+text_sha256 = "490f597b49447bbc"
+state = "pending"
+note = "seqErrThresh and upperThresh."
+
+[[requirement]]
+id = "RFC9946-5.1-10"
+text = "The RECOMMENDED threshold values are 10 for sequence number gaps, 30 ms for lower delay variation thresholds, and 90 ms for upper delay variation thresholds."
+text_sha256 = "b2523521fc4eb355"
+state = "pending"
+note = "seqErrThresh, lowThresh and upperThresh defaults."
+
+[[requirement]]
+id = "RFC9946-5.1-11"
+text = "The load rate adjustment algorithm MUST include a Load PDU timeout and a Status PDU timeout, which both stop the test when received PDU streams cease unexpectedly."
+text_sha256 = "7afedbf080e6d07b"
+state = "pending"
+note = "ADR 0002 reconciles them with the Section 6.1 Watchdog."
+
+[[requirement]]
+id = "RFC9946-5.1-12"
+text = "The Load PDU timeout SHALL be reset to the configured value each time a Load PDU is received."
+text_sha256 = "7fdd6d2ba2fdbb80"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.1-13"
+text = "If the Load PDU timeout expires, the receiver SHALL be closed and no further Status PDU feedback sent."
+text_sha256 = "4a45d61ce471e6a3"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.1-14"
+text = "The default Load PDU timeout MUST be no more than 1 second."
+text_sha256 = "2fb256b7c73e8493"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.1-15"
+text = "The Status PDU timeout SHALL be reset to the configured value each time a feedback message is received."
+text_sha256 = "e3adf5b0419721a4"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.1-16"
+text = "If the Status PDU timeout expires, the sender SHALL be closed and no further load packets sent."
+text_sha256 = "77ab5f12c1d6668b"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.1-17"
+text = "The default Status PDU timeout MUST be no more than 1 second."
+text_sha256 = "3b7da5eea5218ea5"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.1-18"
+text = "A network operator who is certain of the IP-Layer Capacity to be validated MAY start with a fixed-rate test at the IP-Layer Capacity and avoid activating the measurement load rate adjustment algorithm (see Section 8.1 of [RFC9097])."
+text_sha256 = "1735f2fe83612cc9"
+state = "pending"
+note = "A Fixed-Rate Test under an Operator Key."
+
+[[requirement]]
+id = "RFC9946-5.1-19"
+text = "However, the stimulus for a diagnostic test (such as a subscriber request) strongly implies that there is no certainty, and the load adjustment algorithm is RECOMMENDED."
+text_sha256 = "834ae7b9dd8c5e31"
+state = "operational"
+note = "An operator's choice of test."
+
+[[requirement]]
+id = "RFC9946-5.1-20"
+text = "This specification MUST only be used in circumstances consistent with Section 10 (Security Considerations) of [RFC9097]."
+text_sha256 = "bdb443f589c8ac31"
+state = "operational"
+note = "A usage statement."
+
+[[requirement]]
+id = "RFC9946-5.3-1"
+text = "A REQUIRED mode with authentication during the Control phase (Test Setup and Test Activation exchanges)."
+text_sha256 = "8947d3bd8f04b4fb"
+state = "deviation"
+reference = "unauthenticated-mode"
+note = "Authentication Mode 1; authMode field."
+
+[[requirement]]
+id = "RFC9946-5.3-2"
+text = "An OPTIONAL mode with the additional authentication of the Status Feedback messages during the Data phase."
+text_sha256 = "8b86583541df14c2"
+state = "pending"
+note = "Authentication Mode 2; authMode field."
+
+[[requirement]]
+id = "RFC9946-5.3.1-1"
+text = "In this mode, the client and the server SHALL be configured to use one of a number of shared secret keys, designated via the numeric keyId field (see Section 5.4)."
+text_sha256 = "4a916c5fb901e0e5"
+state = "pending"
+note = "keyId field; the Key Table."
+
+[[requirement]]
+id = "RFC9946-5.3.1-2"
+text = "This key SHALL be used as input to the KDF, as specified in Section 5.4.1, to obtain the actual keys used by the client and server for authentication."
+text_sha256 = "abdc10f8072163e8"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.3.1-3"
+text = "During the Control phase, the sender SHALL read the current system (wall-clock) time and populate the authUnixTime field and next calculate the 32-octet HMAC-SHA-256 hash of the entire PDU according to Section 6 of [RFC6234] (with the authDigest and checkSum preset to all zeroes)."
+text_sha256 = "cb76b5c7ef0de16d"
+state = "pending"
+note = "authUnixTime and authDigest fields."
+
+[[requirement]]
+id = "RFC9946-5.3.1-L1"
+text = "The authDigest field is filled by the result, then the packet is sent to the receiver."
+text_sha256 = "17f64c6627361639"
+state = "pending"
+note = "authDigest field."
+
+[[requirement]]
+id = "RFC9946-5.3.1-4"
+text = "The value in the authUnixTime field is a 32-bit timestamp, and a 10-second tolerance window (+/- 5 seconds) SHALL be used by the receiver to distinguish a subsequent replay of a PDU."
+text_sha256 = "867f89f844e69376"
+state = "pending"
+note = "authUnixTime field; the replay cache."
+
+[[requirement]]
+id = "RFC9946-5.3.1-L2"
+text = "See Table 2 of [TR-471] for a recommended timestamp resolution."
+text_sha256 = "e750566d16eff32f"
+state = "not-applicable"
+note = "A pointer to TR-471's recommended timestamp resolution, not a behaviour; authUnixTime is whole seconds as the PDU defines it."
+
+[[requirement]]
+id = "RFC9946-5.3.1-5"
+text = "Upon reception, the receiver SHALL validate the message PDU for correct length, validity of authDigest, immediacy of authUnixTime, and expected formatting (PDU-specific fields are also checked, such as protocol version)."
+text_sha256 = "35f69ff55b998934"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.3.1-L3"
+text = "Validation of the authDigest requires that it be extracted from the PDU and the field, along with the checkSum field, zeroed prior to the Hashed Message Authentication Code (HMAC) calculation used for comparison (see Section 7.2 of [RFC9145])."
+text_sha256 = "30d26dd4cbaa72a8"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.3.1-6"
+text = "If the validation fails, the receiver SHOULD NOT continue with the Control phase and SHOULD implement silent rejection (no further packets sent on the address/port pairs)."
+text_sha256 = "c7c117244ade00dc"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.3.1-L4"
+text = "The exception is when the testing hosts have been configured for troubleshooting Control phase failures and rejection messages will aid in the process."
+text_sha256 = "69f385640ee5925a"
+state = "pending"
+note = "Permits reporting a failed validation when configured for troubleshooting."
+
+[[requirement]]
+id = "RFC9946-5.3.1-7"
+text = "If the validation succeeds, the receiver SHALL continue with the Control phase and compose a successful response or a response indicating the error conditions identified (if any)."
+text_sha256 = "7ab8cf4aa9188293"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.3.1-8"
+text = "This process SHALL be executed for the request and response in the Test Setup exchange, including the Null Request (Section 6) and the Test Activation exchange (Section 7)."
+text_sha256 = "17ed3f235887c90d"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.3.2-1"
+text = "When using the optional authentication during the Data phase, authentication SHALL also be applied to the Status Feedback PDU (see Section 8.2)."
+text_sha256 = "bd744dfd78483e18"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.3.2-2"
+text = "The Status PDU sender SHALL 1) read the current system (wall-clock) time and populate the authUnixTime field, 2) calculate the authDigest field of the entire Status PDU (with the authDigest and checkSum preset to all zeroes), and 3) send the packet to the receiver."
+text_sha256 = "d02c2605f018cce2"
+state = "pending"
+note = "Status PDU authUnixTime and authDigest fields."
+
+[[requirement]]
+id = "RFC9946-5.3.2-L1"
+text = "The values of authUnixTime field and authDigest field are determined as defined by Section 5.3.1."
+text_sha256 = "3b32c0c24abc12f3"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.3.2-3"
+text = "Upon reception, the receiver SHALL validate the message PDU for correct length, validity of authDigest, immediacy of authUnixTime, and expected formatting (PDU-specific fields are also checked, such as protocol version)."
+text_sha256 = "35f69ff55b998934"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.3.2-L2"
+text = "Validation of the authDigest will require that it be extracted from the PDU and the field, along with the checkSum field, zeroed prior to the HMAC calculation used for comparison."
+text_sha256 = "23bd553671cfa1d4"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.3.2-4"
+text = "If the authentication validation fails, the receiver SHALL ignore the message."
+text_sha256 = "21c31dbc841b4f0f"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.3.2-5"
+text = "If the watchdog timer expires (due to successive failed validations), the test session will prematurely terminate (and no further load traffic SHALL be transmitted)."
+text_sha256 = "d3e9379608b94f6f"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.3.2-6"
+text = "If this optional mode has not been selected, then the keyId, authUnixTime, and authDigest fields of the Status PDU (see Section 8.2) SHALL be set to all zeroes."
+text_sha256 = "9c4146a9d8216dc3"
+state = "pending"
+note = "Status PDU keyId, authUnixTime and authDigest fields."
+
+[[requirement]]
+id = "RFC9946-5.4-1"
+text = "The key table SHALL be used with the REQUIRED authentication mode and the OPTIONAL authentication mode (using the same key)."
+text_sha256 = "3185b230e35e1eeb"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.4-2"
+text = "For authentication, this key SHALL only be used as input to the KDF, as specified in Section 5.4.1, to derive the actual keys used for authentication processing."
+text_sha256 = "69c288faedb60e1d"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.4-3"
+text = "The key table SHALL have (at least) the following fields per Section 2 of [RFC7210]: * AdminKeyName * LocalKeyName * KDF * AlgID * Key * SendLifetimeStart * SendLifeTimeEnd * AcceptLifeTimeStart * AcceptLifeTimeEnd"
+text_sha256 = "e76611251072f632"
+state = "pending"
+note = "The TOML Key Table."
+
+[[requirement]]
+id = "RFC9946-5.4-4"
+text = "The LocalKeyName SHALL be determined from the corresponding keyId field in the PDUs that follow."
+text_sha256 = "257f487c4579f964"
+state = "pending"
+note = "keyId field."
+
+[[requirement]]
+id = "RFC9946-5.4.1-1"
+text = "The KDF algorithm SHALL be a Key Derivation Function in Counter Mode, as specified in Section 4.1 of [NIST800-108]."
+text_sha256 = "a19273e1e08b4262"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.4.1-2"
+text = "The Pseudorandom Function (PRF) used in the KDF SHALL be HMAC-SHA-256, as defined in Section 6 of [RFC6234]."
+text_sha256 = "75da8cb40380b3f9"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.4.1-3"
+text = "The KDF SHALL use the following parameters: * Kin (key-derivation key): The shared key as identified by the keyId field in the PDU. * Label: The fixed string \"UDPSTP\" (without quotes), encoded as a UTF-8 string, used to bind the derived keys to this specific protocol. * Context: The UTF-8 string representation of the authUnixTime field received in the very first Setup Request PDU sent from the client to the server. This ensures that the derived keys are unique to the session and tied to the temporal context of the initial setup exchange. The authUnixTime field serves as a nonce and is protected from modification by the HMAC-SHA-256 hash present in the authDigest field. * r: The length of the binary encoding of the counter SHALL be 32 (bits)."
+text_sha256 = "de7d543afed9510d"
+state = "pending"
+note = "The fixed input is laid out as Appendix A builds it."
+
+[[requirement]]
+id = "RFC9946-5.4.1-4"
+text = "The length of the binary encoding of the counter SHALL be 32 (bits)."
+text_sha256 = "d9b9998e8e5d9594"
+state = "pending"
+note = "The r parameter."
+
+[[requirement]]
+id = "RFC9946-5.4.1-5"
+text = "The total derived key material SHALL be 512 bits (64 octets) in length."
+text_sha256 = "de34b47878d45919"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.4.1-6"
+text = "The key material SHALL be structured as follows, from most significant bit (MSB) to least significant bit (LSB): * Client Authentication Key: 256 bits (32 octets); used for authenticating messages sent by the client. * Server Authentication Key: 256 bits (32 octets); used for authenticating messages sent by the server."
+text_sha256 = "f95fee68037997d9"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.4.1-7"
+text = "If authentication of the initial Setup Request PDU received by the server fails, due to an invalid authDigest field, any and all derived keying material and keys SHALL be considered invalid."
+text_sha256 = "5a44804349d6836c"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.4.1-8"
+text = "The key material derived from the initial Setup Request PDU, either at the client prior to transmission or at the server upon reception, SHALL be used for all subsequent PDUs sent between them for that test connection."
+text_sha256 = "634bb3d087be9258"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.5-L1"
+text = "Successful interaction with a local firewall assumes the firewall is configured to allow a host to open a bidirectional connection using unique source and destination addresses as well as port numbers (i.e., a 4-tuple) by sending a packet using that 4-tuple for a given transport protocol."
+text_sha256 = "20ff11121ec31185"
+state = "operational"
+note = "Client-side firewall configuration."
+
+[[requirement]]
+id = "RFC9946-5.5-1"
+text = "The firewall at the server MUST be configured with an open pinhole for the server IP address and standard UDP port number of the server."
+text_sha256 = "f7ed9c4ebf2f2686"
+state = "operational"
+note = "Server firewall configuration."
+
+[[requirement]]
+id = "RFC9946-5.5-2"
+text = "Assuming that the firewall administration at the server does not allow an open UDP ephemeral port range, then the server MUST send a Null Request to the client from the ephemeral port number communicated to the client in the Test Setup Response."
+text_sha256 = "8f281963f9481017"
+state = "pending"
+note = "Null Request, sent from the Ephemeral Port."
+
+[[requirement]]
+id = "RFC9946-5.5-L2"
+text = "If the server firewall administration allows an open UDP ephemeral port range, then the Null Request is not strictly necessary."
+text_sha256 = "be46004fbd99312c"
+state = "pending"
+note = "Permits leaving out the Null Request."
+
+[[requirement]]
+id = "RFC9946-5.6-1"
+text = "The protocol MUST utilize the standard UDP checksum for all IPv4 and IPv6 datagrams it sends."
+text_sha256 = "11c48dea4ca4b1a9"
+state = "operational"
+note = "The operating system's UDP stack computes the UDP checksum; udpstp never turns it off (no SO_NO_CHECK), and IPv6 requires it."
+
+[[requirement]]
+id = "RFC9946-5.6-L1"
+text = "All of the PDUs exchanged between the client and server support an optional header checksum that covers the various fields in the UDPSTP PDU (excluding the payload content of the Load PDU and, to be clear, also the IP and UDP headers)."
+text_sha256 = "54f06a6f19f942e9"
+state = "pending"
+note = "checkSum field."
+
+[[requirement]]
+id = "RFC9946-5.6-L2"
+text = "The calculation is the same as the 16-bit one's complement Internet checksum used in the IPv4 packet Header Checksum specification (see Section 3.1 of [RFC0791])."
+text_sha256 = "4cdb78eeeefadc04"
+state = "pending"
+note = "checkSum field."
+
+[[requirement]]
+id = "RFC9946-5.6-2"
+text = "However, all UDPSTP datagrams transmitted via IPv4 or IPv6 SHALL include a standard UDP checksum to protect other potential recipients to whom a corrupted packet may be delivered."
+text_sha256 = "b53d7ae8fb155ca0"
+state = "operational"
+note = "The operating system's UDP stack computes the UDP checksum; udpstp never turns it off (no SO_NO_CHECK), and IPv6 requires it."
+
+[[requirement]]
+id = "RFC9946-5.6-L3"
+text = "In the case of a nonstandard network API, one option to reduce processing overhead may be to restrict testing to only utilize a payload content of all zeros so that the UDP checksum calculation need not include it for Load PDUs."
+text_sha256 = "48856760747da307"
+state = "not-applicable"
+note = "udpstp sends through the standard socket API."
+
+[[requirement]]
+id = "RFC9946-5.6-3"
+text = "If a PDU sender is populating the checkSum field, it SHALL do so as the last step after the PDU is built in all other respects (with the checkSum field set to zero prior to the calculation)."
+text_sha256 = "ff008ccbae25a694"
+state = "pending"
+note = "checkSum field."
+
+[[requirement]]
+id = "RFC9946-5.6-4"
+text = "The PDU receiver SHALL subsequently verify the PDU checksum whenever checksum processing has been configured and the field is populated."
+text_sha256 = "fae263b1b13ca4ca"
+state = "pending"
+note = "checkSum field."
+
+[[requirement]]
+id = "RFC9946-5.6-5"
+text = "If PDU checksum validation fails, the PDU SHALL be discarded."
+text_sha256 = "c540359804b70d86"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-5.6-6"
+text = "Because of the redundancy when used in conjunction with authentication, it is OPTIONAL for a PDU sender to utilize the UDPSTP checkSum field."
+text_sha256 = "674f09e35df0f9e0"
+state = "pending"
+note = "checkSum field."
+
+[[requirement]]
+id = "RFC9946-5.6-7"
+text = "However, because authentication is not applicable to the Load PDU, the checkSum field SHALL be utilized by the sender whenever UDP data integrity may be uncertain (as outlined above)."
+text_sha256 = "42d9165c22388d1b"
+state = "pending"
+note = "Load PDU checkSum field."

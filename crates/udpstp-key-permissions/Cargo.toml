@@ -1,0 +1,23 @@
+[package]
+name = "udpstp-key-permissions"
+version = "0.1.0"
+description = "Windows Shared Key file permission assessment for udpstp"
+edition.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+readme = "README.md"
+keywords = ["acl", "windows", "permissions", "security", "udpstp"]
+categories = ["os::windows-apis"]
+
+# ADR 0015: only the native module may override this denial. The
+# application's policy and descriptor decoder also forbid unsafe.
+[lints.rust]
+unsafe_code = "deny"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "=0.61.2", features = ["Win32_Foundation", "Win32_Security", "Win32_System_Threading", "Win32_System_SystemServices", "Win32_Storage_FileSystem"] }

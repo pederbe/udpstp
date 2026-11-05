@@ -1,0 +1,398 @@
+# RFC 9946 section 8: Test Load Stream Transmission and Measurement Status Feedback Messages.
+# Format and ID convention: docs/conformance/README.md.
+# Section 8 itself (before 8.1) has no normative sentences.
+
+[[requirement]]
+id = "RFC9946-8.1-1"
+text = "When the server is sending Status Feedback messages, they will also contain the latest transmission parameters from the Sending Rate Table that the client SHALL use."
+text_sha256 = "5a59d81dd96440cf"
+state = "pending"
+note = "srStruct in the Status PDU. Sizes are IPv4-based and an IPv6 Load Sender subtracts 20 bytes (ADR 0004)."
+
+[[requirement]]
+id = "RFC9946-8.1-2"
+text = "When a Load PDU is received, the receiver SHALL do the following: 1. Verify that the size of the message is greater than or equal to the 'struct loadHdr' size shown in Figure 9. 2. Validate the checksum for the Load PDU header portion of the total message (as described in Section 5.6) if the optional checkSum field is being utilized. 3. Confirm that the PDU ID is 0xBEEF (Load PDU)."
+text_sha256 = "1f414c1cd20c1605"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-8.1-3"
+text = "If any of the above checks fail, the message SHALL be considered invalid."
+text_sha256 = "8ac82c1cbdeb8d6e"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-8.1-4"
+text = "The watchdog timer at the receiver SHALL be reset each time a valid Load PDU is received (which includes verification of the checkSum, if in use)."
+text_sha256 = "ad537815df717815"
+state = "pending"
+note = "Timeouts per ADR 0002."
+
+[[requirement]]
+id = "RFC9946-8.1-5"
+text = "When the server is sending Load PDUs in the role of sender, it SHALL use the transmission parameters directly from the Sending Rate Table via the index that is currently selected (which was indirectly based on the feedback in its received Status Feedback messages)."
+text_sha256 = "ace4f805e8349230"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-8.1-6"
+text = "However, when the client is sending Load PDUs in the role of sender, it SHALL use the discrete transmission parameters that were communicated by the server in its periodic Status Feedback messages (and not referencing a Sending Rate Table directly)."
+text_sha256 = "524d9e4e3cf2e582"
+state = "deviation"
+reference = ["sending-rate-structure-sanity-limits", "client-keeps-to-its-max-bandwidth"]
+note = "srStruct in the Status PDU."
+
+[[requirement]]
+id = "RFC9946-8.1-7"
+text = "The threshold of consecutive feedback intervals SHALL be configurable with a default of 3 intervals."
+text_sha256 = "f9646877385fc4bb"
+state = "pending"
+note = "Fast Mode of algorithm B; slowAdjThresh field (Section 7.1)."
+
+[[requirement]]
+id = "RFC9946-8.1-8"
+text = "An OPTIONAL load rate adjustment algorithm (designated C) has been defined in [TR-471]."
+text_sha256 = "e88be887b50b5d5c"
+state = "pending"
+note = "rateAdjAlgo C (Section 12.3.8)."
+
+[[requirement]]
+id = "RFC9946-8.1-9"
+text = "On the other hand, the test configuration MAY use a fixed sending rate requested by the client, using the field srIndexConf."
+text_sha256 = "7e35098da37eac3b"
+state = "pending"
+note = "Fixed-Rate Tests."
+
+[[requirement]]
+id = "RFC9946-8.1-10"
+text = "The client MAY communicate the desired fixed rate in its Test Activation Request."
+text_sha256 = "ba3995cc06e6326f"
+state = "pending"
+note = "srIndexConf without CHTA_SRIDX_ISSTART."
+
+[[requirement]]
+id = "RFC9946-8.1-11"
+text = "The UDP PDU format layout SHALL be as follows (big-endian AB):"
+text_sha256 = "58dc780ed33968a3"
+state = "pending"
+note = "Figure 8, the Load PDU layout, follows."
+
+[[requirement]]
+id = "RFC9946-8.1-12"
+text = "All outgoing Load or Status PDUs SHALL continue to assert this indication until traffic is received again, or the test is terminated."
+text_sha256 = "a16b217c0fc71d67"
+state = "pending"
+note = "rxStopped field."
+
+[[requirement]]
+id = "RFC9946-8.1-13"
+text = "The Load PDU SHALL be organized as follows (followed by any payload content):"
+text_sha256 = "7139f01a682507cc"
+state = "pending"
+note = "Figure 9's struct loadHdr follows."
+
+[[requirement]]
+id = "RFC9946-8.1-L1"
+text = "The default algorithm (B; see [Y.1540]) has three paths to its decision on the next sending rate: 1. When there are no impairments present (no sequence errors and low delay variation), resulting in a sending rate increase. 2. When there are low impairments present (no sequence errors but higher levels of delay variation), the same sending rate is maintained. 3. When the impairment levels are above the thresholds set for this purpose and \"congestion\" is inferred, resulting in a sending rate decrease."
+text_sha256 = "1ba1da9f754c2559"
+state = "pending"
+note = "Load Rate Adjustment Algorithm; its requirements are in Section 5.1."
+
+[[requirement]]
+id = "RFC9946-8.1-L2"
+text = "Consecutive feedback intervals that have a supra- threshold count of sequence number anomalies and/or contain an upper delay variation threshold exception in all of the consecutive intervals are sufficient to declare \"congestion\" within a test."
+text_sha256 = "5883d78a46a29a9f"
+state = "pending"
+note = "Fast Mode of algorithm B."
+
+[[requirement]]
+id = "RFC9946-8.1-L3"
+text = "The single-step mode continues after the first inference of \"congestion\" from measured impairments."
+text_sha256 = "1a7c601ca3e1c2e1"
+state = "pending"
+note = "Algorithm B; algorithm C may make a Fast-Mode Retry."
+
+[[requirement]]
+id = "RFC9946-8.1-L4"
+text = "Boolean, 0 or 1, used to indicate to the remote endpoint that local receive traffic (either Load or Status PDUs) has stopped."
+text_sha256 = "057fbac2a24f33e0"
+state = "pending"
+note = "rxStopped field."
+
+[[requirement]]
+id = "RFC9946-8.1-L5"
+text = "The time threshold to trigger this condition is expected to be a reasonable fraction of the watchdog timeout (a default of one second is recommended)."
+text_sha256 = "88c6ded112530cce"
+state = "pending"
+note = "rxStopped field; record rx-stopped-from-half-the-timeout and ADR 0002."
+
+[[requirement]]
+id = "RFC9946-8.1-L6"
+text = "A four-octet field indicating the Load PDU sequence number (starting at 1)."
+text_sha256 = "8aca5c3601b70d49"
+state = "pending"
+note = "lpduSeqNo field."
+
+[[requirement]]
+id = "RFC9946-8.1-L7"
+text = "This field allows the Load PDU receiver to maintain accurate receive statistics if utilizing receive truncation (only requesting the Load PDU message header octets from the protocol stack)."
+text_sha256 = "5339734acc83b57a"
+state = "pending"
+note = "udpPayload field."
+
+[[requirement]]
+id = "RFC9946-8.1-L8"
+text = "This is determined by the Status PDU sequence number (spduSeqNo) in the most recently received Status PDU."
+text_sha256 = "69c449d36e5ae434"
+state = "pending"
+note = "spduSeqErr field."
+
+[[requirement]]
+id = "RFC9946-8.1-L9"
+text = "Two four-octet fields containing a copy of the most recent spduTime_sec/spduTime_nsec from the last Status PDU received."
+text_sha256 = "e151ed5135f9a7b0"
+state = "pending"
+note = "spduTime_sec/spduTime_nsec fields of the Load PDU."
+
+[[requirement]]
+id = "RFC9946-8.1-L10"
+text = "Two four-octet fields containing the local send time of the Load PDU."
+text_sha256 = "e3712835c3420436"
+state = "pending"
+note = "lpduTime_sec/lpduTime_nsec fields."
+
+[[requirement]]
+id = "RFC9946-8.1-L11"
+text = "On the Load PDU sender, it is the number of ms from reception of the most recent Status PDU (when the latest spduTime_sec/spduTime_nsec was obtained) to the transmission of the Load PDU (where the previously obtained spduTime_sec/spduTime_nsec is returned)."
+text_sha256 = "4e68b826f176853f"
+state = "pending"
+note = "rttRespDelay field."
+
+[[requirement]]
+id = "RFC9946-8.1-L12"
+text = "When the Load PDU receiver is calculating RTT, by subtracting the copied Status PDU send time (in the Load PDU) from the local Load PDU receive time, this value is subtracted from the raw RTT to correct for any response delay due to Load PDU scheduling."
+text_sha256 = "a2627057b4dc06cb"
+state = "pending"
+note = "rttRespDelay field."
+
+[[requirement]]
+id = "RFC9946-8.1-L13"
+text = "The checksum does not cover the payload content."
+text_sha256 = "ec02d96a5b10b729"
+state = "pending"
+note = "checkSum field of the Load PDU."
+
+[[requirement]]
+id = "RFC9946-8.1-L14"
+text = "The calculation is done as the very last step of building the PDU header, with the checkSum field set to zero."
+text_sha256 = "43a91b23f13b597c"
+state = "pending"
+note = "checkSum field of the Load PDU."
+
+[[requirement]]
+id = "RFC9946-8.1-L15"
+text = "All zeroes, all ones, or a pseudorandom binary sequence."
+text_sha256 = "a503e8bc240bf679"
+state = "pending"
+note = "Payload Content; randomized with the Test Activation modifier bit 0x02 (Section 12.3.7)."
+
+[[requirement]]
+id = "RFC9946-8.2-1"
+text = "The Load PDU receiver SHALL send a Status PDU to the sender during a test at the configured feedback interval, after at least one Load PDU has been received (when there is something to provide status on)."
+text_sha256 = "55a1daf11a364f6b"
+state = "pending"
+note = "The \"feedback interval\" is the Trial Interval, trialInt."
+
+[[requirement]]
+id = "RFC9946-8.2-2"
+text = "In these cases, the Status PDU SHALL NOT be sent."
+text_sha256 = "f736aff89bd963bf"
+state = "pending"
+note = "Before the first Load PDU arrives."
+
+[[requirement]]
+id = "RFC9946-8.2-3"
+text = "When the Load PDU sender receives a Status PDU message, it SHALL first follow the Message Verification Procedure listed in Section 6.2, Paragraph 2."
+text_sha256 = "8d6c6480d3887d72"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-8.2-4"
+text = "The watchdog timer at the Load PDU sender SHALL be reset each time a valid Status PDU is received (which includes verification of the checkSum and/or authDigest, if in use)."
+text_sha256 = "fa8e62a9c02d462f"
+state = "pending"
+note = "Timeouts per ADR 0002."
+
+[[requirement]]
+id = "RFC9946-8.2-5"
+text = "The UDP PDU format layout SHALL be as follows (big-endian AB):"
+text_sha256 = "58dc780ed33968a3"
+state = "pending"
+note = "Figure 10, the Status PDU layout, follows."
+
+[[requirement]]
+id = "RFC9946-8.2-6"
+text = "Both sets of statistics SHALL always be populated by the Load PDU receiver, regardless of role (client or server)."
+text_sha256 = "f23d6284efee770f"
+state = "pending"
+note = "sisSav and the Trial Interval fields."
+
+[[requirement]]
+id = "RFC9946-8.2-7"
+text = "This minimum SHALL be kept current (and continuously updated) via each Load PDU received with an updated spduTime_sec/spduTime_nsec."
+text_sha256 = "ac57889eb2f6b372"
+state = "pending"
+note = "rttMinimum field."
+
+[[requirement]]
+id = "RFC9946-8.2-8"
+text = "This value MUST be positive."
+text_sha256 = "785f54714d6667bf"
+state = "deviation"
+reference = "rtt-minimum-may-be-zero"
+note = "rttMinimum field."
+
+[[requirement]]
+id = "RFC9946-8.2-9"
+text = "Before an initial value can be established, and because zero is itself valid, it SHALL be set to STATUS_NODEL when communicated in the Status PDU."
+text_sha256 = "614a5d2e9b2a4646"
+state = "pending"
+note = "rttMinimum field."
+
+[[requirement]]
+id = "RFC9946-8.2-10"
+text = "When a new value is unavailable (possibly due to packet loss), and because zero is itself valid, it SHALL be set to STATUS_NODEL when communicated in the Status PDU."
+text_sha256 = "040170f44ed94d1a"
+state = "pending"
+note = "rttVarSample field."
+
+[[requirement]]
+id = "RFC9946-8.2-11"
+text = "The Status Feedback message PDU (as well as the included Sub-Interval statistics structure) SHALL be organized as follows:"
+text_sha256 = "300e5e29dadedf76"
+state = "pending"
+note = "Figure 11's struct subIntStats and struct statusHdr follow."
+
+[[requirement]]
+id = "RFC9946-8.2-L1"
+text = "The authentication and checkSum fields follow the same methodology as with the Setup Request and Response."
+text_sha256 = "33780c109b559d5b"
+state = "pending"
+note = "Status PDU; Section 6.1."
+
+[[requirement]]
+id = "RFC9946-8.2-L2"
+text = "A four-octet field containing the Status PDU sequence number (starting at 1)."
+text_sha256 = "92c16a69496d30ec"
+state = "pending"
+note = "spduSeqNo field."
+
+[[requirement]]
+id = "RFC9946-8.2-L3"
+text = "A four-octet field containing the Sub-Interval sequence number (starting at 1) that corresponds to the statistics provided in sisSav, for the last saved (completed) Sub-Interval."
+text_sha256 = "a31231c999a6d445"
+state = "pending"
+note = "subIntSeqNo field."
+
+[[requirement]]
+id = "RFC9946-8.2-L4"
+text = "seqErrOoo and seqErrDup are realized by comparing sequence numbers."
+text_sha256 = "37912cf30535c621"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-8.2-L5"
+text = "A lookback list of the last n sequence numbers received is used as the basis."
+text_sha256 = "ebafab0528427c3e"
+state = "pending"
+note = "seqErrOoo and seqErrDup."
+
+[[requirement]]
+id = "RFC9946-8.2-L6"
+text = "Each Load PDU sequence number is checked against this lookback."
+text_sha256 = "ef142e4675168974"
+state = "pending"
+note = "seqErrOoo and seqErrDup."
+
+[[requirement]]
+id = "RFC9946-8.2-L7"
+text = "The number n may depend on the implementation and on typical characteristics of environments, where UDPSTP is deployed (like mobile networks or Wi-Fi)."
+text_sha256 = "7fdc23f21038d218"
+state = "pending"
+note = "Lookback length."
+
+[[requirement]]
+id = "RFC9946-8.2-L8"
+text = "Currently, a default sequence number interval of n=32 has been chosen."
+text_sha256 = "c4c5848d2c4aff15"
+state = "pending"
+note = "Lookback length."
+
+[[requirement]]
+id = "RFC9946-8.2-L9"
+text = "Specifically for seqErrOoo, each successively received higher seqno sets the next-expected seqno to seqno+1, and anything below that is considered out of order (i.e., delayed)."
+text_sha256 = "2d9754c0d81287ff"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-8.2-L10"
+text = "For each Load PDU received, the send time (lpduTime_sec/lpduTime_nsec) is subtracted from the local receive time, which is then normalized by subtracting the current clockDeltaMin."
+text_sha256 = "1d16425d2a6ab4e8"
+state = "pending"
+note = "delayVarMin/delayVarMax/delayVarSum/delayVarCnt fields."
+
+[[requirement]]
+id = "RFC9946-8.2-L11"
+text = "Equivalent to the sum of each deltaTime (although in ms) sent in each Status PDU during the test."
+text_sha256 = "ae4ea27dcd632e19"
+state = "pending"
+note = "accumTime field."
+
+[[requirement]]
+id = "RFC9946-8.2-L12"
+text = "Obtained by subtracting the send time of each Load PDU (lpduTime_sec/ lpduTime_nsec) from the local time that it was received."
+text_sha256 = "74ded53538c25026"
+state = "pending"
+note = "clockDeltaMin field."
+
+[[requirement]]
+id = "RFC9946-8.2-L13"
+text = "This value is initialized with the first Load PDU received and is updated with each subsequent one to maintain a current (and continuously updated) minimum."
+text_sha256 = "24f708028ff604a6"
+state = "pending"
+note = "clockDeltaMin field."
+
+[[requirement]]
+id = "RFC9946-8.2-L14"
+text = "Otherwise, this value may be negative but still valid for one-way delay variation measurements for the default test duration (default is 10 seconds)."
+text_sha256 = "6a5a7ce13b9cf936"
+state = "pending"
+note = "clockDeltaMin field; the RFC gives no encoding for a negative value."
+
+[[requirement]]
+id = "RFC9946-8.2-L15"
+text = "RTT is obtained by subtracting the copied spduTime_sec/ spduTime_nsec in the received Load PDU from the local time at which it was received."
+text_sha256 = "192f9cc599b84acd"
+state = "pending"
+note = "rttMinimum field; adjusted by rttRespDelay (RFC9946-8.1-L12)."
+
+[[requirement]]
+id = "RFC9946-8.2-L16"
+text = "RTT delay variation is obtained by subtracting the current (and continuously updated) \"adjusted\" RTT minimum, communicated as rttMinimum (in Status PDU), from each \"adjusted\" RTT measurement (which is itself obtained by subtracting the copied spduTime_sec/spduTime_nsec in the received Load PDU from the local time at which it was received)."
+text_sha256 = "f92ab6f6e9b7989e"
+state = "pending"
+note = "rttVarSample field."
+
+[[requirement]]
+id = "RFC9946-8.2-L17"
+text = "Note that while one-way delay variation is measured for every Load PDU received, RTT delay variation is only sampled via the Status PDU sent and the very next Load PDU received with the corresponding updated spduTime_sec/spduTime_nsec."
+text_sha256 = "a5aaede8e0223621"
+state = "pending"
+note = "rttVarSample field."
+
+[[requirement]]
+id = "RFC9946-8.2-L18"
+text = "Boolean, 0 or 1, indicating that the clockDeltaMin and/or rttMinimum (in Status PDU), as measured by the Load PDU receiver, has been updated."
+text_sha256 = "48e444fdc44bcd83"
+state = "pending"
+note = "delayMinUpd field."

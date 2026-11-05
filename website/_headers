@@ -1,0 +1,61 @@
+# Response headers for udpstp.com, served by Cloudflare Workers static assets
+# (website/wrangler.jsonc). Written by the site build.
+#
+# Where several rules match a path, Cloudflare joins a header's values with a
+# comma, and `! Name` removes a header an earlier rule set.
+#
+# The docs may be framed by the site itself: mdBook's chapter list falls
+# back to an <iframe> of toc.html without JavaScript.
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  X-Frame-Options: SAMEORIGIN
+  Content-Security-Policy: frame-ancestors 'self'
+  Cross-Origin-Opener-Policy: same-origin
+
+# The landing page: no inline script or style at all, and no framing.
+/
+  ! X-Frame-Options
+  ! Content-Security-Policy
+  X-Frame-Options: DENY
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'
+
+/index.html
+  ! X-Frame-Options
+  ! Content-Security-Policy
+  X-Frame-Options: DENY
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'
+
+# mdBook 0.5 fingerprints its styles, scripts and theme files: a new
+# version gets a new name, so they can be cached for good.
+/css/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/theme/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Fonts keep their names across releases; cache them for a week.
+/fonts/*
+  Cache-Control: public, max-age=604800
+
+# Install scripts: plain text, always fresh.
+/install.sh
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: no-cache
+
+/install.ps1
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: no-cache
+
+# One splat, which matches any characters, then the suffix: every Markdown
+# copy of a page.
+/*.md
+  Content-Type: text/markdown; charset=utf-8
+
+/llms.txt
+  Content-Type: text/plain; charset=utf-8
+
+/llms-full.txt
+  Content-Type: text/plain; charset=utf-8

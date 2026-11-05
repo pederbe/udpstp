@@ -1,0 +1,166 @@
+# The glossary lint's exceptions (`cargo xtask glossary`; CONTRIBUTING.md).
+# Add an entry only for a true exception, never to silence drift: use the
+# glossary's term instead. An entry that exempts nothing fails the check.
+#
+# [[allow]] exempts a finding in the files `path` matches (a glob: `*`
+# within a path segment, `**` across segments) when an occurrence of
+# `pattern` in its line covers it. The pattern is case-sensitive; `*` in it
+# stands for any run of characters.
+#
+# [[unchecked]] names an avoided term that is never checked: an ordinary
+# word whose avoided sense only a reader can tell from its other senses.
+
+# GLOSSARY.md itself.
+
+[[allow]]
+path = "GLOSSARY.md"
+pattern = "_Avoid_: *"
+reason = "The _Avoid_ lists name the avoided terms."
+
+# Names the glossary doesn't govern.
+
+[[allow]]
+path = "**"
+pattern = "UDP Speed Test Protocol"
+reason = "The protocol's name, RFC 9946's title."
+
+# Other senses of an avoided phrase.
+
+[[allow]]
+path = "docs/security.md"
+pattern = "no extra grace period"
+reason = "The authUnixTime time window's edges, not the catch-up budget."
+
+# Ordinary words.
+
+[[unchecked]]
+term = "run"
+reason = "A Client runs a Test; the glossary says so itself."
+
+[[unchecked]]
+term = "path"
+reason = "The network path between the Client and the Server, RFC 9097's term."
+
+[[unchecked]]
+term = "Src"
+reason = "Every crate's src directory."
+
+[[unchecked]]
+term = "Mode"
+reason = "Avoided only unqualified: mode 1 and mode 2 are the Authentication Modes."
+
+[[unchecked]]
+term = "rate"
+reason = "Avoided only unqualified: the sending rate, a Sending Rate Table row's rate."
+
+[[unchecked]]
+term = "Runtime"
+reason = "Avoided only unqualified: the udpstp-runtime crate, and async runtimes."
+
+[[unchecked]]
+term = "report"
+reason = "Also the verb: the Client reports its results."
+
+[[unchecked]]
+term = "Timer"
+reason = "The Watchdog and the Test initiation timer are timers."
+
+[[unchecked]]
+term = "User"
+reason = "The Client user, and OS users."
+
+[[unchecked]]
+term = "sender"
+reason = "Avoided only unqualified: channel senders, a PDU's sender, the Sender Bit Rate column."
+
+[[unchecked]]
+term = "receiver"
+reason = "Avoided only unqualified: a PDU's receiver."
+
+[[unchecked]]
+term = "connection"
+reason = "Avoided only unqualified: a connected socket, firewall connection tracking."
+
+[[unchecked]]
+term = "MTU"
+reason = "Avoided only unqualified: Server MTU, Traditional MTU, a link's MTU."
+
+[[unchecked]]
+term = "cap"
+reason = "The Admitted Rate Cap and per-Test caps are caps; also the verb."
+
+[[unchecked]]
+term = "Packet"
+reason = "IP packets, which carry PDUs."
+
+[[unchecked]]
+term = "Drop"
+reason = "Avoided only unqualified: dropped datagrams."
+
+[[unchecked]]
+term = "Bandwidth"
+reason = "Avoided only unqualified: --max-bandwidth, link bandwidth."
+
+[[unchecked]]
+term = "Retry"
+reason = "Avoided only unqualified: retrying a send or a Test."
+
+[[unchecked]]
+term = "Neither"
+reason = "The English word."
+
+[[unchecked]]
+term = "TTL"
+reason = "Avoided only for the setting: the IPv4 header field."
+
+[[unchecked]]
+term = "TOS"
+reason = "Avoided only for the DSCP alone: the IPv4 header field."
+
+[[unchecked]]
+term = "phase"
+reason = "The Control Phase and the Data Phase are phases."
+
+[[unchecked]]
+term = "channel"
+reason = "Async channels, a secure channel."
+
+[[unchecked]]
+term = "speed"
+reason = "The English word; the protocol's name."
+
+[[unchecked]]
+term = "secret"
+reason = "Avoided only unqualified: container secrets, choosing a key's secret."
+
+[[unchecked]]
+term = "flow"
+reason = "Firewall flows and the IPv6 flow label."
+
+[[unchecked]]
+term = "Override"
+reason = "Avoided only of a parameter: command-line options override settings."
+
+[[unchecked]]
+term = "adjustment"
+reason = "Avoided only of a parameter: the Load Rate Adjustment Algorithm."
+
+[[unchecked]]
+term = "priority"
+reason = "Traffic priority classes, Clippy's lint priority."
+
+[[unchecked]]
+term = "impairment"
+reason = "Avoided only for Congestion: an impairment is a single-interval observation."
+
+[[unchecked]]
+term = "Client address"
+reason = "Avoided only for the Source grouping: a Client's address is its address."
+
+[[unchecked]]
+term = "Rate limit"
+reason = "The Setup Request rate limit, which GLOSSARY.md sets apart from a Quota."
+
+[[unchecked]]
+term = "batch"
+reason = "One sendmmsg or recvmmsg call's datagrams; the avoided sense is a Burst."

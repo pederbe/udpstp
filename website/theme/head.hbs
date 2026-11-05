@@ -1,0 +1,33 @@
+<!-- mdBook pages use inline scripts (theme, sidebar, path_to_root), so the docs
+     policy allows them; the landing page (website/index.html) has none and a
+     strict policy. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="author" content="Peder Bergan">
+<link rel="author" href="https://pederbe.dev">
+<link rel="me" href="https://github.com/pederbe">
+<link rel="me" href="https://www.linkedin.com/in/pederbergan/">
+<link rel="me" href="https://bsky.app/profile/pederbe.dev">
+<link rel="manifest" href="{{ path_to_root }}site.webmanifest">
+<link rel="apple-touch-icon" href="{{ path_to_root }}apple-touch-icon.png">
+<meta property="og:site_name" content="udpstp">
+<meta property="og:image" content="https://udpstp.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="udpstp: measure the capacity your network really delivers. A Rust implementation of UDPSTP (RFC 9946).">
+<meta name="twitter:card" content="summary_large_image">
+<script>
+  // Apply the open default once to a previously saved closed sidebar.
+  try {
+    if (localStorage.getItem('udpstp-sidebar-default') !== 'visible') {
+      localStorage.setItem('udpstp-sidebar-default', 'visible');
+      if (localStorage.getItem('mdbook-sidebar') === 'hidden') {
+        localStorage.removeItem('mdbook-sidebar');
+      }
+    }
+  } catch (_) {}
+  // Let mdBook add the page's section links before painting the chapter list.
+  document.documentElement.classList.add('sidebar-loading');
+  document.addEventListener('DOMContentLoaded', function () {
+    document.documentElement.classList.remove('sidebar-loading');
+  }, { once: true });
+</script>

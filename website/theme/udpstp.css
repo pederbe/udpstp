@@ -1,0 +1,473 @@
+/* udpstp docs theme: palette D (graphite, blue signal, coral accent) over
+   mdBook's navy theme, which is the default, and a retinted light theme.
+   `cargo xtask site contrast` checks the token blocks against
+   website/contrast.toml. */
+
+@font-face {
+  font-family: "udpstp Display";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../fonts/udpstp-display-bold.woff2") format("woff2");
+}
+
+/* Without JavaScript mdBook would follow the system palette under the navy
+   class, mixing its own light tokens with ours. Navy is the default for
+   every reader with JavaScript, so it is the palette without it too. */
+/* tokens: docs dark */
+.navy, html:not(.js) {
+  --bg: #121214;
+  --fg: #f4f4f5;
+  --sidebar-bg: #0c0c0e;
+  --sidebar-fg: #d4d4d8;
+  --sidebar-non-existant: #8b8b94;
+  --sidebar-active: #38bdf8;
+  --sidebar-current-bg: #0f1b23;
+  --sidebar-spacer: #2e2e33;
+  --sidebar-header-border-color: #2e2e33;
+  --scrollbar: #3f3f46;
+  --icons: #a1a1aa;
+  --icons-hover: #f4f4f5;
+  --links: #38bdf8;
+  --inline-code-color: #fda4af;
+  --inline-code-bg: #221a1e;
+  --code-bg: #1c1c20;
+  --theme-popup-bg: #1c1c20;
+  --theme-popup-border: #2e2e33;
+  --theme-hover: #26262b;
+  --quote-bg: #1c1c20;
+  --quote-border: #2e2e33;
+  --table-border-color: #2e2e33;
+  --table-header-bg: #1c1c20;
+  --table-alternate-bg: #1c1c20;
+  --table-row-bg: #121214;
+  --table-row-text: #f4f4f5;
+  --table-row-link: #38bdf8;
+  --table-row-code: #fda4af;
+  --table-row-focus: #38bdf8;
+  --searchbar-border-color: #2e2e33;
+  --searchbar-bg: #1c1c20;
+  --searchbar-fg: #f4f4f5;
+  --searchbar-shadow-color: #000000;
+  --searchresults-header-fg: #a1a1aa;
+  --searchresults-border-color: #2e2e33;
+  --searchresults-li-bg: #1c1c20;
+  --search-mark-bg: #9f1239;
+  --footnote-highlight: #4079ae;
+  --warning-border: #ff8e00;
+  --blockquote-note-color: #4493f8;
+  --blockquote-tip-color: #09ca09;
+  --blockquote-important-color: #ab7df8;
+  --blockquote-warning-color: #d29922;
+  --blockquote-caution-color: #f21424;
+  --color-scheme: dark;
+  --edge: #fb7185;
+  --rail: #38bdf8;
+  --accent-text: #fb7185;
+  --muted: #a1a1aa;
+}
+.navy, html:not(.js) { color-scheme: dark; }
+.navy pre, .navy code.hljs, html:not(.js) pre { background: var(--code-bg); }
+
+/* tokens: docs light */
+.light {
+  --bg: #ffffff;
+  --fg: #18181b;
+  --sidebar-bg: #fafafa;
+  --sidebar-fg: #3f3f46;
+  --sidebar-active: #0369a1;
+  --sidebar-current-bg: #e8f1f8;
+  --links: #0369a1;
+  --inline-code-color: #be123c;
+  --inline-code-bg: #fdf1f3;
+  --code-bg: #f4f4f5;
+  --edge: #e11d48;
+  --rail: #0369a1;
+  --accent-text: #be123c;
+  --muted: #52525b;
+  --table-border-color: #d4d4d8;
+  --table-header-bg: #ededf0;
+  --table-alternate-bg: #f4f4f5;
+  --table-row-bg: #ffffff;
+  --table-row-text: #18181b;
+  --table-row-link: #0369a1;
+  --table-row-code: #be123c;
+  --table-row-focus: #0369a1;
+}
+
+/* Elevation and tints: dark by default, lighter on the light palettes. */
+:root {
+  --shadow: rgba(0, 0, 0, 0.35);
+  --tint: rgba(56, 189, 248, 0.07);
+  --warm: rgba(251, 113, 133, 0.07);
+  --signal-glow: rgba(56, 189, 248, 0.22);
+  --edge-glow: rgba(251, 113, 133, 0.45);
+}
+.light, .rust {
+  --shadow: rgba(24, 24, 27, 0.08);
+  --tint: rgba(3, 105, 161, 0.06);
+  --warm: rgba(225, 29, 72, 0.05);
+  --signal-glow: rgba(3, 105, 161, 0.14);
+  --edge-glow: rgba(225, 29, 72, 0.25);
+}
+
+/* The other built-in themes keep their colours, with the edges, rail and
+   accent of the nearer palette. */
+.coal, .ayu { --edge: #fb7185; --rail: #38bdf8; --accent-text: #fb7185; }
+.rust { --edge: #be123c; --rail: #0369a1; --accent-text: #9f1239; }
+
+/* Tables retain each built-in theme's hue, with readable links and code
+   on both row shades. These tokens are used only inside tables. */
+/* tokens: docs coal tables */
+.coal {
+  --table-row-bg: #131516;
+  --table-alternate-bg: #1a1d1f;
+  --table-header-bg: #292f33;
+  --table-row-text: #98a3ad;
+  --table-row-link: #5bafda;
+  --table-row-code: #c5c8c6;
+  --table-row-focus: #5bafda;
+}
+/* tokens: docs ayu tables */
+.ayu {
+  --table-row-bg: #0f141a;
+  --table-alternate-bg: #151c24;
+  --table-header-bg: #24303d;
+  --table-row-text: #c5c5c5;
+  --table-row-link: #39b1df;
+  --table-row-code: #ffb454;
+  --table-row-focus: #39b1df;
+}
+/* tokens: docs rust tables */
+.rust {
+  --table-row-bg: #e1e1db;
+  --table-alternate-bg: #d9d9d0;
+  --table-header-bg: #c5beb0;
+  --table-row-text: #262625;
+  --table-row-link: #125074;
+  --table-row-code: #4b473e;
+  --table-row-focus: #125074;
+}
+
+/* Keep the reading measure shared by guides, generated references and ADRs.
+   Use relative sizes so browser text enlargement keeps the same hierarchy. */
+html { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+.content main { max-width: 76ch; min-width: 0; font-size: 1.0625em; }
+.content p, .content ol, .content ul { line-height: 1.7; }
+.content p { margin-block: 1em; }
+.content li + li { margin-top: 0.4em; }
+.content li > p { margin-block: 0.55em; }
+.content code { font-size: 0.88em; overflow-wrap: anywhere; }
+/* Reserve mdBook's inline padding before syntax highlighting adds hljs. */
+.content :not(pre):not(.header) > code {
+  padding: 0.1em 0.3em; border-radius: 4px; background: var(--inline-code-bg, var(--warm));
+}
+.content h1 { font-size: 2.5em; line-height: 1.15; margin-block: 0.85em 0.65em; }
+.content h2 { font-size: 1.8em; line-height: 1.2; margin-block: 1.7em 0.6em; }
+.content h3 { font-size: 1.3em; line-height: 1.35; margin-block: 1.65em 0.6em; }
+.content h4, .content h5, .content h6 { line-height: 1.4; margin-block: 1.5em 0.5em; }
+.content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+  overflow-wrap: anywhere;
+  scroll-margin-top: calc(var(--menu-bar-height) + 1em);
+}
+.content hr { margin-block: 2em; border: 0; border-top: 1px solid var(--table-border-color); }
+
+/* Headings in the display face, as on the landing page. */
+.content h1, .content h2 {
+  font-family: "udpstp Display", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* Each page opens with its title over a coral rule and a faint signal glow;
+   sections are set off by a line and the signal rail. */
+.content main > h1:first-child {
+  position: relative; margin-block: 0.5em 0.8em; padding-block: 0.45em 0.5em;
+  border-bottom: 1px solid var(--table-border-color);
+  background: radial-gradient(ellipse at 0 100%, var(--tint), transparent 65%);
+}
+.content main > h1:first-child::after {
+  content: ""; position: absolute; bottom: -2px; left: 0; width: 84px; height: 3px;
+  border-radius: 3px; background: var(--edge); box-shadow: 0 0 18px var(--edge-glow);
+  transform-origin: left;
+}
+.content h2 { padding-top: 0.55em; border-top: 1px solid var(--table-border-color); }
+.content main > h1:first-child + h2 { padding-top: 0; border-top: 0; }
+.content h2 .header { border-inline-start: 3px solid var(--rail); padding-inline-start: 0.45em; }
+.content h3 .header { color: var(--accent-text, var(--fg)); }
+
+/* Coral outer edges on tables and code blocks, grey lines inside, lifted
+   off the page by a soft shadow. */
+.content table {
+  border-collapse: separate; border-spacing: 0;
+  border: 1px solid var(--edge); border-radius: 10px; overflow: hidden;
+  margin: 0; font-size: 0.94em; line-height: 1.55;
+}
+.content table td, .content table th {
+  border-width: 0 0 1px 1px; border-style: solid; border-color: var(--table-border-color);
+  padding: 0.65em 0.85em; vertical-align: top; min-width: 8ch;
+}
+.content table th { text-align: start; font-weight: 700; }
+.content table code { overflow-wrap: normal; }
+.content table thead { color: var(--table-row-text); background: var(--table-header-bg); }
+.content table thead th { color: var(--table-row-link); }
+.content table tbody tr > * { color: var(--table-row-text); background: var(--table-row-bg); }
+.content table tbody tr:nth-child(even) > * { background: var(--table-alternate-bg); }
+.content table a:any-link { color: var(--table-row-link); }
+.content table :not(pre):not(.header) > code, .content table code.hljs {
+  color: var(--table-row-code); background: transparent;
+}
+.content table :focus-visible { outline-color: var(--table-row-focus); }
+.content table tr > :first-child { border-left-width: 0; }
+.content table tbody tr:last-child > * { border-bottom-width: 0; }
+.content .table-wrapper {
+  max-width: 100%; margin-block: 1.4em; border-radius: 10px;
+  box-shadow: 0 8px 24px var(--shadow);
+}
+.content pre {
+  margin-block: 1.4em; border: 1px solid var(--edge); border-radius: 10px;
+  box-shadow: 0 12px 28px var(--shadow);
+}
+.content pre > code {
+  display: block; overflow-x: auto; padding: 1em 1.15em;
+  border-radius: 9px; line-height: 1.6; overflow-wrap: normal;
+}
+
+/* Commands sit in a terminal like the landing page's, outlined in the
+   signal blue; configuration files carry their format. */
+.content pre:has(> code:is(.language-sh, .language-fish, .language-powershell)) {
+  border-color: var(--rail);
+  box-shadow: 0 24px 60px -32px var(--signal-glow), 0 12px 28px var(--shadow);
+}
+.content pre:has(> code:is(.language-sh, .language-fish, .language-powershell, .language-toml))::before {
+  display: block; padding: 0.55em 1.35em; border-bottom: 1px solid var(--table-border-color);
+  border-radius: 9px 9px 0 0; background: var(--code-bg, var(--quote-bg));
+  color: var(--links); font: 600 0.75em/1.5 var(--mono-font);
+  letter-spacing: 0.12em; text-transform: uppercase;
+}
+.content pre:has(> code:is(.language-sh, .language-fish))::before { content: "Terminal"; }
+.content pre:has(> code.language-powershell)::before { content: "PowerShell"; }
+.content pre:has(> code.language-toml)::before { content: "TOML"; color: var(--accent-text, var(--links)); }
+.content pre:has(> code:is(.language-sh, .language-fish, .language-powershell, .language-toml)) > code {
+  border-start-start-radius: 0; border-start-end-radius: 0;
+}
+
+/* Notes and callouts: a tinted panel with a coloured edge. */
+.content blockquote {
+  margin-block: 1.4em; padding: 0.3em 1.1em;
+  border: 1px solid var(--table-border-color); border-inline-start-width: 3px;
+  border-radius: 0 10px 10px 0; background: var(--quote-bg);
+}
+.content blockquote:not(.blockquote-tag) { border-inline-start-color: var(--edge); }
+.content .blockquote-tag-note { border-inline-start-color: var(--blockquote-note-color); }
+.content .blockquote-tag-tip { border-inline-start-color: var(--blockquote-tip-color); }
+.content .blockquote-tag-important { border-inline-start-color: var(--blockquote-important-color); }
+.content .blockquote-tag-warning { border-inline-start-color: var(--blockquote-warning-color); }
+.content .blockquote-tag-caution { border-inline-start-color: var(--blockquote-caution-color); }
+
+/* The chapter list's edge in the signal blue. Parts are labelled like the
+   landing page's eyebrows, and the current chapter carries the coral rail. */
+.sidebar { border-right: 1px solid var(--rail); }
+.sidebar-loading #mdbook-sidebar { visibility: hidden; }
+.sidebar .sidebar-scrollbox { padding: 20px 12px 45px; }
+.chapter li.part-title {
+  margin: 22px 0 4px; padding: 12px 10px 4px;
+  border-top: 1px solid var(--sidebar-spacer);
+  color: var(--sidebar-active); font: 600 1.1rem/1.5 var(--mono-font);
+  letter-spacing: 0.12em; text-transform: uppercase;
+}
+.chapter-link-wrapper { border-radius: 5px; }
+.chapter-link-wrapper:hover { background: var(--tint); }
+.chapter-link-wrapper:has(> a.active) {
+  background: var(--sidebar-current-bg, var(--tint)); box-shadow: inset 3px 0 var(--edge);
+}
+.chapter li a.active { font-weight: 700; }
+.chapter ol.section { margin-left: 14px; padding-left: 8px; border-left: 1px solid var(--sidebar-spacer); }
+
+/* Links in running text are underlined, not told apart by colour alone. */
+.content p a, .content li a, .content td a, .content blockquote a {
+  text-decoration: underline; text-underline-offset: 2px;
+  text-decoration-color: color-mix(in srgb, currentColor 55%, transparent);
+}
+.content p a:hover, .content li a:hover, .content td a:hover, .content blockquote a:hover {
+  text-decoration-color: currentColor;
+}
+
+/* Keyboard focus that shows on every theme. */
+:focus-visible { outline: 2px solid var(--links); outline-offset: 2px; }
+/* Keep focused content clear of the sticky menu, including skip targets. */
+main, .content :focus { scroll-margin-top: calc(var(--menu-bar-height) + 1em); }
+.skip-link {
+  position: fixed; top: -100px; left: 12px; z-index: 1000;
+  padding: 10px 14px; border: 2px solid var(--links); border-radius: 6px;
+  color: var(--fg); background: var(--bg);
+}
+.skip-link:focus { top: 12px; }
+
+/* The masthead: the mark and name lead home, the Docs label to Getting
+   started, under a line that lifts the bar off the page. */
+#mdbook-menu-bar {
+  border-bottom: 1px solid var(--table-border-color);
+  box-shadow: 0 6px 22px var(--shadow);
+}
+#mdbook-menu-bar .right-buttons a {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 40px; min-height: 40px;
+}
+.menu-bar .menu-title {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  margin: 0; cursor: auto; font-size: 1.8rem; font-weight: 700;
+}
+.menu-title a { color: var(--fg); text-decoration: none; }
+.docs-brand {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: "udpstp Display", ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.01em;
+}
+.brand-mark { flex: none; }
+.brand-trace { fill: none; stroke: var(--rail); stroke-width: 3.2; stroke-linejoin: round; stroke-linecap: round; }
+.brand-limit { stroke: var(--edge); stroke-width: 3.2; stroke-linecap: round; }
+.menu-title .docs-home {
+  padding-left: 12px; border-left: 1px solid var(--table-border-color);
+  color: var(--links); font: 600 1.15rem/1.5 var(--mono-font);
+  letter-spacing: 0.1em; text-transform: uppercase;
+}
+#mdbook-searchbar {
+  border: 1px solid var(--rail); border-radius: 8px;
+  box-shadow: 0 4px 24px var(--signal-glow);
+}
+.theme-popup { box-shadow: 0 8px 28px var(--shadow); }
+.chapter-fold-toggle {
+  flex-shrink: 0; min-width: 32px; min-height: 32px;
+  border: 0; background: transparent; color: var(--sidebar-fg);
+  font: inherit; opacity: 1;
+}
+.chapter-fold-toggle:hover { color: var(--sidebar-active); }
+.chapter-link-wrapper > a {
+  display: flex; align-items: center; min-width: 0; min-height: 24px;
+  padding: 3px 10px; line-height: 1.45; overflow-wrap: anywhere;
+}
+.theme-popup .theme { min-height: 32px; }
+.sidebar-contents-link { padding: 0.5em; }
+html:not(.js) #mdbook-sidebar-toggle { display: none; }
+html:not(.js) .chapter-fold-toggle { display: none; }
+html:not(.js) .chapter li > ol { display: block; }
+/* Copy controls must be available before a pointer hovers the code block. */
+pre:focus-within > .buttons { visibility: visible; opacity: 1; }
+.content .table-wrapper:focus-visible, .diagram-scroll:focus-visible {
+  outline-offset: -3px;
+}
+
+/* Diagrams: static SVG rendered at build time, one variant per theme. */
+.diagram { margin: 1.75em 0; }
+.diagram-scroll {
+  overflow-x: auto; max-width: 100%; padding: 0.75em;
+  border: 1px solid var(--table-border-color); border-radius: 10px;
+  box-shadow: 0 10px 30px var(--shadow), 0 0 24px var(--tint);
+}
+/* Preserve the SVG's native label sizes instead of shrinking a large graph
+   to the phone's width. Small diagrams keep their natural dimensions. */
+.content .diagram img { display: block; max-width: none; height: auto; margin: 0 auto; }
+.diagram-light { display: none !important; }
+.light .diagram-dark, .rust .diagram-dark { display: none !important; }
+.light .diagram-light, .rust .diagram-light { display: block !important; }
+.diagram figcaption { margin-top: 0.75em; font-size: 0.9em; line-height: 1.6; color: var(--muted, var(--sidebar-fg)); }
+
+/* Getting started is the front door: its opening paragraph leads, and its
+   closing links become cards, keeping their Markdown. The guides overview
+   opens the same way. */
+.content main > #getting-started:first-child + p,
+.content main > #guides:first-child + p { font-size: 1.15em; line-height: 1.65; }
+#keep-exploring + ul {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(13em, 1fr)); gap: 14px;
+  margin: 1.4em 0 0; padding: 0; list-style: none;
+}
+#keep-exploring + ul > li {
+  margin: 0; padding: 1em 1.15em; line-height: 1.55;
+  border: 1px solid var(--table-border-color); border-top: 2px solid var(--rail); border-radius: 10px;
+  background: linear-gradient(135deg, var(--tint), transparent 80%), var(--bg);
+  box-shadow: 0 8px 24px var(--shadow);
+}
+#keep-exploring + ul > li:nth-child(even) {
+  border-top-color: var(--edge);
+  background: linear-gradient(135deg, var(--warm), transparent 80%), var(--bg);
+}
+#keep-exploring + ul > li > a:first-child { font-weight: 700; }
+#keep-exploring + ul > li:hover { box-shadow: 0 12px 28px var(--shadow), 0 0 24px var(--signal-glow); }
+
+/* The project footer, generated outside main so it is a landmark. */
+.udpstp-footer {
+  max-width: 76ch; margin: 4rem auto 1rem; padding-top: 1rem;
+  border-top: 1px solid var(--table-border-color);
+  font-size: 0.875em; color: var(--muted, var(--sidebar-fg)); text-align: center;
+}
+.udpstp-footer p { margin: 0.25rem 0; }
+.udpstp-footer a { color: inherit; text-decoration: underline; }
+.udpstp-profiles { margin-left: 0.6em; }
+
+@media (max-width: 600px) {
+  .content { padding-inline: 0; }
+  .content h1 { font-size: 2.1em; }
+  .content h2 { font-size: 1.6em; }
+  .content table td, .content table th { padding: 0.6em 0.7em; }
+  /* mdBook's target marker otherwise sits outside the narrow page gutter. */
+  .content :target::before { margin-inline-start: 0; width: 1em; }
+  .menu-bar .menu-title { gap: 8px; font-size: 1.6rem; }
+  .menu-title .docs-home { padding-left: 8px; }
+  .menu-bar .right-buttons { margin-inline: 3px; }
+  #mdbook-menu-bar .right-buttons a { min-width: 32px; }
+}
+@media (max-width: 330px) { .brand-mark { display: none; } }
+
+/* Press feedback is shared by keyboard and pointer activation. The title's
+   coral rule draws in once as the page opens. */
+@media (prefers-reduced-motion: no-preference) {
+  #mdbook-menu-bar .icon-button, .theme-popup .theme { transition: transform 120ms ease-out; }
+  #mdbook-menu-bar .icon-button:active, .theme-popup .theme:active { transform: scale(0.96); }
+  #keep-exploring + ul > li { transition: box-shadow 160ms ease-out; }
+  .content main > h1:first-child::after { animation: udpstp-rule 600ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+}
+@keyframes udpstp-rule { from { transform: scaleX(0); } }
+/* mdBook's searching indicator remains present but stops moving at 4 s. */
+#fa-spin { animation-iteration-count: 2; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+@media print {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .content main { max-width: none; font-size: 1em; }
+  .content .table-wrapper, .diagram-scroll { overflow: visible; }
+  .content pre > code { white-space: pre-wrap; overflow-wrap: anywhere; }
+  .content .diagram img { max-width: 100%; }
+  .content h1, .content h2, .content h3 { break-after: avoid; }
+  .content main > h1:first-child { background: none; }
+  .content main > h1:first-child::after { display: none; }
+  .content pre, .content .table-wrapper, .diagram-scroll, #keep-exploring + ul > li { box-shadow: none; }
+  #keep-exploring + ul { display: block; }
+  #keep-exploring + ul > li { margin-block: 0.6em; break-inside: avoid; background: none; }
+  .diagram { break-inside: avoid; }
+  .diagram-scroll { border: 0; padding: 0; }
+  .content pre, .content table { border-color: #888; }
+  .content pre::before { color: inherit; background: none; }
+  .content table { color: #18181b; print-color-adjust: exact; }
+  .content table thead { color: #18181b; background: #ededed; }
+  .content table thead th { color: inherit; }
+  .content table tbody tr > * { color: #18181b; background: #ffffff; }
+  .content table tbody tr:nth-child(even) > * { background: #f0f0f0; }
+  .content table a:any-link, .content table code, .content table code.hljs { color: inherit; }
+  .udpstp-footer, .diagram-dark { display: none !important; }
+  .diagram-light { display: block !important; }
+  .content a { color: inherit; }
+}
+
+@media (forced-colors: active) {
+  :focus-visible { outline-color: Highlight; }
+  .skip-link, .content pre, .content table, .diagram-scroll { border-color: CanvasText; }
+  .chapter-fold-toggle { color: ButtonText; }
+  .content a, .udpstp-footer a { color: LinkText; }
+  .content table tbody tr:nth-child(even) > * { border-bottom-style: dashed; }
+  .content main > h1:first-child::after { box-shadow: none; background: CanvasText; }
+  .chapter-link-wrapper:has(> a.active) { border-left: 3px solid Highlight; }
+  #keep-exploring + ul > li { border-color: CanvasText; }
+  .brand-trace, .brand-limit { stroke: CanvasText; }
+}

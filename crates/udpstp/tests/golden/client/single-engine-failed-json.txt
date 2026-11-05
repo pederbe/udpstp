@@ -1,0 +1,79 @@
+ErrorStatus 255, not completed: exit 255
+--- stderr
+udpstp: the Data Phase failed: the Data Phase panicked
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"Input":	{
+		"Interface":	"",
+		"Role":	"Receiver",
+		"ID":	45366,
+		"Host":	"192.0.2.1",
+		"HostIPAddress":	"192.0.2.1",
+		"Port":	51646,
+		"NumberOfHosts":	1,
+		"HostList":	[{
+				"Host":	"192.0.2.1",
+				"HostIPAddress":	"192.0.2.1",
+				"ControlPort":	24601
+			}],
+		"ClientIPAddress":	"",
+		"ClientPort":	40000,
+		"JumboFramesPermitted":	1,
+		"NumberOfConnections":	1,
+		"MinNumOfConnections":	1,
+		"DSCP":	0,
+		"ECN":	0,
+		"CEThreshold":	0,
+		"ProtocolVersion":	"Any",
+		"UDPPayloadMin":	52,
+		"UDPPayloadMax":	8972,
+		"UDPPayloadDefault":	1222,
+		"UDPPayloadContent":	"zeroes",
+		"TestType":	"Search",
+		"IPDVEnable":	1,
+		"IPRREnable":	1,
+		"RIPREnable":	1,
+		"PreambleDuration":	0,
+		"MaxRequiredBandwidth":	0,
+		"StartSendingRateIndex":	0,
+		"SendingRateIndex":	-1,
+		"NumberTestSubIntervals":	5,
+		"NumberFirstModeTestSubIntervals":	0,
+		"NumberFirstModeSuppSubIntervals":	0,
+		"TestSubInterval":	1000,
+		"StatusFeedbackInterval":	50,
+		"TimeoutNoTestTraffic":	1000,
+		"TimeoutNoStatusMessage":	1000,
+		"Tmax":	1000,
+		"TmaxRTT":	3000,
+		"TimestampResolution":	1,
+		"SeqErrThresh":	10,
+		"ReordDupIgnoreEnable":	1,
+		"LowerThresh":	30,
+		"UpperThresh":	90,
+		"HighSpeedDelta":	10,
+		"SlowAdjThresh":	3,
+		"HSpeedThresh":	1000000000,
+		"RateAdjAlgorithm":	"B",
+		"InterfaceDeterminesMax":	0
+	},
+	"Output":	{
+		"BOMTime":	"2026-09-21T14:13:20.000000Z",
+		"TmaxUsed":	1000,
+		"TestInterval":	5,
+		"TmaxRTTUsed":	3000,
+		"TimestampResolutionUsed":	1,
+		"EOMTime":	"2026-09-21T14:13:36.000000Z",
+		"Status":	"Error_Other"
+	},
+	"ErrorStatus":	255,
+	"ErrorMessage":	"the Data Phase failed: the Data Phase panicked",
+	"ErrorMessage2":	""
+}

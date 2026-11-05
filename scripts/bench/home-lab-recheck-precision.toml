@@ -1,0 +1,59 @@
+
+[round]
+kind = "server-scale"
+test_interval = 10
+warm_up = 2
+engines = ["udpstp"]
+calibration = []
+reading = "home-lab"
+runs_elsewhere = 5
+client_env = { UDPSTP_ENGINE_HOLD_OFF_US = "250" }
+executor = "pool"
+
+[precision]
+pairs = [["S500", "S500ptc"], ["S900", "S900ptc"]]
+confirmation = true
+
+[[case]]
+name = "S500"
+direction = "downstream"
+row = 500
+counts = [1]
+target = 1
+judged = false
+runs = 5
+engines = ["udpstp"]
+server_env = { UDPSTP_ENGINE_EXECUTOR = "pool", UDPSTP_KERNEL_TX_TIMESTAMPS = "1" }
+
+[[case]]
+name = "S500ptc"
+direction = "downstream"
+row = 500
+counts = [1]
+target = 1
+judged = false
+runs = 5
+engines = ["udpstp"]
+server_env = { UDPSTP_ENGINE_EXECUTOR = "per-test-connection", UDPSTP_KERNEL_TX_TIMESTAMPS = "1" }
+
+[[case]]
+name = "S900"
+direction = "downstream"
+row = 900
+counts = [1]
+target = 1
+judged = false
+runs = 5
+engines = ["udpstp"]
+server_env = { UDPSTP_ENGINE_EXECUTOR = "pool", UDPSTP_KERNEL_TX_TIMESTAMPS = "1" }
+
+[[case]]
+name = "S900ptc"
+direction = "downstream"
+row = 900
+counts = [1]
+target = 1
+judged = false
+runs = 5
+engines = ["udpstp"]
+server_env = { UDPSTP_ENGINE_EXECUTOR = "per-test-connection", UDPSTP_KERNEL_TX_TIMESTAMPS = "1" }

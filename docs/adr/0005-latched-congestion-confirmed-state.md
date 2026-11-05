@@ -1,0 +1,11 @@
+# Congestion uses a back-to-back Errored Interval counter and a latched Congestion Confirmed state
+
+RFC 9946 §5.1 requires Congestion to be inferred from Errored Intervals "in all of the consecutive intervals", while the Y.1540 Amd2 / TR-471 flowcharts (and OB-UDPST, which follows them) keep a single SlowAdjCount that is reset only on a fast increase, so "errored, hold, errored, hold, errored" also confirms congestion. We follow the RFC's strict reading, but not by resetting SlowAdjCount on every non-errored interval: doing that would let algorithm B re-enter Fast Mode after Congestion was confirmed and oscillate, which RFC 9946 §7 forbids ("the single-step mode continues after the first inference of 'congestion'"). Instead a separate counter of back-to-back Errored Intervals, reset by any non-errored interval, sets a latched Congestion Confirmed state when it reaches SlowAdjThresh; algorithm B never clears the latch, and algorithm C clears it only on a Fast-Mode Retry. A Lost Status Backoff event counts as an Errored Interval (amended 2026-09-25, see below).
+
+## Consequences
+
+- Our Server confirms Congestion later than OB-UDPST on paths with intermittent errors, so the two can report different capacities on the same path; this is a recorded OB-UDPST Difference, and interop tests compare each result against a known bottleneck rather than against each other.
+
+## Amendment (2026-09-25): Lost Status Backoff counts as an Errored Interval
+
+This ADR first had a Lost Status Backoff event take one row off without counting as an Errored Interval, which departed from RFC 9097 §8.1: the rate decreases "following the same process" as for errored feedback, "with the same load rate adjustment algorithm variables in their current state", so that "lost status feedback messages ... can result in rate reduction and congestion confirmation". The maintainer chose to avoid the deviation. A backoff now adds to the back-to-back Errored Interval counter, so the third in a row (about 290 ms without a Status PDU at the defaults) confirms Congestion with the one-time drop of 3 × highSpeedDelta rows. The cost is that a short burst of lost feedback can confirm Congestion early and lower the result. Proved by `crates/udpstp-core/tests/lost_status_backoff.rs`.

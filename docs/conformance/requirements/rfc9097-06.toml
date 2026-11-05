@@ -1,0 +1,126 @@
+# RFC 9097 section 6: Maximum IP-Layer Capacity Metric Definitions (Statistics).
+# Imported by RFC 9946 section 5.1 item 12.
+# Format and ID convention: docs/conformance/README.md.
+# Sections 6 and 6.1 have no normative sentences.
+
+[[requirement]]
+id = "RFC9097-6.2-1"
+text = "This section lists the REQUIRED input factors to specify the metric, beyond those listed in Section 4."
+text_sha256 = "1a63b1982661c276"
+state = "not-applicable"
+note = "The section adds no Parameters."
+
+[[requirement]]
+id = "RFC9097-6.3-1"
+text = "This section defines the REQUIRED aspects of the Maximum IP-Layer Capacity Metric (unless otherwise indicated) for measurements between specified Source and Destination hosts:"
+text_sha256 = "ac786b9f48b40167"
+state = "not-applicable"
+note = "An introduction to the section's Requirements, each recorded with its own ID; nothing to do beyond them."
+
+[[requirement]]
+id = "RFC9097-6.3-L1"
+text = "Define the Maximum IP-Layer Capacity, Maximum_C(T,I,PM), to be the maximum number of IP-Layer bits n0[dtn,dtn+1] divided by dt that can be transmitted in packets from the Src host and correctly received by the Dst host, over all dt-length intervals in [T,T+I] and meeting the PM criteria."
+text_sha256 = "69a82f39ea825b02"
+state = "pending"
+note = "Maximum IP-Layer Capacity; a definition, but the one the results compute."
+
+[[requirement]]
+id = "RFC9097-6.3-2"
+text = "The number of sub-intervals with duration dt MUST be set to a natural number m, so that T+I = T + m*dt with dtn+1 - dtn = dt for 1 <= n <= m."
+text_sha256 = "904923c7f1dec140"
+state = "pending"
+note = "testIntTime / subIntPeriod Sub-Intervals."
+
+[[requirement]]
+id = "RFC9097-6.3-3"
+text = "At least one target performance threshold (PM criterion) MUST be defined."
+text_sha256 = "9f5209759ef179ad"
+state = "pending"
+note = "The Performance Criterion."
+
+[[requirement]]
+id = "RFC9097-6.3-4"
+text = "If more than one metric and target performance threshold is defined, then the sub-interval with the maximum number of bits transmitted MUST meet all the target performance thresholds."
+text_sha256 = "86ee39878aab2f7d"
+state = "not-applicable"
+note = "udpstp defines one Performance Criterion, the Loss Ratio, so there is never more than one threshold to meet."
+
+[[requirement]]
+id = "RFC9097-6.3-5"
+text = "Users SHALL specify the Parameter Tmax as required by each metric's reference definition."
+text_sha256 = "0e309d8aed72016a"
+state = "pending"
+note = "Tmax."
+
+[[requirement]]
+id = "RFC9097-6.3-6"
+text = "At least one target performance threshold (PM criterion) MUST be defined."
+text_sha256 = "9f5209759ef179ad"
+state = "pending"
+note = "Bullet restating RFC9097-6.3-3."
+
+[[requirement]]
+id = "RFC9097-6.3-7"
+text = "All sub-intervals MUST be of equal duration."
+text_sha256 = "549bf314655385c6"
+state = "pending"
+note = "subIntPeriod is a whole number of Trial Intervals."
+
+[[requirement]]
+id = "RFC9097-6.3-8"
+text = "The bit rate of the physical interface of the measurement systems MUST be higher than the smallest of the links on the path whose Maximum_C(T,I,PM) is to be measured (the bottleneck link)."
+text_sha256 = "477aaa820a64a78e"
+state = "operational"
+note = "Deployment of the measurement hosts."
+
+[[requirement]]
+id = "RFC9097-6.3-9"
+text = "Measurements according to these definitions SHALL use the UDP transport layer."
+text_sha256 = "3dea83272bcfa6f6"
+state = "pending"
+
+[[requirement]]
+id = "RFC9097-6.4-L1"
+text = "The interval dtn,dtn+1 where Maximum_C(T,I,PM) occurs is the reporting sub-interval for RTD[dtn,dtn+1] and OWL[dtn,dtn+1] within RTD[T,I] and OWL[T,I]."
+text_sha256 = "3019bd3ba0aab137"
+state = "pending"
+note = "Loss and RTT are reported for the Sub-Interval of the maximum."
+
+[[requirement]]
+id = "RFC9097-6.4-1"
+text = "Other metrics MAY be measured: one-way reordering, duplication, and delay variation."
+text_sha256 = "e5f9f105f476cc92"
+state = "pending"
+
+[[requirement]]
+id = "RFC9097-6.5-1"
+text = "If traffic conditioning (e.g., shaping, policing) applies along a path for which Maximum_C(T,I,PM) is to be determined, different values for dt SHOULD be picked and measurements executed during multiple intervals [T,T+I]."
+text_sha256 = "b69245e120b4f523"
+state = "operational"
+note = "The user picks subIntPeriod per Test."
+
+[[requirement]]
+id = "RFC9097-6.5-2"
+text = "Each duration dt SHOULD be chosen so that it is an integer multiple of increasing values k times serialization delay of a Path MTU (PMTU) at the physical interface speed where traffic conditioning is expected."
+text_sha256 = "5d88c0979a4399c2"
+state = "operational"
+note = "The user picks subIntPeriod per Test."
+
+[[requirement]]
+id = "RFC9097-6.6-1"
+text = "The IP-Layer Capacity SHOULD be reported with at least single-Megabit resolution, in units of Megabits per second (Mbps) (which, to avoid any confusion, is 1,000,000 bits per second)."
+text_sha256 = "0fd78363f67351b2"
+state = "pending"
+
+[[requirement]]
+id = "RFC9097-6.6-2"
+text = "The related One-Way Loss metric and Round-Trip Delay measurements for the same Singleton SHALL be reported, also with meaningful resolution for the values measured."
+text_sha256 = "b4cec5223f9c74f8"
+state = "pending"
+
+[[requirement]]
+id = "RFC9097-6.6-3"
+text = "When there are demonstrated and repeatable Capacity modes in the Sample, the Maximum IP-Layer Capacity SHALL be reported for each mode, along with the relative time from the beginning of the stream that the mode was observed to be present."
+text_sha256 = "4be40befcaa967ab"
+state = "pending"
+note = "Capacity Modes."

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<!-- The 1200x630 link-preview image (og:image). website/render.mjs renders it
+     to target/site/rendered/og.png. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>udpstp link preview</title>
+<style>
+@font-face { font-family: "udpstp Display"; font-weight: 700; src: url("fonts/udpstp-display-bold.woff2") format("woff2"); }
+@font-face { font-family: "udpstp Social Sans"; font-weight: 400; src: url("fonts/udpstp-social-sans.woff2") format("woff2"); }
+@font-face { font-family: "udpstp Social Mono"; font-weight: 400; src: url("fonts/udpstp-social-mono.woff2") format("woff2"); }
+@font-face { font-family: "udpstp Social Mono"; font-weight: 700; src: url("fonts/udpstp-social-mono-bold.woff2") format("woff2"); }
+:root { --bg: #121214; --surface: #1c1c20; --line: #2e2e33; --text: #f4f4f5; --muted: #a1a1aa; --signal: #38bdf8; --accent: #fb7185; }
+* { box-sizing: border-box; margin: 0; }
+html, body { width: 1200px; height: 630px; background: var(--bg); overflow: hidden; }
+body { font-family: "udpstp Social Sans", sans-serif; color: var(--text); padding: 64px 72px; display: flex; flex-direction: column; position: relative; }
+.brand { display: flex; align-items: center; gap: 16px; font: 700 34px/1 "udpstp Social Mono", monospace; }
+.brand img { width: 44px; height: 44px; }
+h1 { margin-top: 56px; max-width: 820px; font: 700 76px/1.02 "udpstp Display", sans-serif; letter-spacing: -0.01em; color: var(--signal); }
+p { margin-top: 26px; max-width: 760px; font-size: 28px; color: var(--muted); line-height: 1.4; }
+.foot { margin-top: auto; display: flex; gap: 18px; align-items: center; font: 500 24px/1 "udpstp Social Mono", monospace; color: var(--muted); }
+.foot b { color: var(--text); font-weight: 500; border: 2px solid var(--signal); border-radius: 12px; padding: 14px 20px; background: var(--surface); }
+.mark { position: absolute; right: 72px; top: 150px; width: 250px; height: 250px; opacity: 0.95; }
+</style>
+</head>
+<body>
+<div class="brand"><img src="../docs/assets/logo/udpstp-mark-dark.svg" alt="">udpstp</div>
+<h1>Measure the capacity your network really delivers.</h1>
+<p>A Rust implementation of UDPSTP (RFC&nbsp;9946), with every RFC Requirement traced to a test or a recorded reason.</p>
+<div class="foot"><b>udpstp.com</b>Maximum IP-Layer Capacity, RFC&nbsp;9097</div>
+<img class="mark" src="../docs/assets/logo/udpstp-mark-dark.svg" alt="">
+</body>
+</html>

@@ -1,0 +1,45 @@
+# RFC 9097 section 2: Scope, Goals, and Applicability.
+# Imported by RFC 9946 section 5.1 item 12.
+# Format and ID convention: docs/conformance/README.md.
+
+[[requirement]]
+id = "RFC9097-2-1"
+text = "It is RECOMMENDED to discontinue non-measurement traffic that shares a subscriber's dedicated resources while testing: measurements may not be accurate, and throughput of competing elastic traffic may be greatly reduced."
+text_sha256 = "b6d230ae378d7681"
+state = "operational"
+note = "Advice to the user running a Test."
+
+[[requirement]]
+id = "RFC9097-2-2"
+text = "It MUST only be used in the application of diagnostic and operations measurements as described in this memo."
+text_sha256 = "38159d990b648d8b"
+state = "operational"
+note = "\"It\" is the Load Rate Adjustment Algorithm; RFC 9946 section 5.1 item 2 says the same."
+
+[[requirement]]
+id = "RFC9097-2-3"
+text = "It MUST only be used in circumstances consistent with Section 10 (\"Security Considerations\")."
+text_sha256 = "b8dc3be549fb9286"
+state = "operational"
+note = "RFC 9946 section 5.1 item 11 says the same."
+
+[[requirement]]
+id = "RFC9097-2-4"
+text = "If a network operator is certain of the IP-Layer Capacity to be validated, then testing MAY start with a fixed-rate test at the IP-Layer Capacity and avoid activating the load adjustment algorithm."
+text_sha256 = "99f48fcf53a3eecf"
+state = "pending"
+note = "Fixed-Rate Test, Operator Key only; RFC 9946 section 5.1 item 10."
+
+[[requirement]]
+id = "RFC9097-2-5"
+text = "However, the stimulus for a diagnostic test (such as a subscriber request) strongly implies that there is no certainty, and the load adjustment algorithm is RECOMMENDED."
+text_sha256 = "834ae7b9dd8c5e31"
+state = "pending"
+note = "A Search Test is the default."
+
+[[requirement]]
+id = "RFC9097-2-6"
+text = "Finally, the measurement system's load rate adjustment algorithm SHALL NOT be provided with the exact capacity value to be validated a priori."
+text_sha256 = "a6a68def444857ea"
+state = "pending"
+note = "A Search Test starts at the default row or a requested srIndexConf row, never at a known capacity."

@@ -1,0 +1,47 @@
+name: Interop report
+description: Results of running udpstp against OB-UDPST or another UDPSTP implementation.
+labels: [needs-triage]
+body:
+  - type: input
+    id: peer
+    attributes:
+      label: Peer implementation and version
+      placeholder: e.g. OB-UDPST 9.1.0
+    validations:
+      required: true
+  - type: dropdown
+    id: roles
+    attributes:
+      label: Roles
+      options:
+        - udpstp Client, peer Server
+        - Peer Client, udpstp Server
+    validations:
+      required: true
+  - type: dropdown
+    id: direction
+    attributes:
+      label: Direction
+      options:
+        - Downstream
+        - Upstream
+    validations:
+      required: true
+  - type: dropdown
+    id: auth
+    attributes:
+      label: Authentication Mode
+      options:
+        - Mode 1
+        - Mode 2
+        - Unauthenticated Mode
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: What happened
+      description: Did the Test complete? Include the output of both ends, with any keys removed.
+      render: text
+    validations:
+      required: true

@@ -1,0 +1,251 @@
+name: Release
+
+# The protected approval job runs before any source build, uploaded artifact
+# or attestation. Publishing the completed draft starts release-container.yml.
+on:
+  workflow_dispatch:
+    inputs:
+      approved_commit:
+        description: Full commit SHA approved for this tagged release
+        type: string
+        required: true
+      prerelease:
+        description: Mark the draft as a pre-release
+        type: boolean
+        default: false
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  approve:
+    if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
+    name: Approve the tagged release
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    environment: release
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      # A missing environment is created without protection by GitHub.
+      # Reject that case before checking out source or producing artifacts.
+      - name: Check the approval boundary
+        env:
+          GH_TOKEN: ${{ github.token }}
+          APPROVED_COMMIT: ${{ inputs.approved_commit }}
+        run: |
+          [[ "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]
+          [[ "$APPROVED_COMMIT" =~ ^[0-9a-f]{40}$ ]]
+          test "$GITHUB_SHA" = "$APPROVED_COMMIT"
+          gh api "repos/$GITHUB_REPOSITORY" | jq -e '.private == false' > /dev/null
+          gh api "repos/$GITHUB_REPOSITORY/environments/release" | jq -e '
+            .deployment_branch_policy.custom_branch_policies == true and
+            ([.protection_rules[] | select(.type == "required_reviewers") |
+              .reviewers[] | {type, login: .reviewer.login}] ==
+              [{type: "User", login: "pederbe"}])' > /dev/null
+          gh api "repos/$GITHUB_REPOSITORY/environments/release/deployment-branch-policies" |
+            jq -e '.total_count == 1 and .branch_policies[0].type == "tag" and
+              .branch_policies[0].name == "v*"' > /dev/null
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/approvals" |
+            jq -e 'any(.[]; .state == "approved" and .user.login == "pederbe" and
+              any(.environments[]; .name == "release"))' > /dev/null
+
+  changelog:
+    needs: approve
+    name: Check the finalized changelog
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: rustup toolchain install
+      - name: Validate the frozen release section
+        run: cargo run --locked --manifest-path tools/release-changelog/Cargo.toml -- check "$GITHUB_REF_NAME"
+
+  # One archive per target. Linux builds link against glibc 2.28 (RHEL 8,
+  # Debian 10, Ubuntu 20.04 and later) through cargo-zigbuild, so one
+  # binary runs on every current distribution. The musl builds are static,
+  # for Alpine, routers and other embedded Linux without glibc.
+  build:
+    needs: changelog
+    name: ${{ matrix.target }}
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { target: x86_64-unknown-linux-gnu, zig: "2.28", os: ubuntu-24.04 }
+          - { target: aarch64-unknown-linux-gnu, zig: "2.28", os: ubuntu-24.04-arm }
+          - { target: x86_64-unknown-linux-musl, musl: true, os: ubuntu-24.04 }
+          - { target: aarch64-unknown-linux-musl, musl: true, os: ubuntu-24.04-arm }
+          # Built on x86_64, where the binary can't run: no smoke run.
+          - { target: armv7-unknown-linux-musleabihf, musl: true, os: ubuntu-24.04, cross: true }
+          - { target: x86_64-pc-windows-msvc, os: windows-2025 }
+          - { target: aarch64-apple-darwin, os: macos-15 }
+          - { target: x86_64-apple-darwin, os: macos-15-intel }
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: rustup toolchain install
+      - run: rustup target add ${{ matrix.target }}
+      - uses: taiki-e/install-action@c509219cf42fba86913069efd0ade2458c59337b # v2
+        with:
+          tool: cargo-about@0.9.3
+      - name: Generate third-party notices
+        shell: bash
+        run: sh scripts/release-notices.sh "${{ matrix.target }}"
+      - name: Build (zigbuild)
+        if: matrix.zig
+        run: |
+          python3 -m pip install ziglang==0.15.2
+          cargo install --locked --version 0.23.4 cargo-zigbuild
+          cargo zigbuild --release --locked -p udpstp --target ${{ matrix.target }}.${{ matrix.zig }}
+      - name: Build (zigbuild, static musl)
+        if: matrix.musl
+        run: |
+          python3 -m pip install ziglang==0.15.2
+          cargo install --locked --version 0.23.4 cargo-zigbuild
+          cargo zigbuild --release --locked -p udpstp --target ${{ matrix.target }}
+      - name: Build
+        if: ${{ !matrix.zig && !matrix.musl }}
+        run: cargo build --release --locked -p udpstp --target ${{ matrix.target }}
+      - name: Native binary smoke
+        if: ${{ !matrix.cross }}
+        shell: bash
+        run: |
+          binary=target/${{ matrix.target }}/release/udpstp
+          if [ "${{ runner.os }}" = Windows ]; then binary="$binary.exe"; fi
+          "$binary" --version
+          "$binary" client --help > /dev/null
+          "$binary" server --help > /dev/null
+      # The exe must run without the Visual C++ Redistributable: the C runtime
+      # is linked in (.cargo/config.toml), unless a RUSTFLAGS replaced it.
+      - name: No Visual C++ runtime DLL
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          if grep -a -i -q vcruntime target/${{ matrix.target }}/release/udpstp.exe; then
+            echo "udpstp.exe imports the Visual C++ runtime: link it statically (+crt-static)"
+            exit 1
+          fi
+      # The install scripts (install/) depend on these names and this
+      # layout; scripts/install-test.sh and .ps1 fake them.
+      - name: Archive
+        shell: bash
+        run: |
+          name=udpstp-${GITHUB_REF_NAME}-${{ matrix.target }}
+          mkdir "$name"
+          cp README.md CHANGELOG.md LICENSE-MIT LICENSE-APACHE target/packaging/THIRD-PARTY-LICENSES.md "$name"/
+          if [ -f target/${{ matrix.target }}/release/udpstp.exe ]; then
+            cp target/${{ matrix.target }}/release/udpstp.exe "$name"/
+            7z a "$name.zip" "$name" > /dev/null
+            # winget installs this stable filename directly, without a
+            # versioned directory inside an archive.
+            cp "$name/udpstp.exe" udpstp.exe
+          else
+            cp target/${{ matrix.target }}/release/udpstp "$name"/
+            tar czf "$name.tar.gz" "$name"
+          fi
+      # .deb and .rpm (the metadata is in crates/udpstp/Cargo.toml),
+      # with the same unstripped binary as the archive and the example
+      # systemd unit set to /usr/bin. Rehearsed locally for both
+      # architectures, and installed on Debian 10 and Rocky Linux 8.
+      - name: Packages
+        if: matrix.zig
+        run: |
+          cargo install --locked --version 3.8.0 cargo-deb
+          cargo install --locked --version 0.21.0 cargo-generate-rpm
+          mkdir -p target/packaging
+          sed 's|/usr/local/bin/udpstp|/usr/bin/udpstp|' contrib/systemd/udpstp-server.service > target/packaging/udpstp-server.service
+          cargo deb -p udpstp --no-build --no-strip --target ${{ matrix.target }} -o .
+          cargo generate-rpm -p crates/udpstp --target ${{ matrix.target }} -o .
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ${{ matrix.target }}
+          path: |
+            udpstp-*.zip
+            udpstp-*.tar.gz
+            udpstp-*.rpm
+            udpstp_*.deb
+            udpstp.exe
+          if-no-files-found: error
+          retention-days: 7
+
+  # The archives, their checksums and the SBOM, attested, as a draft
+  # release: publishing it is the maintainer's step (docs/releasing.md).
+  release:
+    if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
+    name: Draft release
+    needs: build
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: rustup toolchain install
+      - name: Read the finalized release notes
+        run: cargo run --locked --manifest-path tools/release-changelog/Cargo.toml -- notes "$GITHUB_REF_NAME" "$RUNNER_TEMP/RELEASE-NOTES.md"
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          path: dist
+          merge-multiple: true
+      - name: SBOM
+        run: |
+          cargo install --locked --version 0.5.9 cargo-cyclonedx
+          cargo cyclonedx --format json --spec-version 1.5 --describe binaries --target all --manifest-path crates/udpstp/Cargo.toml
+          cp crates/udpstp/udpstp_bin.cdx.json "dist/udpstp-${GITHUB_REF_NAME}.cdx.json"
+      # The Homebrew formula is rendered from the archives' checksums, then
+      # listed and attested with them; the tap's updater takes it from here.
+      - name: Checksums and Homebrew formula
+        run: |
+          cd dist
+          sha256sum udpstp-* udpstp_* udpstp.exe > SHA256SUMS
+          version=${GITHUB_REF_NAME#v}
+          if [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            sh ../contrib/homebrew/render-formula.sh "$version" SHA256SUMS > udpstp.rb
+            sha256sum udpstp.rb >> SHA256SUMS
+          fi
+      - uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: dist/*
+      - uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: |
+            dist/udpstp-*.tar.gz
+            dist/udpstp-*.zip
+            dist/udpstp-*.rpm
+            dist/udpstp_*.deb
+            dist/udpstp.exe
+          sbom-path: dist/udpstp-${{ github.ref_name }}.cdx.json
+      - name: Install the pinned GitHub CLI
+        run: |
+          curl -fsSL https://github.com/cli/cli/releases/download/v2.102.0/gh_2.102.0_linux_amd64.tar.gz -o "$RUNNER_TEMP/gh.tar.gz"
+          echo "bb766f710eef8ede859c18578c72c327597cd4c8a85b06001b1f3843c6019386  $RUNNER_TEMP/gh.tar.gz" | sha256sum -c -
+          mkdir "$RUNNER_TEMP/gh"
+          tar xzf "$RUNNER_TEMP/gh.tar.gz" --strip-components=1 -C "$RUNNER_TEMP/gh"
+          echo "$RUNNER_TEMP/gh/bin" >> "$GITHUB_PATH"
+      - name: Draft the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PRERELEASE: ${{ inputs.prerelease }}
+        run: |
+          flags=()
+          if [ "$PRERELEASE" = true ]; then flags+=(--prerelease); fi
+          gh release create "$GITHUB_REF_NAME" --draft --verify-tag \
+            --title "udpstp $GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/RELEASE-NOTES.md" "${flags[@]}" dist/*

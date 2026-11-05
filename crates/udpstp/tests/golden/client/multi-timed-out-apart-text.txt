@@ -1,0 +1,18 @@
+ErrorStatus 108, not completed: exit 108
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: TestInitiationTimedOut
+Test Connection 1 to 192.0.2.2:24601: TestInitiationTimedOut
+--- stderr
+udpstp: Test Connection 0 to 192.0.2.1:24601: the Setup exchange didn't complete
+  within 3 s
+udpstp: Test Connection 1 to 192.0.2.2:24601: the Activation exchange didn't
+  complete within 3 s
+udpstp: Test Connection 0: a response was more than 5 s from this host's clock;
+  check both clocks
+udpstp: Test Connection 1: a response failed verification; check the key
+udpstp: the Test was aborted: fewer than 2 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted

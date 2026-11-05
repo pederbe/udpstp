@@ -1,0 +1,620 @@
+[
+  {
+    "host": "recorded host",
+    "kernel_tx_timestamps": "1",
+    "linux": true,
+    "python": {
+      "json": "{\n \"host\": \"recorded host\",\n \"kernel_tx_timestamps\": \"1\",\n \"runs\": [\n  {\n   \"row\": 50,\n   \"direction\": \"downstream\",\n   \"mbps\": 50,\n   \"capacity_min\": 50.0,\n   \"capacity_max\": 50.0,\n   \"achieved\": 50.0,\n   \"loss\": 2,\n   \"warnings\": {\n    \"BurstsSkipped\": 3,\n    \"BurstsWithheld\": 1\n   },\n   \"send_lag\": null,\n   \"fast_paths\": {\n    \"Gso\": true\n   },\n   \"run\": 1\n  },\n  {\n   \"row\": 50,\n   \"direction\": \"upstream\",\n   \"mbps\": 50,\n   \"capacity_min\": 49.0,\n   \"capacity_max\": 49.0,\n   \"achieved\": 49.0,\n   \"loss\": 1,\n   \"warnings\": {\n    \"BurstsSkipped\": 3,\n    \"BurstsWithheld\": 1\n   },\n   \"send_lag\": {\n    \"LagMaxUs\": 150,\n    \"LagP50Us\": 10,\n    \"LagP99Us\": 101\n   },\n   \"fast_paths\": {\n    \"Gso\": true\n   },\n   \"run\": 1\n  },\n  {\n   \"row\": 50,\n   \"direction\": \"upstream\",\n   \"mbps\": 50,\n   \"capacity_min\": 49.5,\n   \"capacity_max\": 49.5,\n   \"achieved\": 49.5,\n   \"loss\": 1,\n   \"warnings\": {\n    \"BurstsSkipped\": 3,\n    \"BurstsWithheld\": 1\n   },\n   \"send_lag\": {\n    \"LagMaxUs\": 150,\n    \"LagP50Us\": 10,\n    \"LagP99Us\": 100\n   },\n   \"fast_paths\": {\n    \"Gso\": true\n   },\n   \"run\": 1\n  },\n  {\n   \"row\": 25,\n   \"direction\": \"downstream\",\n   \"mbps\": 25,\n   \"capacity_min\": 25.0004,\n   \"capacity_max\": 25.0004,\n   \"achieved\": 25.0,\n   \"loss\": 1,\n   \"warnings\": {\n    \"BurstsSkipped\": 3,\n    \"BurstsWithheld\": 1\n   },\n   \"send_lag\": null,\n   \"fast_paths\": {\n    \"Gso\": true\n   },\n   \"run\": 1\n  },\n  {\n   \"row\": 50,\n   \"direction\": \"downstream\",\n   \"mbps\": 50,\n   \"capacity_min\": null,\n   \"capacity_max\": null,\n   \"achieved\": null,\n   \"loss\": 0,\n   \"warnings\": {\n    \"BurstsSkipped\": 3,\n    \"BurstsWithheld\": 1\n   },\n   \"send_lag\": null,\n   \"fast_paths\": {\n    \"Gso\": true\n   },\n   \"run\": 1\n  },\n  {\n   \"row\": 500,\n   \"direction\": \"upstream\",\n   \"mbps\": 500,\n   \"capacity_min\": 500.0,\n   \"capacity_max\": 500.0,\n   \"achieved\": 500.0,\n   \"loss\": 1,\n   \"warnings\": {\n    \"BurstsSkipped\": 3,\n    \"BurstsWithheld\": 1\n   },\n   \"send_lag\": null,\n   \"fast_paths\": {\n    \"Gso\": true\n   },\n   \"run\": 1\n  },\n  {\n   \"row\": 1001,\n   \"direction\": \"upstream\",\n   \"mbps\": 1100,\n   \"capacity_min\": 1088.0,\n   \"capacity_max\": 1088.0,\n   \"achieved\": 1088.0,\n   \"loss\": 1,\n   \"warnings\": {\n    \"BurstsSkipped\": 3,\n    \"BurstsWithheld\": 1\n   },\n   \"send_lag\": null,\n   \"fast_paths\": {\n    \"Gso\": true\n   },\n   \"run\": 1\n  },\n  {\n   \"row\": 50,\n   \"direction\": \"upstream\",\n   \"error\": \"failed Test\",\n   \"run\": 1\n  }\n ]\n}",
+      "judgments": [
+        {
+          "failures": [],
+          "figures": {
+            "achieved": 50.0,
+            "capacity_max": 50.0,
+            "capacity_min": 50.0,
+            "direction": "downstream",
+            "fast_paths": {
+              "Gso": true
+            },
+            "loss": 2,
+            "mbps": 50,
+            "row": 50,
+            "run": 1,
+            "send_lag": null,
+            "warnings": {
+              "BurstsSkipped": 3,
+              "BurstsWithheld": 1
+            }
+          }
+        },
+        {
+          "failures": [
+            "achieved 49.0 Mbps, more than 1 % from 50",
+            "send lag p99 101 µs over 100"
+          ],
+          "figures": {
+            "achieved": 49.0,
+            "capacity_max": 49.0,
+            "capacity_min": 49.0,
+            "direction": "upstream",
+            "fast_paths": {
+              "Gso": true
+            },
+            "loss": 1,
+            "mbps": 50,
+            "row": 50,
+            "run": 1,
+            "send_lag": {
+              "LagMaxUs": 150,
+              "LagP50Us": 10,
+              "LagP99Us": 101
+            },
+            "warnings": {
+              "BurstsSkipped": 3,
+              "BurstsWithheld": 1
+            }
+          }
+        },
+        {
+          "failures": [],
+          "figures": {
+            "achieved": 49.5,
+            "capacity_max": 49.5,
+            "capacity_min": 49.5,
+            "direction": "upstream",
+            "fast_paths": {
+              "Gso": true
+            },
+            "loss": 1,
+            "mbps": 50,
+            "row": 50,
+            "run": 1,
+            "send_lag": {
+              "LagMaxUs": 150,
+              "LagP50Us": 10,
+              "LagP99Us": 100
+            },
+            "warnings": {
+              "BurstsSkipped": 3,
+              "BurstsWithheld": 1
+            }
+          }
+        },
+        {
+          "failures": [],
+          "figures": {
+            "achieved": 25.0,
+            "capacity_max": 25.0004,
+            "capacity_min": 25.0004,
+            "direction": "downstream",
+            "fast_paths": {
+              "Gso": true
+            },
+            "loss": 1,
+            "mbps": 25,
+            "row": 25,
+            "run": 1,
+            "send_lag": null,
+            "warnings": {
+              "BurstsSkipped": 3,
+              "BurstsWithheld": 1
+            }
+          }
+        },
+        {
+          "failures": [
+            "no Sub-Intervals"
+          ],
+          "figures": {
+            "achieved": null,
+            "capacity_max": null,
+            "capacity_min": null,
+            "direction": "downstream",
+            "fast_paths": {
+              "Gso": true
+            },
+            "loss": 0,
+            "mbps": 50,
+            "row": 50,
+            "run": 1,
+            "send_lag": null,
+            "warnings": {
+              "BurstsSkipped": 3,
+              "BurstsWithheld": 1
+            }
+          }
+        },
+        {
+          "failures": [
+            "no kernel send timestamps"
+          ],
+          "figures": {
+            "achieved": 500.0,
+            "capacity_max": 500.0,
+            "capacity_min": 500.0,
+            "direction": "upstream",
+            "fast_paths": {
+              "Gso": true
+            },
+            "loss": 1,
+            "mbps": 500,
+            "row": 500,
+            "run": 1,
+            "send_lag": null,
+            "warnings": {
+              "BurstsSkipped": 3,
+              "BurstsWithheld": 1
+            }
+          }
+        },
+        {
+          "failures": [],
+          "figures": {
+            "achieved": 1088.0,
+            "capacity_max": 1088.0,
+            "capacity_min": 1088.0,
+            "direction": "upstream",
+            "fast_paths": {
+              "Gso": true
+            },
+            "loss": 1,
+            "mbps": 1100,
+            "row": 1001,
+            "run": 1,
+            "send_lag": null,
+            "warnings": {
+              "BurstsSkipped": 3,
+              "BurstsWithheld": 1
+            }
+          }
+        },
+        {
+          "failures": [
+            "no result"
+          ],
+          "figures": {
+            "direction": "upstream",
+            "error": "failed Test",
+            "row": 50,
+            "run": 1
+          }
+        }
+      ]
+    },
+    "runs": [
+      {
+        "direction": "downstream",
+        "gated": true,
+        "result": {
+          "Output": {
+            "IncrementalResult": [
+              {
+                "IPLayerCapacity": 50.0,
+                "LossCount": 1
+              },
+              {
+                "IPLayerCapacity": 50.0,
+                "LossCount": 1
+              }
+            ]
+          },
+          "udpstp": {
+            "FastPaths": {
+              "Gso": true
+            },
+            "KernelSendTimestamps": null,
+            "Warnings": [
+              {
+                "Code": "BurstsSkipped",
+                "Count": 3
+              },
+              {
+                "Code": "BurstsWithheld",
+                "Count": 1
+              }
+            ]
+          }
+        },
+        "row": 50,
+        "run": 1
+      },
+      {
+        "direction": "upstream",
+        "gated": true,
+        "result": {
+          "Output": {
+            "IncrementalResult": [
+              {
+                "IPLayerCapacity": 49.0,
+                "LossCount": 1
+              }
+            ]
+          },
+          "udpstp": {
+            "FastPaths": {
+              "Gso": true
+            },
+            "KernelSendTimestamps": {
+              "LagMaxUs": 150,
+              "LagP50Us": 10,
+              "LagP99Us": 101
+            },
+            "Warnings": [
+              {
+                "Code": "BurstsSkipped",
+                "Count": 3
+              },
+              {
+                "Code": "BurstsWithheld",
+                "Count": 1
+              }
+            ]
+          }
+        },
+        "row": 50,
+        "run": 1
+      },
+      {
+        "direction": "upstream",
+        "gated": true,
+        "result": {
+          "Output": {
+            "IncrementalResult": [
+              {
+                "IPLayerCapacity": 49.5,
+                "LossCount": 1
+              }
+            ]
+          },
+          "udpstp": {
+            "FastPaths": {
+              "Gso": true
+            },
+            "KernelSendTimestamps": {
+              "LagMaxUs": 150,
+              "LagP50Us": 10,
+              "LagP99Us": 100
+            },
+            "Warnings": [
+              {
+                "Code": "BurstsSkipped",
+                "Count": 3
+              },
+              {
+                "Code": "BurstsWithheld",
+                "Count": 1
+              }
+            ]
+          }
+        },
+        "row": 50,
+        "run": 1
+      },
+      {
+        "direction": "downstream",
+        "gated": true,
+        "result": {
+          "Output": {
+            "IncrementalResult": [
+              {
+                "IPLayerCapacity": 25.0004,
+                "LossCount": 1
+              }
+            ]
+          },
+          "udpstp": {
+            "FastPaths": {
+              "Gso": true
+            },
+            "KernelSendTimestamps": null,
+            "Warnings": [
+              {
+                "Code": "BurstsSkipped",
+                "Count": 3
+              },
+              {
+                "Code": "BurstsWithheld",
+                "Count": 1
+              }
+            ]
+          }
+        },
+        "row": 25,
+        "run": 1
+      },
+      {
+        "direction": "downstream",
+        "gated": true,
+        "result": {
+          "Output": {
+            "IncrementalResult": []
+          },
+          "udpstp": {
+            "FastPaths": {
+              "Gso": true
+            },
+            "KernelSendTimestamps": null,
+            "Warnings": [
+              {
+                "Code": "BurstsSkipped",
+                "Count": 3
+              },
+              {
+                "Code": "BurstsWithheld",
+                "Count": 1
+              }
+            ]
+          }
+        },
+        "row": 50,
+        "run": 1
+      },
+      {
+        "direction": "upstream",
+        "gated": true,
+        "result": {
+          "Output": {
+            "IncrementalResult": [
+              {
+                "IPLayerCapacity": 500.0,
+                "LossCount": 1
+              }
+            ]
+          },
+          "udpstp": {
+            "FastPaths": {
+              "Gso": true
+            },
+            "KernelSendTimestamps": null,
+            "Warnings": [
+              {
+                "Code": "BurstsSkipped",
+                "Count": 3
+              },
+              {
+                "Code": "BurstsWithheld",
+                "Count": 1
+              }
+            ]
+          }
+        },
+        "row": 500,
+        "run": 1
+      },
+      {
+        "direction": "upstream",
+        "gated": false,
+        "result": {
+          "Output": {
+            "IncrementalResult": [
+              {
+                "IPLayerCapacity": 1088.0,
+                "LossCount": 1
+              }
+            ]
+          },
+          "udpstp": {
+            "FastPaths": {
+              "Gso": true
+            },
+            "KernelSendTimestamps": null,
+            "Warnings": [
+              {
+                "Code": "BurstsSkipped",
+                "Count": 3
+              },
+              {
+                "Code": "BurstsWithheld",
+                "Count": 1
+              }
+            ]
+          }
+        },
+        "row": 1001,
+        "run": 1
+      },
+      {
+        "direction": "upstream",
+        "gated": true,
+        "result": {
+          "error": "failed Test"
+        },
+        "row": 50,
+        "run": 1
+      }
+    ]
+  },
+  {
+    "host": "recorded Windows",
+    "kernel_tx_timestamps": "1",
+    "linux": false,
+    "python": {
+      "json": "{\n \"host\": \"recorded Windows\",\n \"kernel_tx_timestamps\": \"1\",\n \"runs\": [\n  {\n   \"row\": 50,\n   \"direction\": \"upstream\",\n   \"mbps\": 50,\n   \"capacity_min\": 50.0,\n   \"capacity_max\": 50.0,\n   \"achieved\": 50.0,\n   \"loss\": 1,\n   \"warnings\": {\n    \"BurstsSkipped\": 3,\n    \"BurstsWithheld\": 1\n   },\n   \"send_lag\": null,\n   \"fast_paths\": {\n    \"Gso\": true\n   },\n   \"run\": 1\n  },\n  {\n   \"row\": 50,\n   \"direction\": \"upstream\",\n   \"mbps\": 50,\n   \"capacity_min\": 49.0,\n   \"capacity_max\": 49.0,\n   \"achieved\": 49.0,\n   \"loss\": 1,\n   \"warnings\": {\n    \"BurstsSkipped\": 3,\n    \"BurstsWithheld\": 1\n   },\n   \"send_lag\": null,\n   \"fast_paths\": {\n    \"Gso\": true\n   },\n   \"run\": 1\n  }\n ]\n}",
+      "judgments": [
+        {
+          "failures": [],
+          "figures": {
+            "achieved": 50.0,
+            "capacity_max": 50.0,
+            "capacity_min": 50.0,
+            "direction": "upstream",
+            "fast_paths": {
+              "Gso": true
+            },
+            "loss": 1,
+            "mbps": 50,
+            "row": 50,
+            "run": 1,
+            "send_lag": null,
+            "warnings": {
+              "BurstsSkipped": 3,
+              "BurstsWithheld": 1
+            }
+          }
+        },
+        {
+          "failures": [
+            "achieved 49.0 Mbps, more than 1 % from 50"
+          ],
+          "figures": {
+            "achieved": 49.0,
+            "capacity_max": 49.0,
+            "capacity_min": 49.0,
+            "direction": "upstream",
+            "fast_paths": {
+              "Gso": true
+            },
+            "loss": 1,
+            "mbps": 50,
+            "row": 50,
+            "run": 1,
+            "send_lag": null,
+            "warnings": {
+              "BurstsSkipped": 3,
+              "BurstsWithheld": 1
+            }
+          }
+        }
+      ]
+    },
+    "runs": [
+      {
+        "direction": "upstream",
+        "gated": true,
+        "result": {
+          "Output": {
+            "IncrementalResult": [
+              {
+                "IPLayerCapacity": 50.0,
+                "LossCount": 1
+              }
+            ]
+          },
+          "udpstp": {
+            "FastPaths": {
+              "Gso": true
+            },
+            "KernelSendTimestamps": null,
+            "Warnings": [
+              {
+                "Code": "BurstsSkipped",
+                "Count": 3
+              },
+              {
+                "Code": "BurstsWithheld",
+                "Count": 1
+              }
+            ]
+          }
+        },
+        "row": 50,
+        "run": 1
+      },
+      {
+        "direction": "upstream",
+        "gated": true,
+        "result": {
+          "Output": {
+            "IncrementalResult": [
+              {
+                "IPLayerCapacity": 49.0,
+                "LossCount": 1
+              }
+            ]
+          },
+          "udpstp": {
+            "FastPaths": {
+              "Gso": true
+            },
+            "KernelSendTimestamps": null,
+            "Warnings": [
+              {
+                "Code": "BurstsSkipped",
+                "Count": 3
+              },
+              {
+                "Code": "BurstsWithheld",
+                "Count": 1
+              }
+            ]
+          }
+        },
+        "row": 50,
+        "run": 1
+      }
+    ]
+  },
+  {
+    "host": "recorded kernel-count",
+    "kernel_tx_timestamps": "kernel-count",
+    "linux": true,
+    "python": {
+      "json": "{\n \"host\": \"recorded kernel-count\",\n \"kernel_tx_timestamps\": \"kernel-count\",\n \"runs\": [\n  {\n   \"row\": 50,\n   \"direction\": \"upstream\",\n   \"mbps\": 50,\n   \"capacity_min\": 50.0,\n   \"capacity_max\": 50.0,\n   \"achieved\": 50.0,\n   \"loss\": 1,\n   \"warnings\": {\n    \"BurstsSkipped\": 3,\n    \"BurstsWithheld\": 1\n   },\n   \"send_lag\": {\n    \"LagMaxUs\": 150,\n    \"LagP50Us\": 10,\n    \"LagP99Us\": 100\n   },\n   \"fast_paths\": {\n    \"Gso\": true\n   },\n   \"run\": 1\n  }\n ]\n}",
+      "judgments": [
+        {
+          "failures": [],
+          "figures": {
+            "achieved": 50.0,
+            "capacity_max": 50.0,
+            "capacity_min": 50.0,
+            "direction": "upstream",
+            "fast_paths": {
+              "Gso": true
+            },
+            "loss": 1,
+            "mbps": 50,
+            "row": 50,
+            "run": 1,
+            "send_lag": {
+              "LagMaxUs": 150,
+              "LagP50Us": 10,
+              "LagP99Us": 100
+            },
+            "warnings": {
+              "BurstsSkipped": 3,
+              "BurstsWithheld": 1
+            }
+          }
+        }
+      ]
+    },
+    "runs": [
+      {
+        "direction": "upstream",
+        "gated": true,
+        "result": {
+          "Output": {
+            "IncrementalResult": [
+              {
+                "IPLayerCapacity": 50.0,
+                "LossCount": 1
+              }
+            ]
+          },
+          "udpstp": {
+            "FastPaths": {
+              "Gso": true
+            },
+            "KernelSendTimestamps": {
+              "LagMaxUs": 150,
+              "LagP50Us": 10,
+              "LagP99Us": 100
+            },
+            "Warnings": [
+              {
+                "Code": "BurstsSkipped",
+                "Count": 3
+              },
+              {
+                "Code": "BurstsWithheld",
+                "Count": 1
+              }
+            ]
+          }
+        },
+        "row": 50,
+        "run": 1
+      }
+    ]
+  }
+]

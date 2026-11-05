@@ -1,0 +1,29 @@
+# The docs half of udpstp.com, built by scripts/build-site.sh: `cargo xtask
+# site prepare` copies this file to target/site/book/ beside the generated
+# sources, and mdBook 0.5.4 builds it.
+[book]
+title = "udpstp"
+description = "udpstp is a Rust implementation of UDPSTP (RFC 9946), which measures the Maximum IP-Layer Capacity of a network path."
+authors = ["Peder Bergan"]
+language = "en"
+src = "src"
+
+[output.html]
+site-url = "/"
+git-repository-url = "https://github.com/pederbe/udpstp"
+default-theme = "navy"
+preferred-dark-theme = "navy"
+additional-css = ["theme/udpstp.css"]
+additional-js = ["theme/footer.js"]
+no-section-label = true
+
+[output.html.playground]
+# Examples explain the library API; the site serves no external playground.
+runnable = false
+
+[output.html.fold]
+enable = true
+level = 0
+
+[output.html.search]
+limit-results = 20

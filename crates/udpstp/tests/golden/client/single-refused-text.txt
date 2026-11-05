@@ -1,0 +1,9 @@
+ErrorStatus 110, not completed: exit 110
+--- stdout
+--------------------------------------------------------------------------------
+--- stderr
+udpstp: 192.0.2.1:24601 refused the Test: it has no room for the --max-bandwidth
+  asked for; retry later or ask for less
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: failed

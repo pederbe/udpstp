@@ -1,0 +1,2626 @@
+=== completed
+ErrorStatus 6, completed: exit 0
+--- stderr
+Test completed
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"Input":	{
+		"Interface":	"",
+		"Role":	"Receiver",
+		"ID":	45366,
+		"Host":	"192.0.2.1",
+		"HostIPAddress":	"192.0.2.1",
+		"Port":	51646,
+		"NumberOfHosts":	1,
+		"HostList":	[{
+				"Host":	"192.0.2.1",
+				"HostIPAddress":	"192.0.2.1",
+				"ControlPort":	24601
+			}],
+		"ClientIPAddress":	"",
+		"ClientPort":	40000,
+		"JumboFramesPermitted":	1,
+		"NumberOfConnections":	1,
+		"MinNumOfConnections":	1,
+		"DSCP":	0,
+		"ECN":	0,
+		"CEThreshold":	0,
+		"ProtocolVersion":	"Any",
+		"UDPPayloadMin":	52,
+		"UDPPayloadMax":	8972,
+		"UDPPayloadDefault":	1222,
+		"UDPPayloadContent":	"zeroes",
+		"TestType":	"Search",
+		"IPDVEnable":	1,
+		"IPRREnable":	1,
+		"RIPREnable":	1,
+		"PreambleDuration":	0,
+		"MaxRequiredBandwidth":	0,
+		"StartSendingRateIndex":	0,
+		"SendingRateIndex":	-1,
+		"NumberTestSubIntervals":	5,
+		"NumberFirstModeTestSubIntervals":	0,
+		"NumberFirstModeSuppSubIntervals":	0,
+		"TestSubInterval":	1000,
+		"StatusFeedbackInterval":	50,
+		"TimeoutNoTestTraffic":	1000,
+		"TimeoutNoStatusMessage":	1000,
+		"Tmax":	1000,
+		"TmaxRTT":	3000,
+		"TimestampResolution":	1,
+		"SeqErrThresh":	10,
+		"ReordDupIgnoreEnable":	1,
+		"LowerThresh":	30,
+		"UpperThresh":	90,
+		"HighSpeedDelta":	10,
+		"SlowAdjThresh":	3,
+		"HSpeedThresh":	1000000000,
+		"RateAdjAlgorithm":	"B",
+		"InterfaceDeterminesMax":	0
+	},
+	"Output":	{
+		"BOMTime":	"2026-09-21T14:13:20.000000Z",
+		"TmaxUsed":	1000,
+		"TestInterval":	5,
+		"TmaxRTTUsed":	3000,
+		"TimestampResolutionUsed":	1,
+		"IncrementalResult":	[{
+				"Interval":	1,
+				"Seconds":	1.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:21.017000Z",
+				"ActiveConnections":	1,
+				"DeliveredPercent":	100.00,
+				"LossRatio":	0.0,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	0,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	91.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}, {
+				"Interval":	2,
+				"Seconds":	2.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:22.017000Z",
+				"ActiveConnections":	1,
+				"DeliveredPercent":	100.00,
+				"LossRatio":	0.0,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	0,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	92.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}, {
+				"Interval":	3,
+				"Seconds":	3.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:23.017000Z",
+				"ActiveConnections":	1,
+				"DeliveredPercent":	100.00,
+				"LossRatio":	0.0,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	0,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	93.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}, {
+				"Interval":	4,
+				"Seconds":	4.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:24.017000Z",
+				"ActiveConnections":	1,
+				"DeliveredPercent":	83.33,
+				"LossRatio":	0.166666667,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	200,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	94.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}, {
+				"Interval":	5,
+				"Seconds":	5.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:25.017000Z",
+				"ActiveConnections":	1,
+				"DeliveredPercent":	100.00,
+				"LossRatio":	0.0,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	0,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	95.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}],
+		"Summary":	{
+			"Mode":	1,
+			"Intervals":	5,
+			"ActiveConnections":	1,
+			"DeliveredPercent":	96.15,
+			"LossRatioSummary":	0.038461538,
+			"ReorderedRatioSummary":	0.0,
+			"ReplicatedRatioSummary":	0.0,
+			"CEPercentOfDelivered":	0.0,
+			"LossCount":	200,
+			"ReorderedCount":	0,
+			"ReplicatedCount":	0,
+			"CECountOfDelivered":	0,
+			"PDVMin":	0.0,
+			"PDVAvg":	0.007,
+			"PDVMax":	0.012,
+			"PDVRangeSummary":	0.012,
+			"RTTMin":	0.0,
+			"RTTAvg":	0.008,
+			"RTTMax":	0.012,
+			"RTTRangeSummary":	0.012,
+			"IPLayerCapacitySummary":	93.00,
+			"InterfaceEthMbps":	0.0,
+			"MinOnewayDelaySummary":	0.0,
+			"MinRTTSummary":	0.001
+		},
+		"ModalSummary":	[],
+		"AtMax":	{
+			"Mode":	1,
+			"Intervals":	5,
+			"TimeOfMax":	"2026-09-21T14:13:25.017000Z",
+			"ActiveConnections":	1,
+			"DeliveredPercent":	100.00,
+			"LossRatioAtMax":	0.0,
+			"ReorderedRatioAtMax":	0.0,
+			"ReplicatedRatioAtMax":	0.0,
+			"CEPercentOfDelivered":	0.0,
+			"LossCount":	0,
+			"ReorderedCount":	0,
+			"ReplicatedCount":	0,
+			"CECountOfDelivered":	0,
+			"PDVMin":	0.0,
+			"PDVAvg":	0.007,
+			"PDVMax":	0.012,
+			"PDVRangeAtMax":	0.012,
+			"RTTMin":	0.0,
+			"RTTAvg":	0.008,
+			"RTTMax":	0.012,
+			"RTTRangeAtMax":	0.012,
+			"MaxIPLayerCapacity":	95.00,
+			"InterfaceEthMbps":	0.0,
+			"MaxETHCapacityNoFCS":	95.11,
+			"MaxETHCapacityWithFCS":	95.14,
+			"MaxETHCapacityWithFCSVLAN":	95.18,
+			"MinOnewayDelayAtMax":	0.0
+		},
+		"ModalResult":	[],
+		"ECNBleachingDetected":	0,
+		"EOMTime":	"2026-09-21T14:13:36.000000Z",
+		"Status":	"Error_Other"
+	},
+	"ErrorStatus":	6,
+	"ErrorMessage":	"",
+	"ErrorMessage2":	"",
+	"udpstp":	{
+		"Warnings":	[{
+				"Code":	"InvalidLoadPdus",
+				"Count":	2,
+				"Message":	"2 invalid Load PDUs ignored"
+			}],
+		"EndReason":	"Completed",
+		"ControlPhaseFailure":	null,
+		"Coercions":	[{
+				"McIndex":	0,
+				"Parameter":	"testIntTime",
+				"Requested":	10,
+				"Coerced":	5
+			}],
+		"DontFragment":	true,
+		"SocketBuffers":	{
+			"Requested":	2097152,
+			"Receive":	4194304,
+			"Send":	4194304
+		},
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[],
+		"PerformanceCriterion":	{
+			"MaxLossRatio":	0.010000000
+		},
+		"CapacityModes":	[{
+				"Mode":	1,
+				"SubIntervals":	[1, 5],
+				"Valid":	true,
+				"MaximumIPLayerCapacity":	{
+					"SubInterval":	5,
+					"IPLayerCapacity":	95.00,
+					"LossRatio":	0.0
+				},
+				"HighestIPLayerCapacity":	{
+					"SubInterval":	5,
+					"IPLayerCapacity":	95.00,
+					"LossRatio":	0.0
+				}
+			}],
+		"MissingSubIntervals":	[],
+		"NoSamples":	[],
+		"IPLayerSenderBitRate":	[{
+				"SubInterval":	1,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}, {
+				"SubInterval":	2,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}, {
+				"SubInterval":	3,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}, {
+				"SubInterval":	4,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}, {
+				"SubInterval":	5,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}]
+	}
+}
+
+=== test-interval-elapsed
+ErrorStatus 6, completed: exit 0
+--- stderr
+Test completed
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"Input":	{
+		"Interface":	"",
+		"Role":	"Receiver",
+		"ID":	45366,
+		"Host":	"192.0.2.1",
+		"HostIPAddress":	"192.0.2.1",
+		"Port":	51646,
+		"NumberOfHosts":	1,
+		"HostList":	[{
+				"Host":	"192.0.2.1",
+				"HostIPAddress":	"192.0.2.1",
+				"ControlPort":	24601
+			}],
+		"ClientIPAddress":	"",
+		"ClientPort":	40000,
+		"JumboFramesPermitted":	1,
+		"NumberOfConnections":	1,
+		"MinNumOfConnections":	1,
+		"DSCP":	0,
+		"ECN":	0,
+		"CEThreshold":	0,
+		"ProtocolVersion":	"Any",
+		"UDPPayloadMin":	52,
+		"UDPPayloadMax":	8972,
+		"UDPPayloadDefault":	1222,
+		"UDPPayloadContent":	"zeroes",
+		"TestType":	"Search",
+		"IPDVEnable":	1,
+		"IPRREnable":	1,
+		"RIPREnable":	1,
+		"PreambleDuration":	0,
+		"MaxRequiredBandwidth":	0,
+		"StartSendingRateIndex":	0,
+		"SendingRateIndex":	-1,
+		"NumberTestSubIntervals":	5,
+		"NumberFirstModeTestSubIntervals":	0,
+		"NumberFirstModeSuppSubIntervals":	0,
+		"TestSubInterval":	1000,
+		"StatusFeedbackInterval":	50,
+		"TimeoutNoTestTraffic":	1000,
+		"TimeoutNoStatusMessage":	1000,
+		"Tmax":	1000,
+		"TmaxRTT":	3000,
+		"TimestampResolution":	1,
+		"SeqErrThresh":	10,
+		"ReordDupIgnoreEnable":	1,
+		"LowerThresh":	30,
+		"UpperThresh":	90,
+		"HighSpeedDelta":	10,
+		"SlowAdjThresh":	3,
+		"HSpeedThresh":	1000000000,
+		"RateAdjAlgorithm":	"B",
+		"InterfaceDeterminesMax":	0
+	},
+	"Output":	{
+		"BOMTime":	"2026-09-21T14:13:20.000000Z",
+		"TmaxUsed":	1000,
+		"TestInterval":	5,
+		"TmaxRTTUsed":	3000,
+		"TimestampResolutionUsed":	1,
+		"IncrementalResult":	[{
+				"Interval":	1,
+				"Seconds":	1.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:21.017000Z",
+				"ActiveConnections":	1,
+				"DeliveredPercent":	100.00,
+				"LossRatio":	0.0,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	0,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	91.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}, {
+				"Interval":	2,
+				"Seconds":	2.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:22.017000Z",
+				"ActiveConnections":	1,
+				"DeliveredPercent":	100.00,
+				"LossRatio":	0.0,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	0,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	92.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}, {
+				"Interval":	3,
+				"Seconds":	3.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:23.017000Z",
+				"ActiveConnections":	1,
+				"DeliveredPercent":	100.00,
+				"LossRatio":	0.0,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	0,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	93.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}, {
+				"Interval":	4,
+				"Seconds":	4.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:24.017000Z",
+				"ActiveConnections":	1,
+				"DeliveredPercent":	83.33,
+				"LossRatio":	0.166666667,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	200,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	94.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}, {
+				"Interval":	5,
+				"Seconds":	5.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:25.017000Z",
+				"ActiveConnections":	1,
+				"DeliveredPercent":	100.00,
+				"LossRatio":	0.0,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	0,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	95.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}],
+		"Summary":	{
+			"Mode":	1,
+			"Intervals":	5,
+			"ActiveConnections":	1,
+			"DeliveredPercent":	96.15,
+			"LossRatioSummary":	0.038461538,
+			"ReorderedRatioSummary":	0.0,
+			"ReplicatedRatioSummary":	0.0,
+			"CEPercentOfDelivered":	0.0,
+			"LossCount":	200,
+			"ReorderedCount":	0,
+			"ReplicatedCount":	0,
+			"CECountOfDelivered":	0,
+			"PDVMin":	0.0,
+			"PDVAvg":	0.007,
+			"PDVMax":	0.012,
+			"PDVRangeSummary":	0.012,
+			"RTTMin":	0.0,
+			"RTTAvg":	0.008,
+			"RTTMax":	0.012,
+			"RTTRangeSummary":	0.012,
+			"IPLayerCapacitySummary":	93.00,
+			"InterfaceEthMbps":	0.0,
+			"MinOnewayDelaySummary":	0.0,
+			"MinRTTSummary":	0.001
+		},
+		"ModalSummary":	[],
+		"AtMax":	{
+			"Mode":	1,
+			"Intervals":	5,
+			"TimeOfMax":	"2026-09-21T14:13:25.017000Z",
+			"ActiveConnections":	1,
+			"DeliveredPercent":	100.00,
+			"LossRatioAtMax":	0.0,
+			"ReorderedRatioAtMax":	0.0,
+			"ReplicatedRatioAtMax":	0.0,
+			"CEPercentOfDelivered":	0.0,
+			"LossCount":	0,
+			"ReorderedCount":	0,
+			"ReplicatedCount":	0,
+			"CECountOfDelivered":	0,
+			"PDVMin":	0.0,
+			"PDVAvg":	0.007,
+			"PDVMax":	0.012,
+			"PDVRangeAtMax":	0.012,
+			"RTTMin":	0.0,
+			"RTTAvg":	0.008,
+			"RTTMax":	0.012,
+			"RTTRangeAtMax":	0.012,
+			"MaxIPLayerCapacity":	95.00,
+			"InterfaceEthMbps":	0.0,
+			"MaxETHCapacityNoFCS":	95.11,
+			"MaxETHCapacityWithFCS":	95.14,
+			"MaxETHCapacityWithFCSVLAN":	95.18,
+			"MinOnewayDelayAtMax":	0.0
+		},
+		"ModalResult":	[],
+		"ECNBleachingDetected":	0,
+		"EOMTime":	"2026-09-21T14:13:36.000000Z",
+		"Status":	"Error_Other"
+	},
+	"ErrorStatus":	6,
+	"ErrorMessage":	"",
+	"ErrorMessage2":	"",
+	"udpstp":	{
+		"Warnings":	[{
+				"Code":	"InvalidLoadPdus",
+				"Count":	2,
+				"Message":	"2 invalid Load PDUs ignored"
+			}, {
+				"Code":	"DataPhaseEnded",
+				"Count":	1,
+				"Message":	"The Test ended without the Server's STOP: TestIntervalElapsed"
+			}],
+		"EndReason":	"TestIntervalElapsed",
+		"ControlPhaseFailure":	null,
+		"Coercions":	[{
+				"McIndex":	0,
+				"Parameter":	"testIntTime",
+				"Requested":	10,
+				"Coerced":	5
+			}],
+		"DontFragment":	true,
+		"SocketBuffers":	{
+			"Requested":	2097152,
+			"Receive":	4194304,
+			"Send":	4194304
+		},
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[],
+		"PerformanceCriterion":	{
+			"MaxLossRatio":	0.010000000
+		},
+		"CapacityModes":	[{
+				"Mode":	1,
+				"SubIntervals":	[1, 5],
+				"Valid":	true,
+				"MaximumIPLayerCapacity":	{
+					"SubInterval":	5,
+					"IPLayerCapacity":	95.00,
+					"LossRatio":	0.0
+				},
+				"HighestIPLayerCapacity":	{
+					"SubInterval":	5,
+					"IPLayerCapacity":	95.00,
+					"LossRatio":	0.0
+				}
+			}],
+		"MissingSubIntervals":	[],
+		"NoSamples":	[],
+		"IPLayerSenderBitRate":	[{
+				"SubInterval":	1,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}, {
+				"SubInterval":	2,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}, {
+				"SubInterval":	3,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}, {
+				"SubInterval":	4,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}, {
+				"SubInterval":	5,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}]
+	}
+}
+
+=== watchdog
+ErrorStatus 200, not completed: exit 200
+--- stderr
+udpstp: warning: the Watchdog ended the Test: nothing received for 3 s
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"Input":	{
+		"Interface":	"",
+		"Role":	"Receiver",
+		"ID":	45366,
+		"Host":	"192.0.2.1",
+		"HostIPAddress":	"192.0.2.1",
+		"Port":	51646,
+		"NumberOfHosts":	1,
+		"HostList":	[{
+				"Host":	"192.0.2.1",
+				"HostIPAddress":	"192.0.2.1",
+				"ControlPort":	24601
+			}],
+		"ClientIPAddress":	"",
+		"ClientPort":	40000,
+		"JumboFramesPermitted":	1,
+		"NumberOfConnections":	1,
+		"MinNumOfConnections":	1,
+		"DSCP":	0,
+		"ECN":	0,
+		"CEThreshold":	0,
+		"ProtocolVersion":	"Any",
+		"UDPPayloadMin":	52,
+		"UDPPayloadMax":	8972,
+		"UDPPayloadDefault":	1222,
+		"UDPPayloadContent":	"zeroes",
+		"TestType":	"Search",
+		"IPDVEnable":	1,
+		"IPRREnable":	1,
+		"RIPREnable":	1,
+		"PreambleDuration":	0,
+		"MaxRequiredBandwidth":	0,
+		"StartSendingRateIndex":	0,
+		"SendingRateIndex":	-1,
+		"NumberTestSubIntervals":	5,
+		"NumberFirstModeTestSubIntervals":	0,
+		"NumberFirstModeSuppSubIntervals":	0,
+		"TestSubInterval":	1000,
+		"StatusFeedbackInterval":	50,
+		"TimeoutNoTestTraffic":	1000,
+		"TimeoutNoStatusMessage":	1000,
+		"Tmax":	1000,
+		"TmaxRTT":	3000,
+		"TimestampResolution":	1,
+		"SeqErrThresh":	10,
+		"ReordDupIgnoreEnable":	1,
+		"LowerThresh":	30,
+		"UpperThresh":	90,
+		"HighSpeedDelta":	10,
+		"SlowAdjThresh":	3,
+		"HSpeedThresh":	1000000000,
+		"RateAdjAlgorithm":	"B",
+		"InterfaceDeterminesMax":	0
+	},
+	"Output":	{
+		"BOMTime":	"2026-09-21T14:13:20.000000Z",
+		"TmaxUsed":	1000,
+		"TestInterval":	5,
+		"TmaxRTTUsed":	3000,
+		"TimestampResolutionUsed":	1,
+		"EOMTime":	"2026-09-21T14:13:36.000000Z",
+		"Status":	"Error_Other"
+	},
+	"ErrorStatus":	200,
+	"ErrorMessage":	"ERROR: the Test didn't complete: fewer than 1 Test Connection remained",
+	"ErrorMessage2":	"warning: the Watchdog ended the Test: nothing received for 3 s",
+	"udpstp":	{
+		"Warnings":	[{
+				"Code":	"InvalidLoadPdus",
+				"Count":	2,
+				"Message":	"2 invalid Load PDUs ignored"
+			}, {
+				"Code":	"TrafficStopped",
+				"Count":	1,
+				"Message":	"Nothing was received for 1 s, so this end stopped sending"
+			}, {
+				"Code":	"DataPhaseEnded",
+				"Count":	1,
+				"Message":	"The Watchdog ended the Test: nothing received for 3 s"
+			}],
+		"EndReason":	"Watchdog",
+		"ControlPhaseFailure":	null,
+		"Coercions":	[{
+				"McIndex":	0,
+				"Parameter":	"testIntTime",
+				"Requested":	10,
+				"Coerced":	5
+			}],
+		"DontFragment":	true,
+		"SocketBuffers":	{
+			"Requested":	2097152,
+			"Receive":	4194304,
+			"Send":	4194304
+		},
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[],
+		"PerformanceCriterion":	{
+			"MaxLossRatio":	0.010000000
+		},
+		"CapacityModes":	[{
+				"Mode":	1,
+				"SubIntervals":	[1, 5],
+				"Valid":	true,
+				"MaximumIPLayerCapacity":	{
+					"SubInterval":	2,
+					"IPLayerCapacity":	92.00,
+					"LossRatio":	0.0
+				},
+				"HighestIPLayerCapacity":	{
+					"SubInterval":	2,
+					"IPLayerCapacity":	92.00,
+					"LossRatio":	0.0
+				}
+			}],
+		"MissingSubIntervals":	[3, 4, 5],
+		"NoSamples":	[],
+		"IPLayerSenderBitRate":	[{
+				"SubInterval":	1,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}, {
+				"SubInterval":	2,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}],
+		"SubIntervals":	[{
+				"Interval":	1,
+				"Seconds":	1.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:21.017000Z",
+				"ActiveConnections":	1,
+				"DeliveredPercent":	100.00,
+				"LossRatio":	0.0,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	0,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	91.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}, {
+				"Interval":	2,
+				"Seconds":	2.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:22.017000Z",
+				"ActiveConnections":	1,
+				"DeliveredPercent":	100.00,
+				"LossRatio":	0.0,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	0,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	92.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}],
+		"MinRTT":	0.001
+	}
+}
+
+=== stopped-interrupted
+ErrorStatus 204, not completed: exit 204
+--- stderr
+udpstp: the Test was interrupted
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"Input":	{
+		"Interface":	"",
+		"Role":	"Receiver",
+		"ID":	45366,
+		"Host":	"192.0.2.1",
+		"HostIPAddress":	"192.0.2.1",
+		"Port":	51646,
+		"NumberOfHosts":	1,
+		"HostList":	[{
+				"Host":	"192.0.2.1",
+				"HostIPAddress":	"192.0.2.1",
+				"ControlPort":	24601
+			}],
+		"ClientIPAddress":	"",
+		"ClientPort":	40000,
+		"JumboFramesPermitted":	1,
+		"NumberOfConnections":	1,
+		"MinNumOfConnections":	1,
+		"DSCP":	0,
+		"ECN":	0,
+		"CEThreshold":	0,
+		"ProtocolVersion":	"Any",
+		"UDPPayloadMin":	52,
+		"UDPPayloadMax":	8972,
+		"UDPPayloadDefault":	1222,
+		"UDPPayloadContent":	"zeroes",
+		"TestType":	"Search",
+		"IPDVEnable":	1,
+		"IPRREnable":	1,
+		"RIPREnable":	1,
+		"PreambleDuration":	0,
+		"MaxRequiredBandwidth":	0,
+		"StartSendingRateIndex":	0,
+		"SendingRateIndex":	-1,
+		"NumberTestSubIntervals":	5,
+		"NumberFirstModeTestSubIntervals":	0,
+		"NumberFirstModeSuppSubIntervals":	0,
+		"TestSubInterval":	1000,
+		"StatusFeedbackInterval":	50,
+		"TimeoutNoTestTraffic":	1000,
+		"TimeoutNoStatusMessage":	1000,
+		"Tmax":	1000,
+		"TmaxRTT":	3000,
+		"TimestampResolution":	1,
+		"SeqErrThresh":	10,
+		"ReordDupIgnoreEnable":	1,
+		"LowerThresh":	30,
+		"UpperThresh":	90,
+		"HighSpeedDelta":	10,
+		"SlowAdjThresh":	3,
+		"HSpeedThresh":	1000000000,
+		"RateAdjAlgorithm":	"B",
+		"InterfaceDeterminesMax":	0
+	},
+	"Output":	{
+		"BOMTime":	"2026-09-21T14:13:20.000000Z",
+		"TmaxUsed":	1000,
+		"TestInterval":	5,
+		"TmaxRTTUsed":	3000,
+		"TimestampResolutionUsed":	1,
+		"EOMTime":	"2026-09-21T14:13:36.000000Z",
+		"Status":	"Error_Other"
+	},
+	"ErrorStatus":	204,
+	"ErrorMessage":	"the Test was interrupted",
+	"ErrorMessage2":	"",
+	"udpstp":	{
+		"Warnings":	[{
+				"Code":	"InvalidLoadPdus",
+				"Count":	2,
+				"Message":	"2 invalid Load PDUs ignored"
+			}, {
+				"Code":	"Interrupted",
+				"Count":	1,
+				"Message":	"The Test was interrupted, so the results are partial"
+			}],
+		"EndReason":	"Stopped",
+		"ControlPhaseFailure":	null,
+		"Coercions":	[{
+				"McIndex":	0,
+				"Parameter":	"testIntTime",
+				"Requested":	10,
+				"Coerced":	5
+			}],
+		"DontFragment":	true,
+		"SocketBuffers":	{
+			"Requested":	2097152,
+			"Receive":	4194304,
+			"Send":	4194304
+		},
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[],
+		"PerformanceCriterion":	{
+			"MaxLossRatio":	0.010000000
+		},
+		"CapacityModes":	[{
+				"Mode":	1,
+				"SubIntervals":	[1, 5],
+				"Valid":	true,
+				"MaximumIPLayerCapacity":	{
+					"SubInterval":	2,
+					"IPLayerCapacity":	92.00,
+					"LossRatio":	0.0
+				},
+				"HighestIPLayerCapacity":	{
+					"SubInterval":	2,
+					"IPLayerCapacity":	92.00,
+					"LossRatio":	0.0
+				}
+			}],
+		"MissingSubIntervals":	[3, 4, 5],
+		"NoSamples":	[],
+		"IPLayerSenderBitRate":	[{
+				"SubInterval":	1,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}, {
+				"SubInterval":	2,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}],
+		"SubIntervals":	[{
+				"Interval":	1,
+				"Seconds":	1.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:21.017000Z",
+				"ActiveConnections":	1,
+				"DeliveredPercent":	100.00,
+				"LossRatio":	0.0,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	0,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	91.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}, {
+				"Interval":	2,
+				"Seconds":	2.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:22.017000Z",
+				"ActiveConnections":	1,
+				"DeliveredPercent":	100.00,
+				"LossRatio":	0.0,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	0,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	92.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}],
+		"MinRTT":	0.001
+	}
+}
+
+=== stopped
+ErrorStatus 200, not completed: exit 200
+--- stderr
+udpstp: warning: the Test ended without the Server's STOP: Stopped
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"Input":	{
+		"Interface":	"",
+		"Role":	"Receiver",
+		"ID":	45366,
+		"Host":	"192.0.2.1",
+		"HostIPAddress":	"192.0.2.1",
+		"Port":	51646,
+		"NumberOfHosts":	1,
+		"HostList":	[{
+				"Host":	"192.0.2.1",
+				"HostIPAddress":	"192.0.2.1",
+				"ControlPort":	24601
+			}],
+		"ClientIPAddress":	"",
+		"ClientPort":	40000,
+		"JumboFramesPermitted":	1,
+		"NumberOfConnections":	1,
+		"MinNumOfConnections":	1,
+		"DSCP":	0,
+		"ECN":	0,
+		"CEThreshold":	0,
+		"ProtocolVersion":	"Any",
+		"UDPPayloadMin":	52,
+		"UDPPayloadMax":	8972,
+		"UDPPayloadDefault":	1222,
+		"UDPPayloadContent":	"zeroes",
+		"TestType":	"Search",
+		"IPDVEnable":	1,
+		"IPRREnable":	1,
+		"RIPREnable":	1,
+		"PreambleDuration":	0,
+		"MaxRequiredBandwidth":	0,
+		"StartSendingRateIndex":	0,
+		"SendingRateIndex":	-1,
+		"NumberTestSubIntervals":	5,
+		"NumberFirstModeTestSubIntervals":	0,
+		"NumberFirstModeSuppSubIntervals":	0,
+		"TestSubInterval":	1000,
+		"StatusFeedbackInterval":	50,
+		"TimeoutNoTestTraffic":	1000,
+		"TimeoutNoStatusMessage":	1000,
+		"Tmax":	1000,
+		"TmaxRTT":	3000,
+		"TimestampResolution":	1,
+		"SeqErrThresh":	10,
+		"ReordDupIgnoreEnable":	1,
+		"LowerThresh":	30,
+		"UpperThresh":	90,
+		"HighSpeedDelta":	10,
+		"SlowAdjThresh":	3,
+		"HSpeedThresh":	1000000000,
+		"RateAdjAlgorithm":	"B",
+		"InterfaceDeterminesMax":	0
+	},
+	"Output":	{
+		"BOMTime":	"2026-09-21T14:13:20.000000Z",
+		"TmaxUsed":	1000,
+		"TestInterval":	5,
+		"TmaxRTTUsed":	3000,
+		"TimestampResolutionUsed":	1,
+		"EOMTime":	"2026-09-21T14:13:36.000000Z",
+		"Status":	"Error_Other"
+	},
+	"ErrorStatus":	200,
+	"ErrorMessage":	"ERROR: the Test didn't complete: fewer than 1 Test Connection remained",
+	"ErrorMessage2":	"warning: the Test ended without the Server's STOP: Stopped",
+	"udpstp":	{
+		"Warnings":	[{
+				"Code":	"InvalidLoadPdus",
+				"Count":	2,
+				"Message":	"2 invalid Load PDUs ignored"
+			}, {
+				"Code":	"DataPhaseEnded",
+				"Count":	1,
+				"Message":	"The Test ended without the Server's STOP: Stopped"
+			}],
+		"EndReason":	"Stopped",
+		"ControlPhaseFailure":	null,
+		"Coercions":	[{
+				"McIndex":	0,
+				"Parameter":	"testIntTime",
+				"Requested":	10,
+				"Coerced":	5
+			}],
+		"DontFragment":	true,
+		"SocketBuffers":	{
+			"Requested":	2097152,
+			"Receive":	4194304,
+			"Send":	4194304
+		},
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[],
+		"PerformanceCriterion":	{
+			"MaxLossRatio":	0.010000000
+		},
+		"CapacityModes":	[{
+				"Mode":	1,
+				"SubIntervals":	[1, 5],
+				"Valid":	true,
+				"MaximumIPLayerCapacity":	{
+					"SubInterval":	2,
+					"IPLayerCapacity":	92.00,
+					"LossRatio":	0.0
+				},
+				"HighestIPLayerCapacity":	{
+					"SubInterval":	2,
+					"IPLayerCapacity":	92.00,
+					"LossRatio":	0.0
+				}
+			}],
+		"MissingSubIntervals":	[3, 4, 5],
+		"NoSamples":	[],
+		"IPLayerSenderBitRate":	[{
+				"SubInterval":	1,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}, {
+				"SubInterval":	2,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}],
+		"SubIntervals":	[{
+				"Interval":	1,
+				"Seconds":	1.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:21.017000Z",
+				"ActiveConnections":	1,
+				"DeliveredPercent":	100.00,
+				"LossRatio":	0.0,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	0,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	91.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}, {
+				"Interval":	2,
+				"Seconds":	2.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:22.017000Z",
+				"ActiveConnections":	1,
+				"DeliveredPercent":	100.00,
+				"LossRatio":	0.0,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	0,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	92.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}],
+		"MinRTT":	0.001
+	}
+}
+
+=== unconfirmed
+ErrorStatus 255, not completed: exit 255
+--- stderr
+udpstp: warning: the Test ended without the Server's STOP: Unconfirmed
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"Input":	{
+		"Interface":	"",
+		"Role":	"Receiver",
+		"ID":	45366,
+		"Host":	"192.0.2.1",
+		"HostIPAddress":	"192.0.2.1",
+		"Port":	51646,
+		"NumberOfHosts":	1,
+		"HostList":	[{
+				"Host":	"192.0.2.1",
+				"HostIPAddress":	"192.0.2.1",
+				"ControlPort":	24601
+			}],
+		"ClientIPAddress":	"",
+		"ClientPort":	40000,
+		"JumboFramesPermitted":	1,
+		"NumberOfConnections":	1,
+		"MinNumOfConnections":	1,
+		"DSCP":	0,
+		"ECN":	0,
+		"CEThreshold":	0,
+		"ProtocolVersion":	"Any",
+		"UDPPayloadMin":	52,
+		"UDPPayloadMax":	8972,
+		"UDPPayloadDefault":	1222,
+		"UDPPayloadContent":	"zeroes",
+		"TestType":	"Search",
+		"IPDVEnable":	1,
+		"IPRREnable":	1,
+		"RIPREnable":	1,
+		"PreambleDuration":	0,
+		"MaxRequiredBandwidth":	0,
+		"StartSendingRateIndex":	0,
+		"SendingRateIndex":	-1,
+		"NumberTestSubIntervals":	5,
+		"NumberFirstModeTestSubIntervals":	0,
+		"NumberFirstModeSuppSubIntervals":	0,
+		"TestSubInterval":	1000,
+		"StatusFeedbackInterval":	50,
+		"TimeoutNoTestTraffic":	1000,
+		"TimeoutNoStatusMessage":	1000,
+		"Tmax":	1000,
+		"TmaxRTT":	3000,
+		"TimestampResolution":	1,
+		"SeqErrThresh":	10,
+		"ReordDupIgnoreEnable":	1,
+		"LowerThresh":	30,
+		"UpperThresh":	90,
+		"HighSpeedDelta":	10,
+		"SlowAdjThresh":	3,
+		"HSpeedThresh":	1000000000,
+		"RateAdjAlgorithm":	"B",
+		"InterfaceDeterminesMax":	0
+	},
+	"Output":	{
+		"BOMTime":	"2026-09-21T14:13:20.000000Z",
+		"TmaxUsed":	1000,
+		"TestInterval":	5,
+		"TmaxRTTUsed":	3000,
+		"TimestampResolutionUsed":	1,
+		"EOMTime":	"2026-09-21T14:13:36.000000Z",
+		"Status":	"Error_Other"
+	},
+	"ErrorStatus":	255,
+	"ErrorMessage":	"warning: the Test ended without the Server's STOP: Unconfirmed",
+	"ErrorMessage2":	"",
+	"udpstp":	{
+		"Warnings":	[{
+				"Code":	"InvalidLoadPdus",
+				"Count":	2,
+				"Message":	"2 invalid Load PDUs ignored"
+			}, {
+				"Code":	"DataPhaseEnded",
+				"Count":	1,
+				"Message":	"The Test ended without the Server's STOP: Unconfirmed"
+			}],
+		"EndReason":	"Unconfirmed",
+		"ControlPhaseFailure":	null,
+		"Coercions":	[{
+				"McIndex":	0,
+				"Parameter":	"testIntTime",
+				"Requested":	10,
+				"Coerced":	5
+			}],
+		"DontFragment":	true,
+		"SocketBuffers":	{
+			"Requested":	2097152,
+			"Receive":	4194304,
+			"Send":	4194304
+		},
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[],
+		"PerformanceCriterion":	{
+			"MaxLossRatio":	0.010000000
+		},
+		"CapacityModes":	[{
+				"Mode":	1,
+				"SubIntervals":	[1, 5],
+				"Valid":	true,
+				"MaximumIPLayerCapacity":	{
+					"SubInterval":	2,
+					"IPLayerCapacity":	92.00,
+					"LossRatio":	0.0
+				},
+				"HighestIPLayerCapacity":	{
+					"SubInterval":	2,
+					"IPLayerCapacity":	92.00,
+					"LossRatio":	0.0
+				}
+			}],
+		"MissingSubIntervals":	[3, 4, 5],
+		"NoSamples":	[],
+		"IPLayerSenderBitRate":	[{
+				"SubInterval":	1,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}, {
+				"SubInterval":	2,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}],
+		"SubIntervals":	[{
+				"Interval":	1,
+				"Seconds":	1.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:21.017000Z",
+				"ActiveConnections":	1,
+				"DeliveredPercent":	100.00,
+				"LossRatio":	0.0,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	0,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	91.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}, {
+				"Interval":	2,
+				"Seconds":	2.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:22.017000Z",
+				"ActiveConnections":	1,
+				"DeliveredPercent":	100.00,
+				"LossRatio":	0.0,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	0,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	92.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}],
+		"MinRTT":	0.001
+	}
+}
+
+=== stopped-by-client
+ErrorStatus 255, not completed: exit 255
+--- stderr
+udpstp: warning: the Test ended without the Server's STOP: StoppedByClient
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"Input":	{
+		"Interface":	"",
+		"Role":	"Receiver",
+		"ID":	45366,
+		"Host":	"192.0.2.1",
+		"HostIPAddress":	"192.0.2.1",
+		"Port":	51646,
+		"NumberOfHosts":	1,
+		"HostList":	[{
+				"Host":	"192.0.2.1",
+				"HostIPAddress":	"192.0.2.1",
+				"ControlPort":	24601
+			}],
+		"ClientIPAddress":	"",
+		"ClientPort":	40000,
+		"JumboFramesPermitted":	1,
+		"NumberOfConnections":	1,
+		"MinNumOfConnections":	1,
+		"DSCP":	0,
+		"ECN":	0,
+		"CEThreshold":	0,
+		"ProtocolVersion":	"Any",
+		"UDPPayloadMin":	52,
+		"UDPPayloadMax":	8972,
+		"UDPPayloadDefault":	1222,
+		"UDPPayloadContent":	"zeroes",
+		"TestType":	"Search",
+		"IPDVEnable":	1,
+		"IPRREnable":	1,
+		"RIPREnable":	1,
+		"PreambleDuration":	0,
+		"MaxRequiredBandwidth":	0,
+		"StartSendingRateIndex":	0,
+		"SendingRateIndex":	-1,
+		"NumberTestSubIntervals":	5,
+		"NumberFirstModeTestSubIntervals":	0,
+		"NumberFirstModeSuppSubIntervals":	0,
+		"TestSubInterval":	1000,
+		"StatusFeedbackInterval":	50,
+		"TimeoutNoTestTraffic":	1000,
+		"TimeoutNoStatusMessage":	1000,
+		"Tmax":	1000,
+		"TmaxRTT":	3000,
+		"TimestampResolution":	1,
+		"SeqErrThresh":	10,
+		"ReordDupIgnoreEnable":	1,
+		"LowerThresh":	30,
+		"UpperThresh":	90,
+		"HighSpeedDelta":	10,
+		"SlowAdjThresh":	3,
+		"HSpeedThresh":	1000000000,
+		"RateAdjAlgorithm":	"B",
+		"InterfaceDeterminesMax":	0
+	},
+	"Output":	{
+		"BOMTime":	"2026-09-21T14:13:20.000000Z",
+		"TmaxUsed":	1000,
+		"TestInterval":	5,
+		"TmaxRTTUsed":	3000,
+		"TimestampResolutionUsed":	1,
+		"EOMTime":	"2026-09-21T14:13:36.000000Z",
+		"Status":	"Error_Other"
+	},
+	"ErrorStatus":	255,
+	"ErrorMessage":	"warning: the Test ended without the Server's STOP: StoppedByClient",
+	"ErrorMessage2":	"",
+	"udpstp":	{
+		"Warnings":	[{
+				"Code":	"InvalidLoadPdus",
+				"Count":	2,
+				"Message":	"2 invalid Load PDUs ignored"
+			}, {
+				"Code":	"DataPhaseEnded",
+				"Count":	1,
+				"Message":	"The Test ended without the Server's STOP: StoppedByClient"
+			}],
+		"EndReason":	"StoppedByClient",
+		"ControlPhaseFailure":	null,
+		"Coercions":	[{
+				"McIndex":	0,
+				"Parameter":	"testIntTime",
+				"Requested":	10,
+				"Coerced":	5
+			}],
+		"DontFragment":	true,
+		"SocketBuffers":	{
+			"Requested":	2097152,
+			"Receive":	4194304,
+			"Send":	4194304
+		},
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[],
+		"PerformanceCriterion":	{
+			"MaxLossRatio":	0.010000000
+		},
+		"CapacityModes":	[{
+				"Mode":	1,
+				"SubIntervals":	[1, 5],
+				"Valid":	true,
+				"MaximumIPLayerCapacity":	{
+					"SubInterval":	2,
+					"IPLayerCapacity":	92.00,
+					"LossRatio":	0.0
+				},
+				"HighestIPLayerCapacity":	{
+					"SubInterval":	2,
+					"IPLayerCapacity":	92.00,
+					"LossRatio":	0.0
+				}
+			}],
+		"MissingSubIntervals":	[3, 4, 5],
+		"NoSamples":	[],
+		"IPLayerSenderBitRate":	[{
+				"SubInterval":	1,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}, {
+				"SubInterval":	2,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}],
+		"SubIntervals":	[{
+				"Interval":	1,
+				"Seconds":	1.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:21.017000Z",
+				"ActiveConnections":	1,
+				"DeliveredPercent":	100.00,
+				"LossRatio":	0.0,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	0,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	91.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}, {
+				"Interval":	2,
+				"Seconds":	2.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:22.017000Z",
+				"ActiveConnections":	1,
+				"DeliveredPercent":	100.00,
+				"LossRatio":	0.0,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	0,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	92.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}],
+		"MinRTT":	0.001
+	}
+}
+
+=== over-rate
+ErrorStatus 255, not completed: exit 255
+--- stderr
+udpstp: warning: the Test ended without the Server's STOP: OverRate
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"Input":	{
+		"Interface":	"",
+		"Role":	"Receiver",
+		"ID":	45366,
+		"Host":	"192.0.2.1",
+		"HostIPAddress":	"192.0.2.1",
+		"Port":	51646,
+		"NumberOfHosts":	1,
+		"HostList":	[{
+				"Host":	"192.0.2.1",
+				"HostIPAddress":	"192.0.2.1",
+				"ControlPort":	24601
+			}],
+		"ClientIPAddress":	"",
+		"ClientPort":	40000,
+		"JumboFramesPermitted":	1,
+		"NumberOfConnections":	1,
+		"MinNumOfConnections":	1,
+		"DSCP":	0,
+		"ECN":	0,
+		"CEThreshold":	0,
+		"ProtocolVersion":	"Any",
+		"UDPPayloadMin":	52,
+		"UDPPayloadMax":	8972,
+		"UDPPayloadDefault":	1222,
+		"UDPPayloadContent":	"zeroes",
+		"TestType":	"Search",
+		"IPDVEnable":	1,
+		"IPRREnable":	1,
+		"RIPREnable":	1,
+		"PreambleDuration":	0,
+		"MaxRequiredBandwidth":	0,
+		"StartSendingRateIndex":	0,
+		"SendingRateIndex":	-1,
+		"NumberTestSubIntervals":	5,
+		"NumberFirstModeTestSubIntervals":	0,
+		"NumberFirstModeSuppSubIntervals":	0,
+		"TestSubInterval":	1000,
+		"StatusFeedbackInterval":	50,
+		"TimeoutNoTestTraffic":	1000,
+		"TimeoutNoStatusMessage":	1000,
+		"Tmax":	1000,
+		"TmaxRTT":	3000,
+		"TimestampResolution":	1,
+		"SeqErrThresh":	10,
+		"ReordDupIgnoreEnable":	1,
+		"LowerThresh":	30,
+		"UpperThresh":	90,
+		"HighSpeedDelta":	10,
+		"SlowAdjThresh":	3,
+		"HSpeedThresh":	1000000000,
+		"RateAdjAlgorithm":	"B",
+		"InterfaceDeterminesMax":	0
+	},
+	"Output":	{
+		"BOMTime":	"2026-09-21T14:13:20.000000Z",
+		"TmaxUsed":	1000,
+		"TestInterval":	5,
+		"TmaxRTTUsed":	3000,
+		"TimestampResolutionUsed":	1,
+		"EOMTime":	"2026-09-21T14:13:36.000000Z",
+		"Status":	"Error_Other"
+	},
+	"ErrorStatus":	255,
+	"ErrorMessage":	"warning: the Test ended without the Server's STOP: OverRate",
+	"ErrorMessage2":	"",
+	"udpstp":	{
+		"Warnings":	[{
+				"Code":	"InvalidLoadPdus",
+				"Count":	2,
+				"Message":	"2 invalid Load PDUs ignored"
+			}, {
+				"Code":	"DataPhaseEnded",
+				"Count":	1,
+				"Message":	"The Test ended without the Server's STOP: OverRate"
+			}],
+		"EndReason":	"OverRate",
+		"ControlPhaseFailure":	null,
+		"Coercions":	[{
+				"McIndex":	0,
+				"Parameter":	"testIntTime",
+				"Requested":	10,
+				"Coerced":	5
+			}],
+		"DontFragment":	true,
+		"SocketBuffers":	{
+			"Requested":	2097152,
+			"Receive":	4194304,
+			"Send":	4194304
+		},
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[],
+		"PerformanceCriterion":	{
+			"MaxLossRatio":	0.010000000
+		},
+		"CapacityModes":	[{
+				"Mode":	1,
+				"SubIntervals":	[1, 5],
+				"Valid":	true,
+				"MaximumIPLayerCapacity":	{
+					"SubInterval":	2,
+					"IPLayerCapacity":	92.00,
+					"LossRatio":	0.0
+				},
+				"HighestIPLayerCapacity":	{
+					"SubInterval":	2,
+					"IPLayerCapacity":	92.00,
+					"LossRatio":	0.0
+				}
+			}],
+		"MissingSubIntervals":	[3, 4, 5],
+		"NoSamples":	[],
+		"IPLayerSenderBitRate":	[{
+				"SubInterval":	1,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}, {
+				"SubInterval":	2,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}],
+		"SubIntervals":	[{
+				"Interval":	1,
+				"Seconds":	1.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:21.017000Z",
+				"ActiveConnections":	1,
+				"DeliveredPercent":	100.00,
+				"LossRatio":	0.0,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	0,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	91.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}, {
+				"Interval":	2,
+				"Seconds":	2.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:22.017000Z",
+				"ActiveConnections":	1,
+				"DeliveredPercent":	100.00,
+				"LossRatio":	0.0,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	0,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	92.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}],
+		"MinRTT":	0.001
+	}
+}
+
+=== data-phase-engine-failed
+ErrorStatus 255, not completed: exit 255
+--- stderr
+udpstp: the Data Phase failed: the Data Phase panicked
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"Input":	{
+		"Interface":	"",
+		"Role":	"Receiver",
+		"ID":	45366,
+		"Host":	"192.0.2.1",
+		"HostIPAddress":	"192.0.2.1",
+		"Port":	51646,
+		"NumberOfHosts":	1,
+		"HostList":	[{
+				"Host":	"192.0.2.1",
+				"HostIPAddress":	"192.0.2.1",
+				"ControlPort":	24601
+			}],
+		"ClientIPAddress":	"",
+		"ClientPort":	40000,
+		"JumboFramesPermitted":	1,
+		"NumberOfConnections":	1,
+		"MinNumOfConnections":	1,
+		"DSCP":	0,
+		"ECN":	0,
+		"CEThreshold":	0,
+		"ProtocolVersion":	"Any",
+		"UDPPayloadMin":	52,
+		"UDPPayloadMax":	8972,
+		"UDPPayloadDefault":	1222,
+		"UDPPayloadContent":	"zeroes",
+		"TestType":	"Search",
+		"IPDVEnable":	1,
+		"IPRREnable":	1,
+		"RIPREnable":	1,
+		"PreambleDuration":	0,
+		"MaxRequiredBandwidth":	0,
+		"StartSendingRateIndex":	0,
+		"SendingRateIndex":	-1,
+		"NumberTestSubIntervals":	5,
+		"NumberFirstModeTestSubIntervals":	0,
+		"NumberFirstModeSuppSubIntervals":	0,
+		"TestSubInterval":	1000,
+		"StatusFeedbackInterval":	50,
+		"TimeoutNoTestTraffic":	1000,
+		"TimeoutNoStatusMessage":	1000,
+		"Tmax":	1000,
+		"TmaxRTT":	3000,
+		"TimestampResolution":	1,
+		"SeqErrThresh":	10,
+		"ReordDupIgnoreEnable":	1,
+		"LowerThresh":	30,
+		"UpperThresh":	90,
+		"HighSpeedDelta":	10,
+		"SlowAdjThresh":	3,
+		"HSpeedThresh":	1000000000,
+		"RateAdjAlgorithm":	"B",
+		"InterfaceDeterminesMax":	0
+	},
+	"Output":	{
+		"BOMTime":	"2026-09-21T14:13:20.000000Z",
+		"TmaxUsed":	1000,
+		"TestInterval":	5,
+		"TmaxRTTUsed":	3000,
+		"TimestampResolutionUsed":	1,
+		"EOMTime":	"2026-09-21T14:13:36.000000Z",
+		"Status":	"Error_Other"
+	},
+	"ErrorStatus":	255,
+	"ErrorMessage":	"the Data Phase failed: the Data Phase panicked",
+	"ErrorMessage2":	"",
+	"udpstp":	{
+		"Warnings":	[{
+				"Code":	"InvalidLoadPdus",
+				"Count":	2,
+				"Message":	"2 invalid Load PDUs ignored"
+			}, {
+				"Code":	"DataPhaseEnded",
+				"Count":	1,
+				"Message":	"The Data Phase failed, so the results are partial: the Data Phase panicked"
+			}],
+		"EndReason":	"DataPhaseEngineFailed",
+		"ControlPhaseFailure":	null,
+		"Coercions":	[{
+				"McIndex":	0,
+				"Parameter":	"testIntTime",
+				"Requested":	10,
+				"Coerced":	5
+			}],
+		"DontFragment":	true,
+		"SocketBuffers":	{
+			"Requested":	2097152,
+			"Receive":	4194304,
+			"Send":	4194304
+		},
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[],
+		"PerformanceCriterion":	{
+			"MaxLossRatio":	0.010000000
+		},
+		"CapacityModes":	[{
+				"Mode":	1,
+				"SubIntervals":	[1, 5],
+				"Valid":	true,
+				"MaximumIPLayerCapacity":	{
+					"SubInterval":	2,
+					"IPLayerCapacity":	92.00,
+					"LossRatio":	0.0
+				},
+				"HighestIPLayerCapacity":	{
+					"SubInterval":	2,
+					"IPLayerCapacity":	92.00,
+					"LossRatio":	0.0
+				}
+			}],
+		"MissingSubIntervals":	[3, 4, 5],
+		"NoSamples":	[],
+		"IPLayerSenderBitRate":	[{
+				"SubInterval":	1,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}, {
+				"SubInterval":	2,
+				"IPLayerSenderBitRateEstimate":	90.00
+			}],
+		"SubIntervals":	[{
+				"Interval":	1,
+				"Seconds":	1.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:21.017000Z",
+				"ActiveConnections":	1,
+				"DeliveredPercent":	100.00,
+				"LossRatio":	0.0,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	0,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	91.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}, {
+				"Interval":	2,
+				"Seconds":	2.0,
+				"TimeOfSubInterval":	"2026-09-21T14:13:22.017000Z",
+				"ActiveConnections":	1,
+				"DeliveredPercent":	100.00,
+				"LossRatio":	0.0,
+				"ReorderedRatio":	0.0,
+				"ReplicatedRatio":	0.0,
+				"CEPercentOfDelivered":	0.0,
+				"LossCount":	0,
+				"ReorderedCount":	0,
+				"ReplicatedCount":	0,
+				"CECountOfDelivered":	0,
+				"PDVMin":	0.0,
+				"PDVAvg":	0.007,
+				"PDVMax":	0.012,
+				"PDVRange":	0.012,
+				"RTTMin":	0.0,
+				"RTTAvg":	0.008,
+				"RTTMax":	0.012,
+				"RTTRange":	0.012,
+				"IPLayerCapacity":	92.00,
+				"InterfaceEthMbps":	0.0,
+				"MinOnewayDelay":	0.0
+			}],
+		"MinRTT":	0.001
+	}
+}
+
+=== activation-rejected
+ErrorStatus 152, not completed: exit 152
+--- stderr
+udpstp: the Server rejected the Activation Request
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	152,
+	"ErrorMessage":	"the Server rejected the Activation Request",
+	"ErrorMessage2":	"",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"ActivationRejected",
+		"ControlPhaseFailure":	null,
+		"Coercions":	[],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[]
+	}
+}
+
+=== activation-rejected-fixed-rate
+ErrorStatus 152, not completed: exit 152
+--- stderr
+udpstp: the Server rejected the Activation Request; only an Operator Key may run a Fixed-Rate Test (RFC 9946 §4.1), so check the key, or the Server's log
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	152,
+	"ErrorMessage":	"the Server rejected the Activation Request; only an Operator Key may run a Fixed-Rate Test (RFC 9946 §4.1), so check the key, or the Server's log",
+	"ErrorMessage2":	"",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"ActivationRejected",
+		"ControlPhaseFailure":	null,
+		"Coercions":	[],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[]
+	}
+}
+
+=== unknown-activation-response
+ErrorStatus 150, not completed: exit 150
+--- stderr
+udpstp: the Test ended: UnknownActivationResponse
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	150,
+	"ErrorMessage":	"the Test ended: UnknownActivationResponse",
+	"ErrorMessage2":	"",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"ControlPhaseFailed",
+		"ControlPhaseFailure":	"UnknownActivationResponse",
+		"Coercions":	[],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[]
+	}
+}
+
+=== unacceptable-coercion
+ErrorStatus 201, not completed: exit 201
+--- stderr
+udpstp: 192.0.2.1:24601 set dscpEcn to 0 (asked for 184), which --refuse-coercion doesn't accept; the Test ended
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	201,
+	"ErrorMessage":	"192.0.2.1:24601 set dscpEcn to 0 (asked for 184), which --refuse-coercion doesn't accept; the Test ended",
+	"ErrorMessage2":	"",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"ControlPhaseFailed",
+		"ControlPhaseFailure":	"UnacceptableCoercion",
+		"Coercions":	[{
+				"McIndex":	0,
+				"Parameter":	"dscpEcn",
+				"Requested":	184,
+				"Coerced":	0
+			}],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[]
+	}
+}
+
+=== unrunnable-parameter
+ErrorStatus 202, not completed: exit 202
+--- stderr
+udpstp: the Server set testIntTime to 1, which the Client can't run with; the Test ended
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	202,
+	"ErrorMessage":	"the Server set testIntTime to 1, which the Client can't run with; the Test ended",
+	"ErrorMessage2":	"",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"ControlPhaseFailed",
+		"ControlPhaseFailure":	"UnrunnableParameter",
+		"Coercions":	[{
+				"McIndex":	0,
+				"Parameter":	"testIntTime",
+				"Requested":	10,
+				"Coerced":	1
+			}],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[]
+	}
+}
+
+=== setup-rejected
+ErrorStatus 108, not completed: exit 108
+--- stderr
+udpstp: 192.0.2.1:24601 refused the Test: the request's time was more than 5 s from its clock; check both clocks
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	108,
+	"ErrorMessage":	"192.0.2.1:24601 refused the Test: the request's time was more than 5 s from its clock; check both clocks",
+	"ErrorMessage2":	"",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"ControlPhaseFailed",
+		"ControlPhaseFailure":	"SetupRejectedAuthTimeInvalid",
+		"Coercions":	[],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[]
+	}
+}
+
+=== unknown-setup-response
+ErrorStatus 100, not completed: exit 100
+--- stderr
+udpstp: 192.0.2.1:24601 answered the Setup Request with cmdResponse 99, which RFC 9946 doesn't define; the Test was not started
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	100,
+	"ErrorMessage":	"192.0.2.1:24601 answered the Setup Request with cmdResponse 99, which RFC 9946 doesn't define; the Test was not started",
+	"ErrorMessage2":	"",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"ControlPhaseFailed",
+		"ControlPhaseFailure":	"UnknownSetupResponse",
+		"Coercions":	[],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[]
+	}
+}
+
+=== no-authentication
+ErrorStatus 50, not completed: exit 50
+--- stderr
+udpstp: configuration error: no key to authenticate with; give one with --key-file, or --unauthenticated for a Server that allows Unauthenticated Mode
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	50,
+	"ErrorMessage":	"configuration error: no key to authenticate with; give one with --key-file, or --unauthenticated for a Server that allows Unauthenticated Mode",
+	"ErrorMessage2":	"",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"ControlPhaseFailed",
+		"ControlPhaseFailure":	"NoAuthenticationConfigured",
+		"Coercions":	[],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[]
+	}
+}
+
+=== no-key
+ErrorStatus 50, not completed: exit 50
+--- stderr
+udpstp: configuration error: no key in the key file may be sent with now (its send lifetime), or none with the --key-id given
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	50,
+	"ErrorMessage":	"configuration error: no key in the key file may be sent with now (its send lifetime), or none with the --key-id given",
+	"ErrorMessage2":	"",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"ControlPhaseFailed",
+		"ControlPhaseFailure":	"NoKeyForSending",
+		"Coercions":	[],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[]
+	}
+}
+
+=== ambiguous-key
+ErrorStatus 50, not completed: exit 50
+--- stderr
+udpstp: configuration error: several keys are valid now; choose one with --key-id
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	50,
+	"ErrorMessage":	"configuration error: several keys are valid now; choose one with --key-id",
+	"ErrorMessage2":	"",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"ControlPhaseFailed",
+		"ControlPhaseFailure":	"AmbiguousKeyForSending",
+		"Coercions":	[],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[]
+	}
+}
+
+=== multicast-server
+ErrorStatus 50, not completed: exit 50
+--- stderr
+udpstp: configuration error: 224.0.0.1:24601 is a multicast or broadcast address; the Server address must be unicast (RFC 9946 §6)
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	50,
+	"ErrorMessage":	"configuration error: 224.0.0.1:24601 is a multicast or broadcast address; the Server address must be unicast (RFC 9946 §6)",
+	"ErrorMessage2":	"",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"ControlPhaseFailed",
+		"ControlPhaseFailure":	"MulticastOrBroadcastServer",
+		"Coercions":	[],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[]
+	}
+}
+
+=== socket-unavailable
+ErrorStatus 75, not completed: exit 75
+--- stderr
+udpstp: the Test Connection's socket couldn't be opened
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	75,
+	"ErrorMessage":	"the Test Connection's socket couldn't be opened",
+	"ErrorMessage2":	"",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"ControlPhaseFailed",
+		"ControlPhaseFailure":	"SocketUnavailable",
+		"Coercions":	[],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[]
+	}
+}
+
+=== socket-error
+ErrorStatus 255, not completed: exit 255
+--- stderr
+udpstp: 192.0.2.1:24601: Too many open files (os error 24)
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	255,
+	"ErrorMessage":	"192.0.2.1:24601: Too many open files (os error 24)",
+	"ErrorMessage2":	"",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"SocketError",
+		"ControlPhaseFailure":	null,
+		"Coercions":	[],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[]
+	}
+}
+
+=== abandoned
+ErrorStatus 204, not completed: exit 204
+--- stderr
+udpstp: the Test was interrupted
+udpstp: the Test was abandoned before it started
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	204,
+	"ErrorMessage":	"the Test was abandoned before it started",
+	"ErrorMessage2":	"the Test was interrupted",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"Abandoned",
+		"ControlPhaseFailure":	null,
+		"Coercions":	[],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[]
+	}
+}
+
+=== timed-out-setup-unanswered
+ErrorStatus 200, not completed: exit 200
+--- stderr
+udpstp: no answer from 192.0.2.1:24601 within 3 s
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	200,
+	"ErrorMessage":	"ERROR: the Test didn't complete: fewer than 1 Test Connection remained",
+	"ErrorMessage2":	"no answer from 192.0.2.1:24601 within 3 s",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"ControlPhaseFailed",
+		"ControlPhaseFailure":	"TestInitiationTimedOut",
+		"Coercions":	[],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[]
+	}
+}
+
+=== timed-out-setup-late
+ErrorStatus 108, not completed: exit 108
+--- stderr
+udpstp: 192.0.2.1:24601: the Setup exchange didn't complete within 3 s
+udpstp: a response was more than 5 s from this host's clock; check both clocks
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	108,
+	"ErrorMessage":	"a response was more than 5 s from this host's clock; check both clocks",
+	"ErrorMessage2":	"192.0.2.1:24601: the Setup exchange didn't complete within 3 s",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"ControlPhaseFailed",
+		"ControlPhaseFailure":	"TestInitiationTimedOut",
+		"Coercions":	[],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[]
+	}
+}
+
+=== timed-out-setup-unverified
+ErrorStatus 107, not completed: exit 107
+--- stderr
+udpstp: 192.0.2.1:24601: the Setup exchange didn't complete within 3 s
+udpstp: a response failed verification; check the key
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	107,
+	"ErrorMessage":	"a response failed verification; check the key",
+	"ErrorMessage2":	"192.0.2.1:24601: the Setup exchange didn't complete within 3 s",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"ControlPhaseFailed",
+		"ControlPhaseFailure":	"TestInitiationTimedOut",
+		"Coercions":	[],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[]
+	}
+}
+
+=== timed-out-setup-broadcast
+ErrorStatus 200, not completed: exit 200
+--- stderr
+udpstp: 192.0.2.1:24601: the Setup exchange didn't complete within 3 s
+udpstp: a Setup Response came to a broadcast or multicast address and was ignored (RFC 9946 §6)
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	200,
+	"ErrorMessage":	"ERROR: the Test didn't complete: fewer than 1 Test Connection remained",
+	"ErrorMessage2":	"a Setup Response came to a broadcast or multicast address and was ignored (RFC 9946 §6)",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"ControlPhaseFailed",
+		"ControlPhaseFailure":	"TestInitiationTimedOut",
+		"Coercions":	[],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[]
+	}
+}
+
+=== timed-out-setup-corrupted
+ErrorStatus 200, not completed: exit 200
+--- stderr
+udpstp: 192.0.2.1:24601: the Setup exchange didn't complete within 3 s
+udpstp: a response failed its header checksum (--checksum): it was corrupted on the path, or the Server computes the checksum otherwise
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	200,
+	"ErrorMessage":	"ERROR: the Test didn't complete: fewer than 1 Test Connection remained",
+	"ErrorMessage2":	"a response failed its header checksum (--checksum): it was corrupted on the path, or the Server computes the checksum otherwise",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"ControlPhaseFailed",
+		"ControlPhaseFailure":	"TestInitiationTimedOut",
+		"Coercions":	[],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[]
+	}
+}
+
+=== timed-out-activation-unanswered
+ErrorStatus 200, not completed: exit 200
+--- stderr
+udpstp: 192.0.2.1:24601: the Activation exchange didn't complete within 3 s
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	200,
+	"ErrorMessage":	"ERROR: the Test didn't complete: fewer than 1 Test Connection remained",
+	"ErrorMessage2":	"192.0.2.1:24601: the Activation exchange didn't complete within 3 s",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"ControlPhaseFailed",
+		"ControlPhaseFailure":	"TestInitiationTimedOut",
+		"Coercions":	[],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[]
+	}
+}
+
+=== timed-out-activation-late
+ErrorStatus 158, not completed: exit 158
+--- stderr
+udpstp: 192.0.2.1:24601: the Activation exchange didn't complete within 3 s
+udpstp: a response was more than 5 s from this host's clock; check both clocks
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	158,
+	"ErrorMessage":	"a response was more than 5 s from this host's clock; check both clocks",
+	"ErrorMessage2":	"192.0.2.1:24601: the Activation exchange didn't complete within 3 s",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"ControlPhaseFailed",
+		"ControlPhaseFailure":	"TestInitiationTimedOut",
+		"Coercions":	[],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[]
+	}
+}
+
+=== timed-out-activation-unverified
+ErrorStatus 157, not completed: exit 157
+--- stderr
+udpstp: 192.0.2.1:24601: the Activation exchange didn't complete within 3 s
+udpstp: a response failed verification; check the key
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	157,
+	"ErrorMessage":	"a response failed verification; check the key",
+	"ErrorMessage2":	"192.0.2.1:24601: the Activation exchange didn't complete within 3 s",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"ControlPhaseFailed",
+		"ControlPhaseFailure":	"TestInitiationTimedOut",
+		"Coercions":	[],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[]
+	}
+}
+
+=== timed-out-activation-corrupted
+ErrorStatus 200, not completed: exit 200
+--- stderr
+udpstp: 192.0.2.1:24601: the Activation exchange didn't complete within 3 s
+udpstp: a response failed its header checksum (--checksum): it was corrupted on the path, or the Server computes the checksum otherwise
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	200,
+	"ErrorMessage":	"ERROR: the Test didn't complete: fewer than 1 Test Connection remained",
+	"ErrorMessage2":	"a response failed its header checksum (--checksum): it was corrupted on the path, or the Server computes the checksum otherwise",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"ControlPhaseFailed",
+		"ControlPhaseFailure":	"TestInitiationTimedOut",
+		"Coercions":	[],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[]
+	}
+}

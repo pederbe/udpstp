@@ -1,0 +1,125 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ReadAnything",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeImages",
+        "ec2:DescribeInstances",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSubnets",
+        "sts:GetCallerIdentity"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "LaunchOnlyTaggedInstancesOfTheRoundsType",
+      "Effect": "Allow",
+      "Action": "ec2:RunInstances",
+      "Resource": [
+        "arn:aws:ec2:eu-north-1:*:instance/*",
+        "arn:aws:ec2:eu-north-1:*:volume/*",
+        "arn:aws:ec2:eu-north-1:*:network-interface/*"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "eu-north-1"
+        },
+        "Null": {
+          "aws:RequestTag/udpstp-bench": "false"
+        },
+        "StringEqualsIfExists": {
+          "ec2:InstanceType": [
+            "c6in.large",
+            "c6in.2xlarge"
+          ],
+          "ec2:Tenancy": "default"
+        }
+      }
+    },
+    {
+      "Sid": "LaunchOnlyCanonicalsImages",
+      "Effect": "Allow",
+      "Action": "ec2:RunInstances",
+      "Resource": "arn:aws:ec2:eu-north-1::image/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "eu-north-1",
+          "ec2:Owner": "099720109477"
+        }
+      }
+    },
+    {
+      "Sid": "LaunchIntoTheseResources",
+      "Effect": "Allow",
+      "Action": "ec2:RunInstances",
+      "Resource": [
+        "arn:aws:ec2:eu-north-1:*:subnet/*",
+        "arn:aws:ec2:eu-north-1:*:security-group/*"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "eu-north-1"
+        }
+      }
+    },
+    {
+      "Sid": "CreateOnlyTaggedSecurityGroups",
+      "Effect": "Allow",
+      "Action": "ec2:CreateSecurityGroup",
+      "Resource": "arn:aws:ec2:eu-north-1:*:security-group/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "eu-north-1"
+        },
+        "Null": {
+          "aws:RequestTag/udpstp-bench": "false"
+        }
+      }
+    },
+    {
+      "Sid": "CreateSecurityGroupsInTheDefaultVpc",
+      "Effect": "Allow",
+      "Action": "ec2:CreateSecurityGroup",
+      "Resource": "arn:aws:ec2:eu-north-1:*:vpc/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "eu-north-1"
+        }
+      }
+    },
+    {
+      "Sid": "TagOnlyWhileCreating",
+      "Effect": "Allow",
+      "Action": "ec2:CreateTags",
+      "Resource": "arn:aws:ec2:eu-north-1:*:*/*",
+      "Condition": {
+        "StringEquals": {
+          "ec2:CreateAction": [
+            "RunInstances",
+            "CreateSecurityGroup"
+          ]
+        }
+      }
+    },
+    {
+      "Sid": "ChangeAndEndOnlyTheRoundsResources",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:AuthorizeSecurityGroupIngress",
+        "ec2:DeleteSecurityGroup",
+        "ec2:TerminateInstances"
+      ],
+      "Resource": [
+        "arn:aws:ec2:eu-north-1:*:security-group/*",
+        "arn:aws:ec2:eu-north-1:*:instance/*"
+      ],
+      "Condition": {
+        "Null": {
+          "aws:ResourceTag/udpstp-bench": "false"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+# RFC 9097 section 7: IP-Layer Sender Bit Rate Singleton Metric Definitions.
+# Imported by RFC 9946 section 5.1 item 12.
+# Format and ID convention: docs/conformance/README.md.
+# Sections 7 and 7.1 have no normative sentences.
+
+[[requirement]]
+id = "RFC9097-7.2-1"
+text = "This section lists the REQUIRED input factors to specify the metric, beyond those listed in Section 4."
+text_sha256 = "1a63b1982661c276"
+state = "not-applicable"
+note = "An introduction to the section's Requirements, each recorded with its own ID; nothing to do beyond them."
+
+[[requirement]]
+id = "RFC9097-7.2-L1"
+text = "The nominal duration of N sub-intervals in S (default st = 0.05 seconds)."
+text_sha256 = "e6b0fc7b5180c56a"
+state = "pending"
+note = "st, one Trial Interval."
+
+[[requirement]]
+id = "RFC9097-7.2-2"
+text = "S SHALL be longer than I, primarily to account for on-demand activation of the path, or any preamble to testing required, and the delay of the path."
+text_sha256 = "444b37e2eb058a60"
+state = "pending"
+
+[[requirement]]
+id = "RFC9097-7.2-3"
+text = "st SHOULD be much smaller than the sub-interval dt and on the same order as FT; otherwise, the rate measurement will include many rate adjustments and include more time smoothing, possibly smoothing the interval that contains the Maximum IP-Layer Capacity (and therefore losing relevance)."
+text_sha256 = "5a4421d1796d5056"
+state = "pending"
+
+[[requirement]]
+id = "RFC9097-7.3-1"
+text = "This section defines the REQUIRED aspects of the IP-Layer Sender Bit Rate Metric (unless otherwise indicated) for measurements at the specified Source on packets addressed for the intended Destination host and matching the required Type-P:"
+text_sha256 = "1112bfd20eeae861"
+state = "not-applicable"
+note = "An introduction to the section's Requirements, each recorded with its own ID; nothing to do beyond them."
+
+[[requirement]]
+id = "RFC9097-7.3-2"
+text = "Define the IP-Layer Sender Bit Rate, B(S,st), to be the number of IP- Layer bits (including header and data fields) that are transmitted from the Source with address pair Src and Dst during one contiguous sub-interval, st, during the test interval S (where S SHALL be longer than I) and where the fixed-size packet count during that single sub- interval st also provides the number of IP-Layer bits in any interval, [stn,stn+1]."
+text_sha256 = "41e7119681a47ad5"
+state = "pending"
+note = "IP-Layer Sender Bit Rate."
+
+[[requirement]]
+id = "RFC9097-7.3-3"
+text = "Measurements according to this definition SHALL use the UDP transport layer."
+text_sha256 = "6c3b330416b9ce3e"
+state = "pending"
+
+[[requirement]]
+id = "RFC9097-7.3-4"
+text = "Any feedback from the Dst host to the Src host received by the Src host during an interval [stn,stn+1] SHOULD NOT result in an adaptation of the Src host traffic conditioning during this interval (rate adjustment occurs on st interval boundaries)."
+text_sha256 = "75db7521e42cd39b"
+state = "deviation"
+reference = "rate-changes-when-a-status-pdu-arrives"
+
+[[requirement]]
+id = "RFC9097-7.4-1"
+text = "Both the Sender and Receiver (or Source and Destination) bit rates SHOULD be assessed as part of an IP-Layer Capacity measurement."
+text_sha256 = "f4a94529b69b32cc"
+state = "pending"
+
+[[requirement]]
+id = "RFC9097-7.5-1"
+text = "The IP-Layer Sender Bit Rate SHALL be reported with meaningful resolution, in units of Megabits per second (which, to avoid any confusion, is 1,000,000 bits per second)."
+text_sha256 = "ce56ac4be721a2bb"
+state = "pending"

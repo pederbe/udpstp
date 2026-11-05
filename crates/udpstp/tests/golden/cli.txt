@@ -1,0 +1,90 @@
+udpstp	(command)
+udpstp	--color	action=Set	value=COLOR	num_args=1	possible=auto,always,never	default=auto
+udpstp	--help -h	action=Help	num_args=0
+udpstp	--version -V	action=Version	num_args=0
+udpstp client	(command)
+udpstp client	<servers>	action=Append	value=SERVER	num_args=1..	required
+udpstp client	--test-connections	action=Set	value=N	num_args=1
+udpstp client	--min-test-connections	action=Set	value=N	num_args=1
+udpstp client	--unauthenticated	action=SetTrue	value=UNAUTHENTICATED	num_args=0	default=false
+udpstp client	--key-file	action=Set	value=FILE	num_args=1
+udpstp client	--key-id	action=Set	value=KEYID	num_args=1
+udpstp client	--auth-mode	action=Set	value=MODE	num_args=1	default=2
+udpstp client	--mode-1-server	action=Append	value=SERVER	num_args=1
+udpstp client	--allow-server-address	action=Append	value=SERVER=IP	num_args=1
+udpstp client	--time-limit	action=Set	value=SECONDS	num_args=1	default=3
+udpstp client	--direction	action=Set	value=DIRECTION	num_args=1	possible=downstream,upstream	default=downstream
+udpstp client	--test-interval	action=Set	value=SECONDS	num_args=1	default=10
+udpstp client	--fixed-rate	action=Set	value=ROW	num_args=1
+udpstp client	--start-row	action=Set	value=ROW	num_args=1
+udpstp client	--random-payload	action=SetTrue	value=RANDOM_PAYLOAD	num_args=0	default=false
+udpstp client	--delay-var	action=Set	value=DELAY_VAR	num_args=1	possible=one-way,rtt	default=one-way
+udpstp client	--refuse-coercion	action=Append	value=PARAMETER	num_args=1
+udpstp client	--checksum	action=SetTrue	value=BOOL	num_args=0..=1	possible=true,false	default=false	require_equals
+udpstp client	--jumbo	action=Set	value=BOOL	num_args=0..=1	possible=true,false	default=true	require_equals
+udpstp client	--traditional-mtu	action=Set	value=BOOL	num_args=0..=1	possible=true,false	default=false	require_equals
+udpstp client	--algorithm	action=Set	value=ALGORITHM	num_args=1	possible=b,c	default=b
+udpstp client	--max-bandwidth	action=Set	value=MBPS	num_args=1
+udpstp client	--dscp	action=Set	value=DSCP	num_args=1	default=0
+udpstp client	--format	action=Set	value=FORMAT	num_args=1	possible=text,json	default=text
+udpstp client	--address-privacy	action=Set	value=ADDRESS_PRIVACY	num_args=1	possible=full,pseudonymize,truncate	default=full
+udpstp client	--address-privacy-key-file	action=Set	value=FILE	num_args=1
+udpstp client	--json-extension	action=Set	value=BOOL	num_args=0..=1	possible=true,false	default=true	require_equals
+udpstp client	--max-loss-ratio	action=Set	value=RATIO	num_args=1	default=0.01
+udpstp client	--faster-sub-interval-margin	action=Set	value=PERCENT	num_args=1	default=5
+udpstp client	--first-mode-sub-intervals	action=Set	value=N	num_args=1
+udpstp client	--socket-buffer-size	action=Set	value=BYTES	num_args=1	default=2097152
+udpstp client	--dont-fragment	action=Set	value=BOOL	num_args=0..=1	possible=true,false	default=true	require_equals
+udpstp client	--max-hops	action=Set	value=HOPS	num_args=1	default=64
+udpstp client	--color	action=Set	value=COLOR	num_args=1	possible=auto,always,never	default=auto
+udpstp client	--help -h	action=Help	num_args=0
+udpstp server	(command)
+udpstp server	--config	action=Set	value=FILE	num_args=1
+udpstp server	--listen	action=Append	value=ADDRESS	num_args=1
+udpstp server	--port	action=Set	value=PORT	num_args=1
+udpstp server	--allow-unauthenticated	action=Set	value=BOOL	num_args=0..=1	possible=true,false	require_equals
+udpstp server	--checksum	action=Set	value=BOOL	num_args=0..=1	possible=true,false	require_equals
+udpstp server	--jumbo	action=Set	value=BOOL	num_args=0..=1	possible=true,false	require_equals
+udpstp server	--traditional-mtu	action=Set	value=BOOL	num_args=0..=1	possible=true,false	require_equals
+udpstp server	--server-mtu	action=Set	value=BYTES	num_args=1
+udpstp server	--mtu	action=Set	value=BYTES	num_args=1	hidden
+udpstp server	--ephemeral-ports	action=Set	value=FIRST-LAST	num_args=1
+udpstp server	--delay-var-statistic	action=Set	value=STATISTIC	num_args=1	possible=average,maximum
+udpstp server	--delay-var	action=Set	value=STATISTIC	num_args=1	possible=average,maximum	hidden
+udpstp server	--tests-per-source	action=Set	value=N	num_args=1
+udpstp server	--max-test-connections	action=Set	value=N	num_args=1
+udpstp server	--test-connections-per-test	action=Set	value=N	num_args=1
+udpstp server	--max-unactivated-test-connections	action=Set	value=N	num_args=1
+udpstp server	--admitted-rate-cap	action=Set	value=MBPS	num_args=1
+udpstp server	--max-test-share	action=Set	value=PERCENT	num_args=1
+udpstp server	--require-max-bandwidth	action=Set	value=BOOL	num_args=0..=1	possible=true,false	require_equals
+udpstp server	--troubleshooting	action=Set	value=BOOL	num_args=0..=1	possible=true,false	require_equals
+udpstp server	--unverified-setups-per-second	action=Set	value=N	num_args=1
+udpstp server	--source-setup-burst	action=Set	value=N	num_args=1
+udpstp server	--source-setups-per-second	action=Set	value=N	num_args=1
+udpstp server	--key-setup-burst	action=Set	value=N	num_args=1
+udpstp server	--key-setups-per-second	action=Set	value=N	num_args=1
+udpstp server	--allowed-dscp	action=Append	value=DSCP,...	num_args=1..	delimiter=,
+udpstp server	--operator-allowed-dscp	action=Append	value=DSCP,...	num_args=1..	delimiter=,
+udpstp server	--max-start-row	action=Set	value=ROW	num_args=1
+udpstp server	--quota-period	action=Set	value=SECONDS	num_args=1
+udpstp server	--source-tests-per-quota-period	action=Set	value=N	num_args=1
+udpstp server	--source-bytes-per-quota-period	action=Set	value=BYTES	num_args=1
+udpstp server	--socket-buffer-size	action=Set	value=BYTES	num_args=1
+udpstp server	--dont-fragment	action=Set	value=BOOL	num_args=0..=1	possible=true,false	require_equals
+udpstp server	--max-hops	action=Set	value=HOPS	num_args=1
+udpstp server	--log-format	action=Set	value=FORMAT	num_args=1	possible=human,json
+udpstp server	--log-file	action=Set	value=FILE	num_args=1
+udpstp server	--address-privacy	action=Set	value=HOW	num_args=1	possible=full,pseudonymize,truncate
+udpstp server	--address-privacy-key-file	action=Set	value=FILE	num_args=1
+udpstp server	--statistics-interval	action=Set	value=SECONDS	num_args=1
+udpstp server	--key-file	action=Set	value=FILE	num_args=1
+udpstp server	--print-config	action=SetTrue	value=PRINT_CONFIG	num_args=0	default=false
+udpstp server	--settings-only	action=SetTrue	value=SETTINGS_ONLY	num_args=0	default=false
+udpstp server	--windows-service	action=SetTrue	value=WINDOWS_SERVICE	num_args=0	default=false
+udpstp server	--color	action=Set	value=COLOR	num_args=1	possible=auto,always,never	default=auto
+udpstp server	--help -h	action=Help	num_args=0
+udpstp help	(command)
+udpstp help client	(command)
+udpstp help server	(command)
+udpstp help help	(command)

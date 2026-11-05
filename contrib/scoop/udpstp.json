@@ -1,0 +1,28 @@
+{
+    "version": "0.1.0",
+    "description": "udpstp: IP-Layer Capacity measurement with UDPSTP (RFC 9946)",
+    "homepage": "https://udpstp.com",
+    "license": "MIT|Apache-2.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/pederbe/udpstp/releases/download/v0.1.0/udpstp-v0.1.0-x86_64-pc-windows-msvc.zip",
+            "hash": "0000000000000000000000000000000000000000000000000000000000000000",
+            "extract_dir": "udpstp-v0.1.0-x86_64-pc-windows-msvc"
+        }
+    },
+    "bin": "udpstp.exe",
+    "checkver": {
+        "github": "https://github.com/pederbe/udpstp"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/pederbe/udpstp/releases/download/v$version/udpstp-v$version-x86_64-pc-windows-msvc.zip",
+                "extract_dir": "udpstp-v$version-x86_64-pc-windows-msvc"
+            }
+        },
+        "hash": {
+            "url": "https://github.com/pederbe/udpstp/releases/download/v$version/SHA256SUMS"
+        }
+    }
+}

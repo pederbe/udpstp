@@ -1,0 +1,398 @@
+# RFC 9946 section 6: Test Setup Request and Response.
+# Format and ID convention: docs/conformance/README.md.
+
+[[requirement]]
+id = "RFC9946-6-1"
+text = "The client source IP address and the server destination IP address MUST NOT be a broadcast or multicast address."
+text_sha256 = "a67c90ea44df9dfc"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-6-2"
+text = "Any Test Setup Request or Test Setup Response packet containing a multicast or broadcast source or destination IP address MUST be silently dropped and ignored."
+text_sha256 = "4f3f1279bca314c7"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-6-L1"
+text = "The measurement method and the protocol specified by this document are expected to function with unicast and anycast IP addresses."
+text_sha256 = "9e8b5eb3eb989e3e"
+state = "pending"
+note = "Replies leave from the arrival address (ADR 0007)."
+
+[[requirement]]
+id = "RFC9946-6.1-1"
+text = "The client SHALL begin the Control phase exchange by sending a Test Setup Request message to the server's (standard) control port."
+text_sha256 = "5317f25bdf8d26c4"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-6.1-2"
+text = "The client SHALL simultaneously start a test initiation timer so that if the Control phase fails to complete Test Setup and Test Activation exchanges in the allocated time, the client software SHALL exit (i.e., the UDP socket will be closed and an error message will be displayed to the user)."
+text_sha256 = "c0006e4cdd7b59c9"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-6.1-3"
+text = "The test initiation timer MAY reuse the test termination timeout value."
+text_sha256 = "524d8774c174f074"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-6.1-4"
+text = "Note: Any field labeled as 'reserved for alignment', in any PDU, MUST be set to 0 and MUST be ignored upon receipt."
+text_sha256 = "12b67efa752b1939"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-6.1-5"
+text = "The UDP PDU format layout SHALL be as follows (big-endian AB, starting with the most significant byte and ending with the least significant byte):"
+text_sha256 = "9b9272fe7284934b"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-6.1-6"
+text = "This field MAY be used to rate-limit the maximum rate the server should attempt."
+text_sha256 = "73acc66538e31f5e"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-6.1-7"
+text = "This bit SHALL be set by default."
+text_sha256 = "1fcd72d455671bd6"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-6.1-8"
+text = "By default, sending rates up to 1 Gbps SHALL NOT produce IP packet sizes greater than 1250 bytes (unless CHSR_TRADITIONAL_MTU is set), while rates above 1 Gbps MAY produce IP packet sizes up to 9000 bytes."
+text_sha256 = "eab0d506af3079bd"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-6.1-9"
+text = "When CHSR_JUMBO_STATUS is not set, all sending rates SHALL NOT produce IP packet sizes greater than 1250 bytes (unless CHSR_TRADITIONAL_MTU is set)."
+text_sha256 = "6add7a13d51cc011"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-6.1-10"
+text = "This bit SHALL NOT be set by default."
+text_sha256 = "8288d815dee2a825"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-6.1-11"
+text = "If set, sending rates up to 1 Gbps MAY produce IP packets up to the traditional size of 1500 bytes."
+text_sha256 = "d2b2f0b367fad3bb"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-6.1-12"
+text = "If CHSR_JUMBO_STATUS is simultaneously not set, all sending rates SHALL NOT produce IP packets greater than the traditional size of 1500 bytes."
+text_sha256 = "b89e6c92db6ac546"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-6.1-13"
+text = "This field MUST be set to 0 and MUST be ignored upon receipt."
+text_sha256 = "7c6f06dc43929b4a"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-6.1-L1"
+text = "A one-octet field indicating the index of a connection relative to all connections that make up a single test (starting at 0, incremented by 1 per connection)."
+text_sha256 = "c0080123837372e8"
+state = "pending"
+note = "mcIndex field."
+
+[[requirement]]
+id = "RFC9946-6.1-L2"
+text = "An implementation may restrict the number of connections supported for a single test to a value less than or equal to 255."
+text_sha256 = "0d5bc856519ee17e"
+state = "pending"
+note = "mcIndex field."
+
+[[requirement]]
+id = "RFC9946-6.1-L3"
+text = "A two-octet field containing a pseudorandom non-zero identifier (via a Random Number Generator, source port number, ...) that is common to all connections of a single test."
+text_sha256 = "425bd31cdf87f6c5"
+state = "pending"
+note = "mcIdent field."
+
+[[requirement]]
+id = "RFC9946-6.1-L4"
+text = "A one-octet field set to CHSR_CREQ_SETUPREQ to indicate a Setup Request message."
+text_sha256 = "05312264334bdb95"
+state = "pending"
+note = "cmdRequest field."
+
+[[requirement]]
+id = "RFC9946-6.1-L5"
+text = "Note that CHSR_CREQ_NONE remains unused."
+text_sha256 = "438f5bfdaa914f3a"
+state = "pending"
+note = "cmdRequest field."
+
+[[requirement]]
+id = "RFC9946-6.1-L6"
+text = "All Request PDUs always have a Command Response of XXXX_CRSP_NONE (i.e., CHSR_CRSP_NONE, CHNR_CRSP_NONE, or CHTA_CRSP_NONE)."
+text_sha256 = "0507967f0c3b3347"
+state = "pending"
+note = "cmdResponse field."
+
+[[requirement]]
+id = "RFC9946-6.1-L7"
+text = "The server compares this value to its currently available configured limit for test admission control."
+text_sha256 = "feba556ee38c23c6"
+state = "pending"
+note = "maxBandwidth field."
+
+[[requirement]]
+id = "RFC9946-6.1-L8"
+text = "The maxBandwidth field's most significant bit, the CHSR_USDIR_BIT, is set to 0 by default to indicate \"downstream\" and has to be set to 1 to indicate \"upstream\"."
+text_sha256 = "dcbc9eaeff9a6ee7"
+state = "pending"
+note = "maxBandwidth field."
+
+[[requirement]]
+id = "RFC9946-6.1-L9"
+text = "A two-octet field set to zero in the Test Setup Request and populated by the server in the Test Setup Response."
+text_sha256 = "15816447a9b0612a"
+state = "pending"
+note = "testPort field."
+
+[[requirement]]
+id = "RFC9946-6.1-L10"
+text = "It contains the UDP ephemeral port number on the server that the client has to use for the Test Activation Request and subsequent Load or Status PDUs."
+text_sha256 = "7c02efb4dbdc3058"
+state = "pending"
+note = "testPort field."
+
+[[requirement]]
+id = "RFC9946-6.1-L11"
+text = "One of the following has to be set (see Section 5.3 for requirements and details of operation): AUTHMODE_1: Required authentication for the Control phase. AUTHMODE_2: Required authentication for the Control and Data phases (Status Feedback PDU only)."
+text_sha256 = "4c26279105bc4440"
+state = "deviation"
+reference = "unauthenticated-mode"
+note = "authMode field. Modes 1 and 2 are met; Unauthenticated Mode (0) is the Deviation."
+
+[[requirement]]
+id = "RFC9946-6.1-L12"
+text = "A 32-bit timestamp of the current system (wall-clock) time since the Unix Epoch on January 1, 1970 at 00:00:00 UTC."
+text_sha256 = "c0fc6b77d8fb5f13"
+state = "pending"
+note = "authUnixTime field; the low 32 bits of the wall clock (ADR 0009)."
+
+[[requirement]]
+id = "RFC9946-6.1-L13"
+text = "Normally, the calculation is done as the last step of building the PDU."
+text_sha256 = "c73bbf586fbcbe44"
+state = "pending"
+note = "authDigest field."
+
+[[requirement]]
+id = "RFC9946-6.1-L14"
+text = "However, if the optional checkSum field is being utilized, it becomes the penultimate step and is done just prior to the checksum calculation (with the checkSum field set to zero)."
+text_sha256 = "21abf09b93f68105"
+state = "pending"
+note = "authDigest field."
+
+[[requirement]]
+id = "RFC9946-6.1-L15"
+text = "The calculation is done as the very last step of building the PDU, with the checkSum field set to zero."
+text_sha256 = "5ee750d6414622ae"
+state = "pending"
+note = "checkSum field."
+
+[[requirement]]
+id = "RFC9946-6.2-1"
+text = "When the server receives the Setup Request, it SHALL first perform the following: Message Verification Procedure: 1. Verify that the size of the message is correct. 2. If the optional checkSum field is being utilized, validate the checksum as described in Section 5.6 and (if valid) zero the checkSum field prior to authentication verification. 3. Verify that the authMode value is valid and appropriate (per Section 5.3) for the message type. 4. If the authMode is valid and appropriate, authenticate the message by checking the authDigest as prescribed in Section 5.3. 5. If the message is authentic, check the authUnixTime field for acceptable immediacy."
+text_sha256 = "1f3ad23e7406914d"
+state = "pending"
+note = "The Message Verification Procedure that later sections cite as \"Section 6.2, Paragraph 2\". The authUnixTime window is +/-5 s inclusive, compared modulo 2^32 (ADR 0009)."
+
+[[requirement]]
+id = "RFC9946-6.2-2"
+text = "Note: If any of the above checks fail, the message SHALL be considered invalid."
+text_sha256 = "930daebe51911cd2"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-6.2.1-1"
+text = "The server SHALL then evaluate the other fields in the protocol header, such as the protocol version, the PDU ID (to validate the type of message), the maximum bandwidth requested for the test, and the modifierBitmap for use of options such as Jumbo datagram status and Traditional MTU (1500 bytes)."
+text_sha256 = "f0320ef1514efffc"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-6.2.1-2"
+text = "If the client has selected options for * Jumbo datagram support (modifierBitmap), * Traditional MTU (modifierBitmap), and * Authentication mode (authMode) that do not match the server configuration, the server MUST reject the Setup Request."
+text_sha256 = "a1856e329b606856"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-6.2.1-3"
+text = "If the authDigest is valid, a Test Setup Response SHALL be sent back to the client with a corresponding Command Response value indicating the reason for the rejection."
+text_sha256 = "4cda4af826ff0f80"
+state = "deviation"
+reference = "authentic-setup-requests-left-unanswered"
+note = "Applies when a Setup Request must be rejected. Met except for the refusals the Deviation leaves unanswered; the rejection codes are recorded in docs/conformance/records/control.toml. OB-UDPST also answers authentication failures."
+
+[[requirement]]
+id = "RFC9946-6.2.1-4"
+text = "If the authDigest is invalid, then the Test Setup Request SHOULD fail silently."
+text_sha256 = "9ea6eb954df996ab"
+state = "pending"
+note = "The RFC permits server administrators to send a Setup Response anyway, for operations and troubleshooting (Troubleshooting Mode)."
+
+[[requirement]]
+id = "RFC9946-6.2.1-5"
+text = "The additional circumstances when a server SHALL NOT communicate the appropriate Command Response code for an error condition (fail silently) are when: * the Setup Request PDU size is not equal to the 'struct controlHdrSR' size shown in Figure 3, * the PDU ID is not 0xACE1 (Test Setup PDU), or * a directed attack has been detected."
+text_sha256 = "96d35a7466c58330"
+state = "pending"
+note = "Attack detection is out of scope per the RFC, so the third case is not testable."
+
+[[requirement]]
+id = "RFC9946-6.2.1-6"
+text = "When the server replies to a Test Setup Request message, the Test Setup Response PDU is structured identically to the Test Setup Request PDU and SHALL retain the original values received in it, with the following exceptions: * The cmdRequest field is set to CHSR_CREQ_SETUPRSP, indicating a response. * The cmdResponse field is set to an error code (starting at cmdResponse 2, Bad Protocol Version; see Section 12.3.5), indicating the reason for rejection. If cmdResponse indicates a bad protocol version (CHSR_CRSP_BADVER), the protocolVer field is also updated to indicate the current expected version. * The authUnixTime field is updated to the current system (wall- clock) time and, after the authDigest and checkSum fields are zeroed, the authDigest is recalculated and inserted. If the optional checkSum field is being utilized, it is then also calculated and inserted."
+text_sha256 = "24f12d76354c61b9"
+state = "pending"
+note = "The rejection case: the exceptions cover cmdRequest, cmdResponse (and protocolVer for CHSR_CRSP_BADVER), authUnixTime, authDigest and checkSum. Reserved fields are still zeroed (RFC9946-6.1-4); the Server echoes keyId (ADR 0009)."
+
+[[requirement]]
+id = "RFC9946-6.2.1-7"
+text = "The Setup Request/Response message PDU SHALL be organized as follows (here and in all following code figures coded by programming language C [C-Prog]):"
+text_sha256 = "078de894ddcf8281"
+state = "pending"
+note = "Figure 3's struct controlHdrSR follows."
+
+[[requirement]]
+id = "RFC9946-6.2.1-L1"
+text = "The exception is for operations support: server administrators are permitted to send a Setup Response to support operations and troubleshooting."
+text_sha256 = "3bc03d4b25b1b20e"
+state = "pending"
+note = "Troubleshooting Mode."
+
+[[requirement]]
+id = "RFC9946-6.2.2-1"
+text = "If the server finds that the Setup Request matches its configuration and is otherwise acceptable, the server SHALL initiate a new connection to receive the Test Activation Request from the client, using a new UDP socket allocated from the UDP ephemeral port range."
+text_sha256 = "7d326f47652ee2f9"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-6.2.2-2"
+text = "Then, the server SHALL start a watchdog timer (to terminate the new connection if the client goes silent) and SHALL send the Test Setup Response back to the client."
+text_sha256 = "328b2f5b9c919638"
+state = "pending"
+note = "The watchdog uses the same value as on the Client side, whose timeouts are in Section 6.1; timeouts per ADR 0002."
+
+[[requirement]]
+id = "RFC9946-6.2.2-3"
+text = "When the server replies to the Test Setup Request message, the Test Setup Response PDU is structured identically to the Test Setup Request PDU and SHALL retain the original values received in it, with the following exceptions: * The cmdRequest field is set to CHSR_CREQ_SETUPRSP, indicating a response. * The cmdResponse field is set to CHSR_CRSP_ACKOK, indicating an acknowledgment. * The testPort field is set to the ephemeral port number to be used for the client's Test Activation Request and all subsequent communication. * The authUnixTime field is updated to the current system (wall- clock) time and, after the authDigest and checkSum fields are zeroed, the authDigest is recalculated and inserted. If the optional checkSum field is being utilized, it is then also calculated and inserted."
+text_sha256 = "9573362e5cc3d6bf"
+state = "pending"
+note = "The acceptance case: the exceptions cover cmdRequest, cmdResponse, testPort, authUnixTime, authDigest and checkSum. Reserved fields are still zeroed (RFC9946-6.1-4); the Server echoes keyId (ADR 0009)."
+
+[[requirement]]
+id = "RFC9946-6.2.2-4"
+text = "To ensure that a server's local firewall will successfully allow packets received for the new ephemeral port number, the server SHALL immediately send a Null Request with the corresponding values including the source and destination IP addresses and port numbers."
+text_sha256 = "161b729d647f043e"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-6.2.2-5"
+text = "The source port SHALL be the new ephemeral port."
+text_sha256 = "72573ece20de840e"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-6.2.2-6"
+text = "If received, the client SHALL follow the Message Verification Procedure listed in Section 6.2, Paragraph 2."
+text_sha256 = "a5173bceabb5d5e2"
+state = "pending"
+note = "The Null Request; there is no response to it."
+
+[[requirement]]
+id = "RFC9946-6.2.2-7"
+text = "The UDP PDU format layout SHALL be as follows (big-endian AB):"
+text_sha256 = "58dc780ed33968a3"
+state = "pending"
+note = "The Null Request layout (Figure 4) follows."
+
+[[requirement]]
+id = "RFC9946-6.2.2-8"
+text = "If a Test Activation Request is not subsequently received from the client on the new ephemeral port number before the watchdog timer expires, the server SHALL close the socket and deallocate the associated resources."
+text_sha256 = "bfba302485bbcfca"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-6.2.2-9"
+text = "The Null Request message PDU SHALL be organized as follows:"
+text_sha256 = "66b76bcda1bb22fb"
+state = "pending"
+note = "Figure 5's struct controlHdrNR follows."
+
+[[requirement]]
+id = "RFC9946-6.2.2-L1"
+text = "The watchdog timer is set to the same value as on the client side (see Section 6)"
+text_sha256 = "b01acef16ca72be1"
+state = "pending"
+note = "The RFC's sentence has no final period. Timeouts per ADR 0002."
+
+[[requirement]]
+id = "RFC9946-6.2.2-L2"
+text = "Note that there is no response to a Null Request."
+text_sha256 = "d0b2810e479a1eb5"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-6.2.2-L3"
+text = "The authentication and checkSum fields follow the same methodology as with the Setup Request and Response."
+text_sha256 = "33780c109b559d5b"
+state = "pending"
+note = "Null Request."
+
+[[requirement]]
+id = "RFC9946-6.2.2-L4"
+text = "Set to CHNR_CREQ_NULLREQ to indicate a Null Request message."
+text_sha256 = "fab7c6abc4d59600"
+state = "pending"
+note = "Null Request cmdRequest field."
+
+[[requirement]]
+id = "RFC9946-6.2.2-L5"
+text = "Set to CHNR_CRSP_NONE."
+text_sha256 = "e2a53e65af7645c3"
+state = "pending"
+note = "Null Request cmdResponse field."
+
+[[requirement]]
+id = "RFC9946-6.3-1"
+text = "When the client receives the Test Setup Response message, it SHALL first follow the Message Verification Procedure listed in Section 6.2, Paragraph 2."
+text_sha256 = "c0c4b78d80ea0012"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-6.3-2"
+text = "The client SHALL then proceed to evaluate the other fields in the protocol, beginning with the protocol version, PDU ID (to validate the type of message), and cmdRequest for the role of the message, which MUST be Test Setup Response, CHSR_CREQ_SETUPRSP, as indicated by Figure 3."
+text_sha256 = "8806c4c6d599f82e"
+state = "pending"
+note = "How the Client checks protocolVer is unspecified; record setup-response-protocol-version."
+
+[[requirement]]
+id = "RFC9946-6.3-3"
+text = "If the cmdResponse value indicates an error (values greater than CHSR_CRSP_ACKOK), the client SHALL display/report a relevant message to the user or management process and exit."
+text_sha256 = "e2cee7f3477bb477"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-6.3-4"
+text = "If the client receives a Command Response code that is not equal to one of the codes defined, the client MUST terminate the connection and terminate operation of the current Setup Request."
+text_sha256 = "2d2da886aa0f2586"
+state = "pending"
+note = "An undefined code above the defined range also matches RFC9946-6.3-3; CHSR_CRSP_NONE (0) is defined but neither error nor success."
+
+[[requirement]]
+id = "RFC9946-6.3-5"
+text = "If the Command Response code value indicates success (CHSR_CRSP_ACKOK), the client SHALL compose a Test Activation Request with all the test parameters it desires, such as the test direction, the test duration, etc., as described below."
+text_sha256 = "9d3abe47c0ba91c6"
+state = "pending"

@@ -1,0 +1,213 @@
+name: Release container
+
+# Publication is the maintainer's decision after downloaded-asset qualification.
+on:
+  release:
+    types: [published]
+
+concurrency:
+  group: release-container
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  attestations: read
+
+jobs:
+  qualify:
+    if: startsWith(github.event.release.tag_name, 'v')
+    name: Qualify the ${{ matrix.arch }} image
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - arch: amd64
+            os: ubuntu-24.04
+            gh_digest: bb766f710eef8ede859c18578c72c327597cd4c8a85b06001b1f3843c6019386
+          - arch: arm64
+            os: ubuntu-24.04-arm
+            gh_digest: 7862c86c72f43df3a2d93ddde6f473285b4e2af61b494849846827e513ef6484
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_ID: ${{ github.event.release.id }}
+      RELEASE_TAG: ${{ github.event.release.tag_name }}
+    steps:
+      - name: Require an immutable published release
+        run: |
+          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]
+          gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" |
+            jq -e --arg tag "$RELEASE_TAG" '.draft == false and .immutable == true and .tag_name == $tag' > /dev/null
+          test "$(gh api "repos/$GITHUB_REPOSITORY/commits/$RELEASE_TAG" --jq .sha)" = "$GITHUB_SHA"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Install the pinned GitHub CLI
+        env:
+          ARCH: ${{ matrix.arch }}
+          DIGEST: ${{ matrix.gh_digest }}
+        run: |
+          curl -fsSL "https://github.com/cli/cli/releases/download/v2.102.0/gh_2.102.0_linux_${ARCH}.tar.gz" -o "$RUNNER_TEMP/gh.tar.gz"
+          echo "$DIGEST  $RUNNER_TEMP/gh.tar.gz" | sha256sum -c -
+          mkdir "$RUNNER_TEMP/gh"
+          tar xzf "$RUNNER_TEMP/gh.tar.gz" --strip-components=1 -C "$RUNNER_TEMP/gh"
+          echo "$RUNNER_TEMP/gh/bin" >> "$GITHUB_PATH"
+      - name: Verify the Linux release assets
+        run: |
+          mkdir "$RUNNER_TEMP/assets" "$RUNNER_TEMP/context"
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --dir "$RUNNER_TEMP/assets" \
+            --pattern "udpstp-${RELEASE_TAG}-*-unknown-linux-gnu.tar.gz" --pattern SHA256SUMS
+          cd "$RUNNER_TEMP/assets"
+          sha256sum --ignore-missing -c SHA256SUMS
+          for file in SHA256SUMS udpstp-*.tar.gz; do
+            gh attestation verify "$file" --repo "$GITHUB_REPOSITORY" \
+              --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/release.yml" \
+              --source-ref "refs/tags/$RELEASE_TAG" --source-digest "$GITHUB_SHA"
+          done
+          for target in x86_64-unknown-linux-gnu aarch64-unknown-linux-gnu; do
+            file="udpstp-${RELEASE_TAG}-${target}.tar.gz"
+            gh attestation verify "$file" --repo "$GITHUB_REPOSITORY" \
+              --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/release.yml" \
+              --source-ref "refs/tags/$RELEASE_TAG" --source-digest "$GITHUB_SHA" \
+              --predicate-type https://cyclonedx.org/bom
+            arch=amd64
+            if [ "$target" = aarch64-unknown-linux-gnu ]; then arch=arm64; fi
+            mkdir -p "$RUNNER_TEMP/context/binary/$arch"
+            tar xzf "$file" --strip-components=1 -C "$RUNNER_TEMP/context/binary/$arch" \
+              "udpstp-${RELEASE_TAG}-${target}/udpstp" \
+              "udpstp-${RELEASE_TAG}-${target}/LICENSE-MIT" \
+              "udpstp-${RELEASE_TAG}-${target}/LICENSE-APACHE" \
+              "udpstp-${RELEASE_TAG}-${target}/THIRD-PARTY-LICENSES.md"
+          done
+          cp "$GITHUB_WORKSPACE/contrib/container/server.toml" "$RUNNER_TEMP/context/server.toml"
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+        with:
+          version: v0.38.1
+          driver-opts: image=moby/buildkit:v0.34.0@sha256:b059f8d7226d0b326bc871af489a5dddf65e36af4d20d14251b072974d9ee87c
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: ${{ runner.temp }}/context
+          file: contrib/container/Release.Containerfile
+          platforms: linux/${{ matrix.arch }}
+          load: true
+          push: false
+          provenance: false
+          tags: localhost/udpstp:qualified
+      - name: Authenticated Test and SIGTERM on the native image
+        env:
+          UDPSTP_CONTAINER_ENGINE: docker
+        run: scripts/container-check.sh "$RUNNER_TEMP/context/binary/${{ matrix.arch }}/udpstp" localhost/udpstp:qualified
+
+  publish:
+    name: Publish the qualified images
+    needs: qualify
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_ID: ${{ github.event.release.id }}
+      RELEASE_TAG: ${{ github.event.release.tag_name }}
+    steps:
+      - name: Require an immutable published release
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" |
+            jq -e --arg tag "$RELEASE_TAG" '.draft == false and .immutable == true and .tag_name == $tag' > /dev/null
+          test "$(gh api "repos/$GITHUB_REPOSITORY/commits/$RELEASE_TAG" --jq .sha)" = "$GITHUB_SHA"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Install the pinned GitHub CLI
+        run: |
+          curl -fsSL https://github.com/cli/cli/releases/download/v2.102.0/gh_2.102.0_linux_amd64.tar.gz -o "$RUNNER_TEMP/gh.tar.gz"
+          echo "bb766f710eef8ede859c18578c72c327597cd4c8a85b06001b1f3843c6019386  $RUNNER_TEMP/gh.tar.gz" | sha256sum -c -
+          mkdir "$RUNNER_TEMP/gh"
+          tar xzf "$RUNNER_TEMP/gh.tar.gz" --strip-components=1 -C "$RUNNER_TEMP/gh"
+          echo "$RUNNER_TEMP/gh/bin" >> "$GITHUB_PATH"
+      - name: Verify the qualified inputs again
+        run: |
+          mkdir "$RUNNER_TEMP/assets" "$RUNNER_TEMP/context"
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --dir "$RUNNER_TEMP/assets" \
+            --pattern "udpstp-${RELEASE_TAG}-*-unknown-linux-gnu.tar.gz" --pattern SHA256SUMS
+          cd "$RUNNER_TEMP/assets"
+          sha256sum --ignore-missing -c SHA256SUMS
+          for file in SHA256SUMS udpstp-*.tar.gz; do
+            gh attestation verify "$file" --repo "$GITHUB_REPOSITORY" \
+              --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/release.yml" \
+              --source-ref "refs/tags/$RELEASE_TAG" --source-digest "$GITHUB_SHA"
+          done
+          for target in x86_64-unknown-linux-gnu aarch64-unknown-linux-gnu; do
+            arch=amd64
+            if [ "$target" = aarch64-unknown-linux-gnu ]; then arch=arm64; fi
+            mkdir -p "$RUNNER_TEMP/context/binary/$arch"
+            tar xzf "udpstp-${RELEASE_TAG}-${target}.tar.gz" --strip-components=1 -C "$RUNNER_TEMP/context/binary/$arch" \
+              "udpstp-${RELEASE_TAG}-${target}/udpstp" \
+              "udpstp-${RELEASE_TAG}-${target}/LICENSE-MIT" \
+              "udpstp-${RELEASE_TAG}-${target}/LICENSE-APACHE" \
+              "udpstp-${RELEASE_TAG}-${target}/THIRD-PARTY-LICENSES.md"
+          done
+          cp "$GITHUB_WORKSPACE/contrib/container/server.toml" "$RUNNER_TEMP/context/server.toml"
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+        with:
+          version: v0.38.1
+          driver-opts: image=moby/buildkit:v0.34.0@sha256:b059f8d7226d0b326bc871af489a5dddf65e36af4d20d14251b072974d9ee87c
+      - uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - name: Refuse replacing a version image
+        id: image
+        run: |
+          image="ghcr.io/${GITHUB_REPOSITORY,,}"
+          version=${RELEASE_TAG#v}
+          if docker buildx imagetools inspect "$image:$version" > "$RUNNER_TEMP/existing-image" 2> "$RUNNER_TEMP/inspect-error"; then
+            echo "The version image already exists. Preserve it and inspect the previous run."
+            exit 1
+          elif ! grep -qiE 'manifest unknown|not found' "$RUNNER_TEMP/inspect-error"; then
+            cat "$RUNNER_TEMP/inspect-error"
+            exit 1
+          fi
+          echo "name=$image" >> "$GITHUB_OUTPUT"
+          echo "tag=$image:$version" >> "$GITHUB_OUTPUT"
+      - name: Push the version image
+        id: build
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: ${{ runner.temp }}/context
+          file: contrib/container/Release.Containerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          provenance: false
+          tags: ${{ steps.image.outputs.tag }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.version=${{ github.event.release.tag_name }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.licenses=MIT OR Apache-2.0
+      - name: Attest the version image
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-name: ${{ steps.image.outputs.name }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+          create-storage-record: false
+      - name: Verify provenance and update latest for a stable release
+        env:
+          IMAGE: ${{ steps.image.outputs.name }}
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          gh attestation verify "oci://$IMAGE@$DIGEST" --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/release-container.yml" \
+            --source-ref "refs/tags/$RELEASE_TAG" --source-digest "$GITHUB_SHA"
+          prerelease=$(gh api "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" --jq .prerelease)
+          if [ "$prerelease" = false ]; then
+            docker buildx imagetools create --tag "$IMAGE:latest" "$IMAGE@$DIGEST"
+          fi

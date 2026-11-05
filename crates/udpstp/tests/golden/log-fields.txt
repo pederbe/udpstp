@@ -1,0 +1,55 @@
+ActivationParameterCoerced	coerced:integer level:string message:string parameter:string requested:integer test_connection_id:integer timestamp:string
+ActivationRequestRejected	level:string message:string parameter:string reason:string test_connection_id:integer timestamp:string
+ActivationRequestRejected	level:string message:string reason:string test_connection_id:integer timestamp:string
+ActivationRequestSilentlyRejected	level:string message:string reason:string test_connection_id:integer timestamp:string
+ActivationWatchdogExpired	level:string message:string test_connection_id:integer timestamp:string
+BurstsSkipped	bursts:integer bytes:integer datagrams:integer level:string message:string test_connection_id:integer timestamp:string
+BurstsWithheld	bursts:integer bytes:integer datagrams:integer level:string message:string test_connection_id:integer timestamp:string
+DataPhaseEnded	burst_lateness_p99_us:integer fast_paths:string level:string message:string reason:string receive_buffer_overflows:integer send_lag_max_us:integer send_lag_p50_us:integer send_lag_p99_us:integer send_lag_samples:integer test_connection_id:integer timestamp:string
+DataPhaseEnded	error:string fast_paths:string level:string message:string reason:string test_connection_id:integer timestamp:string
+DataPhaseEnded	fast_paths:string level:string message:string reason:string receive_buffer_overflows:integer test_connection_id:integer timestamp:string
+DataPhaseEngines	engine_threads:integer error:string executor:string grouping_us:integer level:string message:string timestamp:string
+DataPhaseEngines	engine_threads:integer executor:string grouping_us:integer level:string message:string timestamp:string
+DataPhaseEngines	executor:string grouping_us:integer level:string message:string timestamp:string
+DatagramsDropped	count:integer level:string message:string test_connection_id:integer timestamp:string
+DelaySamplesDropped	count:integer level:string message:string test_connection_id:integer timestamp:string
+FirstLoadPduReceived	level:string message:string test_connection_id:integer timestamp:string
+FirstStatusPduReceived	level:string message:string test_connection_id:integer timestamp:string
+HopLimitExceeded	count:integer level:string message:string test_connection_id:integer timestamp:string
+IcmpErrors	count:integer level:string message:string test_connection_id:integer timestamp:string
+IgnoredLoadPdus	count:integer level:string message:string test_connection_id:integer timestamp:string
+InvalidLoadPdus	count:integer level:string message:string test_connection_id:integer timestamp:string
+InvalidStatusPdus	count:integer level:string message:string test_connection_id:integer timestamp:string
+Listening	address:string level:string message:string timestamp:string
+LostStatusBackoff	level:string message:string row:integer test_connection_id:integer timestamp:string
+NoEphemeralPort	error:string level:string message:string test_connection_id:integer timestamp:string
+NoIpv6Listener	error:string level:string message:string timestamp:string
+PathMtuExceeded	count:integer level:string message:string test_connection_id:integer timestamp:string
+PeerMissedStatusPdus	count:integer level:string message:string test_connection_id:integer timestamp:string
+PeerRxStopped	count:integer level:string message:string test_connection_id:integer timestamp:string
+SetupRequestIgnored	client:string level:string message:string reason:string timestamp:string
+SetupRequestRejected	client:string level:string message:string reason:string timestamp:string
+SetupRequestSilentlyRejected	client:string level:string message:string reason:string timestamp:string
+SocketBuffersShort	level:string message:string receive_bytes:integer requested_bytes:integer send_bytes:integer test_connection_id:integer timestamp:string
+SocketError	error:string level:string message:string test_connection_id:integer timestamp:string
+SocketError	error:string level:string message:string timestamp:string
+StaleStatusPdus	count:integer level:string message:string test_connection_id:integer timestamp:string
+StartupError	error:string exit_status:integer level:string message:string timestamp:string
+StartupWarning	level:string message:string reason:string timestamp:string
+Statistics	active_test_connections:integer authentication_failures:integer level:string message:string rate_limited:integer report:integer setup_requests_ignored:integer stale_status_pdus:integer test_connections:integer tests:integer timestamp:string unactivated_test_connections_evicted:integer
+StatisticsRefusals	count:integer kind:string level:string message:string reason:string report:integer timestamp:string
+StatusPdusFailedVerification	count:integer level:string message:string test_connection_id:integer timestamp:string
+StatusPdusMissing	count:integer level:string message:string test_connection_id:integer timestamp:string
+StopReceived	level:string message:string test_connection_id:integer timestamp:string
+Stopping	level:string message:string reason:string timestamp:string
+Suppressed	bursts:integer bytes:integer count:integer datagrams:integer level:string message:string suppressed_event:string timestamp:string
+Suppressed	count:integer level:string message:string suppressed_count:integer suppressed_event:string timestamp:string
+TestConnectionActivated	direction:string level:string message:string test_connection_id:integer timestamp:string
+TestConnectionAdmitted	client:string key_id:integer level:string mc_ident:integer message:string test_connection_id:integer timestamp:string
+TestConnectionAdmitted	client:string level:string mc_ident:integer message:string test_connection_id:integer timestamp:string
+TestConnectionReleased	level:string message:string test_connection_id:integer timestamp:string
+TestSummary	bytes_received:integer bytes_sent:integer client:string direction:string dscp:integer high_speed_delta:integer ignore_ooo_dup:bool ip_layer_sender_bit_rate:integer key_id:integer level:string low_thresh:integer mc_ident:integer message:string one_way_delay_variation:bool random_payload:bool rate_adj_algo:string reason:string receive_buffer_overflows:integer result:string seq_err_thresh:integer skipped_bursts:integer skipped_bytes:integer skipped_datagrams:integer slow_adj_thresh:integer sr_index_conf:integer sr_index_is_start:bool sub_interval:integer test_connections:integer test_interval:integer timestamp:string trial_interval:integer upper_thresh:integer withheld_bursts:integer withheld_bytes:integer withheld_datagrams:integer
+TestSummary	bytes_received:integer bytes_sent:integer client:string level:string mc_ident:integer message:string result:string skipped_bursts:integer skipped_bytes:integer skipped_datagrams:integer test_connections:integer timestamp:string withheld_bursts:integer withheld_bytes:integer withheld_datagrams:integer
+TrafficStopped	level:string message:string test_connection_id:integer timestamp:string
+TroubleshootingModeOn	level:string message:string timestamp:string
+UnactivatedTestConnectionEvicted	level:string message:string test_connection_id:integer timestamp:string

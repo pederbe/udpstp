@@ -1,0 +1,15 @@
+ErrorStatus 113, not completed: exit 113
+--- stdout
+--------------------------------------------------------------------------------
+Test Connection 0 to 192.0.2.1:24601: SetupRejectedConnectionAllocationFailure
+Test Connection 1 to 192.0.2.2:24601: abandoned
+--- stderr
+udpstp: 192.0.2.1:24601 refused Test Connection 0: it runs as many Tests or Test
+  Connections as it allows, or one from this address or network, or this address
+  or key used its quota of Tests
+udpstp: Test Connection 0: retry later
+udpstp: the Test was aborted: fewer than 2 Test Connections
+  (--min-test-connections) could run
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted

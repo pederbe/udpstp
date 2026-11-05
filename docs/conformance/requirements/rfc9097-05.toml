@@ -1,0 +1,118 @@
+# RFC 9097 section 5: IP-Layer Capacity Singleton Metric Definitions.
+# Imported by RFC 9946 section 5.1 item 12.
+# Format and ID convention: docs/conformance/README.md.
+# Sections 5, 5.1 and 5.5 have no normative sentences.
+
+[[requirement]]
+id = "RFC9097-5.2-1"
+text = "This section lists the REQUIRED input factors to specify the metric, beyond those listed in Section 4."
+text_sha256 = "1a63b1982661c276"
+state = "not-applicable"
+note = "The section adds no Parameters."
+
+[[requirement]]
+id = "RFC9097-5.3-1"
+text = "This section defines the REQUIRED aspects of the measurable IP-Layer Capacity Metric (unless otherwise indicated) for measurements between specified Source and Destination hosts:"
+text_sha256 = "82d80067abd5ee28"
+state = "not-applicable"
+note = "An introduction to the section's Requirements, each recorded with its own ID; nothing to do beyond them."
+
+[[requirement]]
+id = "RFC9097-5.3-L1"
+text = "Define the IP-Layer Capacity, C(T,dt,PM), to be the number of IP- Layer bits (including header and data fields) in packets that can be transmitted from the Src host and correctly received by the Dst host during one contiguous sub-interval, dt in length."
+text_sha256 = "790456f65db36bba"
+state = "deviation"
+reference = "approximate-upstream-aggregation"
+note = "IP-Layer Capacity; a definition, but the one the Sub-Interval results compute."
+
+[[requirement]]
+id = "RFC9097-5.3-2"
+text = "Anticipating a Sample of Singletons, the number of sub-intervals with duration dt MUST be set to a natural number m, so that T+I = T + m*dt with dtn+1 - dtn = dt for 1 <= n <= m."
+text_sha256 = "bb2f78786b6a0b58"
+state = "pending"
+note = "testIntTime / subIntPeriod Sub-Intervals."
+
+[[requirement]]
+id = "RFC9097-5.3-3"
+text = "Parameter PM represents other performance metrics (see Section 5.4 below); their measurement results SHALL be collected during measurement of IP-Layer Capacity and associated with the corresponding dtn for further evaluation and reporting."
+text_sha256 = "e6d181e364c98971"
+state = "pending"
+note = "Per-Sub-Interval statistics (sisSav)."
+
+[[requirement]]
+id = "RFC9097-5.3-4"
+text = "Users SHALL specify the Parameter Tmax as required by each metric's reference definition."
+text_sha256 = "0e309d8aed72016a"
+state = "pending"
+note = "Tmax."
+
+[[requirement]]
+id = "RFC9097-5.3-5"
+text = "PM represents other performance metrics (see Section 5.4 below); their measurement results SHALL be collected during measurement of IP-Layer Capacity and associated with the corresponding dtn for further evaluation and reporting."
+text_sha256 = "7290d547e8836a1c"
+state = "pending"
+note = "Bullet restating RFC9097-5.3-3."
+
+[[requirement]]
+id = "RFC9097-5.3-6"
+text = "All sub-intervals MUST be of equal duration."
+text_sha256 = "549bf314655385c6"
+state = "pending"
+note = "subIntPeriod is a whole number of Trial Intervals."
+
+[[requirement]]
+id = "RFC9097-5.3-7"
+text = "The bit rate of the physical interface of the measurement devices MUST be higher than the smallest of the links on the path whose C(T,I,PM) is to be measured (the bottleneck link)."
+text_sha256 = "efc00e07aabea575"
+state = "operational"
+note = "Deployment of the measurement hosts."
+
+[[requirement]]
+id = "RFC9097-5.3-8"
+text = "Measurements according to this definition SHALL use the UDP transport layer."
+text_sha256 = "6c3b330416b9ce3e"
+state = "pending"
+
+[[requirement]]
+id = "RFC9097-5.3-9"
+text = "The measurement SHOULD use a randomized Source port or equivalent technique, and SHOULD send responses from the Source address matching the test packet Destination address."
+text_sha256 = "39e05453639bc5c1"
+state = "pending"
+note = "The Client's ports are assigned by the OS from its ephemeral range, not udpstp's Ephemeral Ports (the Server's); replies leave from the arrival address (ADR 0007)."
+
+[[requirement]]
+id = "RFC9097-5.4-1"
+text = "The statistics used to summarize RTD[dtn,dtn+1] MAY include the minimum, maximum, median, mean, and the range = (maximum - minimum)."
+text_sha256 = "071391238ecc7048"
+state = "pending"
+
+[[requirement]]
+id = "RFC9097-5.4-2"
+text = "The statistics used to summarize OWL[dtn,dtn+1] MAY include the count of lost packets and the ratio of lost packets."
+text_sha256 = "29feac3a3ec88e30"
+state = "pending"
+note = "Loss Ratio."
+
+[[requirement]]
+id = "RFC9097-5.4-3"
+text = "Other metrics MAY be measured: one-way reordering, duplication, and delay variation."
+text_sha256 = "e5f9f105f476cc92"
+state = "pending"
+
+[[requirement]]
+id = "RFC9097-5.6-1"
+text = "The IP-Layer Capacity SHOULD be reported with at least single-Megabit resolution, in units of Megabits per second (Mbps) (which, to avoid any confusion, is 1,000,000 bits per second)."
+text_sha256 = "0fd78363f67351b2"
+state = "pending"
+
+[[requirement]]
+id = "RFC9097-5.6-2"
+text = "The related One-Way Loss metric and Round-Trip Delay measurements for the same Singleton SHALL be reported, also with meaningful resolution for the values measured."
+text_sha256 = "b4cec5223f9c74f8"
+state = "pending"
+
+[[requirement]]
+id = "RFC9097-5.6-3"
+text = "Individual Capacity measurements MAY be reported in a manner consistent with the Maximum IP-Layer Capacity; see Section 9."
+text_sha256 = "9160f95611c0f412"
+state = "pending"

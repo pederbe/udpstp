@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>udpstp: measure your true network capacity</title>
+<meta name="description" content="Measure what your network can carry with udpstp. Inspect capacity, loss and delay, automate authenticated Tests, and trace the method to the RFCs.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#121214" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)">
+<meta name="author" content="Peder Bergan">
+<link rel="author" href="https://pederbe.dev">
+<link rel="me" href="https://github.com/pederbe">
+<link rel="me" href="https://www.linkedin.com/in/pederbergan/">
+<link rel="me" href="https://bsky.app/profile/pederbe.dev">
+<link rel="canonical" href="https://udpstp.com/">
+<meta property="og:site_name" content="udpstp">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://udpstp.com/">
+<meta property="og:title" content="udpstp: measure your true network capacity">
+<meta property="og:description" content="Measure what your network can carry with udpstp. Inspect capacity, loss and delay, automate authenticated Tests, and trace the method to the RFCs.">
+<meta property="og:image" content="https://udpstp.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="udpstp: measure the capacity your network really delivers. A Rust implementation of UDPSTP (RFC 9946).">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="udpstp: measure your true network capacity">
+<meta name="twitter:description" content="Measure what your network can carry with udpstp. Inspect capacity, loss and delay, automate authenticated Tests, and trace the method to the RFCs.">
+<meta name="twitter:image" content="https://udpstp.com/og.png">
+<meta name="twitter:image:alt" content="udpstp: measure the capacity your network really delivers. A Rust implementation of UDPSTP (RFC 9946).">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<link rel="alternate" type="text/plain" href="llms.txt" title="llms.txt">
+<link rel="preload" href="fonts/udpstp-display-bold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="landing.css">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "SoftwareApplication",
+   "@id": "https://udpstp.com/#app",
+   "name": "udpstp",
+   "url": "https://udpstp.com/",
+   "description": "A Rust implementation of UDPSTP, the UDP Speed Test Protocol (RFC 9946), which measures the Maximum IP-Layer Capacity of a network path (RFC 9097).",
+   "applicationCategory": "NetworkingApplication",
+   "operatingSystem": "Linux, macOS, Windows",
+   "installUrl": "https://udpstp.com/guides/installing-udpstp.html",
+   <!-- released -->"softwareVersion": "@JSON_VERSION@",<!-- /released -->
+   "license": [
+    "https://spdx.org/licenses/MIT.html",
+    "https://spdx.org/licenses/Apache-2.0.html"
+   ],
+   "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+   "author": {"@id": "https://pederbe.dev/#person"},
+   "creator": {"@id": "https://pederbe.dev/#person"}
+  },
+  {
+   "@type": "SoftwareSourceCode",
+   "name": "udpstp",
+   "codeRepository": "https://github.com/pederbe/udpstp",
+   "programmingLanguage": "Rust",
+   "runtimePlatform": "Linux, macOS, Windows",
+   "license": [
+    "https://spdx.org/licenses/MIT.html",
+    "https://spdx.org/licenses/Apache-2.0.html"
+   ],
+   "targetProduct": {"@id": "https://udpstp.com/#app"},
+   "author": {"@id": "https://pederbe.dev/#person"},
+   "creator": {"@id": "https://pederbe.dev/#person"}
+  },
+  {
+   "@type": "Person",
+   "@id": "https://pederbe.dev/#person",
+   "name": "Peder Bergan",
+   "url": "https://pederbe.dev",
+   "sameAs": [
+    "https://github.com/pederbe",
+    "https://www.linkedin.com/in/pederbergan/",
+    "https://bsky.app/profile/pederbe.dev"
+   ]
+  }
+ ]
+}
+</script>
+<script src="landing.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav">
+  <a class="brand" href="./" aria-label="udpstp home"><picture><source srcset="logo-light.svg" media="(prefers-color-scheme: light)"><img class="brand-mark" src="logo-dark.svg" alt="" width="24" height="24"></picture>udpstp</a>
+  <nav aria-label="Main">
+    <a href="getting-started.html">Docs</a>
+    <a href="conformance/index.html">Conformance</a>
+    <a href="https://github.com/pederbe/udpstp">GitHub</a>
+  </nav>
+</header>
+
+<main id="main" tabindex="-1">
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-scene" aria-hidden="true">
+      <span class="hero-glow" data-motion="breathe"></span>
+      <svg class="capacity-trace" viewBox="0 0 1200 160" preserveAspectRatio="none" focusable="false">
+        <path class="trace-base" d="M0 150 H120 V128 H240 V100 H360 V70 H480 V44 H560 V30 H620 V58 H700 V40 H780 V34 H1200"/>
+        <path class="trace-live" data-motion="trace" pathLength="1" d="M0 150 H120 V128 H240 V100 H360 V70 H480 V44 H560 V30 H620 V58 H700 V40 H780 V34 H1200"/>
+      </svg>
+    </div>
+    <div class="hero-copy">
+      <p class="eyebrow">A Rust implementation of UDPSTP <span class="badge">Version @VERSION@<!-- released --><a class="star" href="#fine-print" aria-label="About this version">*</a><!-- /released --></span></p>
+      <h1 id="hero-title"><span class="word"><span data-word>Measure</span></span> <span class="word"><span data-word>the</span></span> <span class="word"><span data-word>capacity</span></span> <span class="word"><span data-word>your</span></span> <span class="word"><span data-word>network</span></span> <span class="glow-line"><span class="word"><span data-word>really</span></span> <span class="word"><span data-word>delivers.</span></span></span></h1>
+      <p class="lede">Get the capacity number and the evidence behind it. Find <strong>Maximum IP-Layer Capacity</strong>, follow loss and delay throughout a Test, and bring structured results into your own tools.</p>
+      <p class="hero-context">For investigating a network path or building a measurement platform. udpstp puts the metric of <a href="https://www.rfc-editor.org/rfc/rfc9097">RFC&nbsp;9097</a> and the UDP Speed Test Protocol (<a href="https://www.rfc-editor.org/rfc/rfc9946">RFC&nbsp;9946</a>) in a memory-safe Rust tool with authenticated Tests.</p>
+      <div class="actions">
+        <a class="button primary" href="getting-started.html">Try udpstp</a>
+        <a class="button accent-edge" href="#how-title">How a Test works</a>
+      </div>
+      <ul class="hero-facts" aria-label="At a glance">
+        <li>Linux, macOS and Windows</li>
+        <li>Authenticated Tests</li>
+        <li>Interoperates with <a href="https://github.com/BroadbandForum/obudpst">OB-UDPST</a></li>
+      </ul>
+    </div>
+    <aside class="installer" id="install" aria-labelledby="install-title" data-reveal data-aura>
+      <div class="install-heading">
+        <picture aria-hidden="true"><source srcset="logo-light.svg" media="(prefers-color-scheme: light)"><img src="logo-dark.svg" alt="" width="40" height="40"></picture>
+        <div><p class="eyebrow">Install</p><h2 id="install-title">Try udpstp</h2></div>
+      </div>
+      <p class="install-intro">Choose your platform, install udpstp, and connect to a Server for your first Test.</p>
+        <div class="install-tabs" role="tablist" aria-label="Ways to install" hidden>
+          <button type="button" role="tab" id="tab-script" aria-controls="panel-script" aria-selected="true">Linux / macOS</button>
+          <button type="button" role="tab" id="tab-brew" aria-controls="panel-brew" aria-selected="false" tabindex="-1">Homebrew</button>
+          <button type="button" role="tab" id="tab-apt" aria-controls="panel-apt" aria-selected="false" tabindex="-1">Debian / Ubuntu</button>
+          <button type="button" role="tab" id="tab-dnf" aria-controls="panel-dnf" aria-selected="false" tabindex="-1">Fedora / RHEL</button>
+          <button type="button" role="tab" id="tab-windows" aria-controls="panel-windows" aria-selected="false" tabindex="-1">Windows</button>
+          <button type="button" role="tab" id="tab-cargo" aria-controls="panel-cargo" aria-selected="false" tabindex="-1">Cargo</button>
+        </div>
+        <div class="install-panel" id="panel-script" aria-labelledby="method-script">
+          <h3 class="install-method" id="method-script">Linux and macOS</h3>
+          <div class="install">
+            <code id="cmd-script" tabindex="0" role="region" aria-label="Linux and macOS install command">curl -fsSL https://udpstp.com/install.sh | sh</code>
+            <button type="button" class="copy" data-copy="cmd-script" aria-label="Copy the Linux and macOS install command" hidden>Copy</button>
+          </div>
+          <p class="install-note">Installs the latest release into <code>~/.local/bin</code> after checking its checksum. Runs on x86_64, aarch64 and armv7, from glibc 2.28 to Alpine and routers.</p>
+        </div>
+        <div class="install-panel" id="panel-brew" aria-labelledby="method-brew">
+          <h3 class="install-method" id="method-brew">Homebrew</h3>
+          <div class="install">
+            <code id="cmd-brew" tabindex="0" role="region" aria-label="Homebrew install command">brew install pederbe/tap/udpstp</code>
+            <button type="button" class="copy" data-copy="cmd-brew" aria-label="Copy the Homebrew install command" hidden>Copy</button>
+          </div>
+          <p class="install-note">For macOS and Linux. Updates arrive with <code>brew upgrade</code>.</p>
+        </div>
+        <div class="install-panel" id="panel-apt" aria-labelledby="method-apt">
+          <h3 class="install-method" id="method-apt">Debian and Ubuntu</h3>
+          <div class="install">
+            <code id="cmd-apt" tabindex="0" role="region" aria-label="Debian and Ubuntu install command">curl -fsSL https://packages.udpstp.com/udpstp.gpg | sudo tee /usr/share/keyrings/udpstp.gpg &gt;/dev/null &amp;&amp; echo "deb [signed-by=/usr/share/keyrings/udpstp.gpg] https://packages.udpstp.com/apt stable main" | sudo tee /etc/apt/sources.list.d/udpstp.list &amp;&amp; sudo apt update &amp;&amp; sudo apt install udpstp</code>
+            <button type="button" class="copy" data-copy="cmd-apt" aria-label="Copy the Debian and Ubuntu install command" hidden>Copy</button>
+          </div>
+          <p class="install-note">Adds the signed apt repository, with updates through <code>apt upgrade</code> and the Server's systemd unit. Debian 10, Ubuntu 20.04 and newer.</p>
+        </div>
+        <div class="install-panel" id="panel-dnf" aria-labelledby="method-dnf">
+          <h3 class="install-method" id="method-dnf">Fedora, RHEL and similar</h3>
+          <div class="install">
+            <code id="cmd-dnf" tabindex="0" role="region" aria-label="Fedora and RHEL install command">sudo curl -fsSLo /etc/yum.repos.d/udpstp.repo https://packages.udpstp.com/udpstp.repo &amp;&amp; sudo dnf install udpstp</code>
+            <button type="button" class="copy" data-copy="cmd-dnf" aria-label="Copy the Fedora and RHEL install command" hidden>Copy</button>
+          </div>
+          <p class="install-note">Adds the signed dnf repository, with updates through <code>dnf upgrade</code> and the Server's systemd unit. RHEL 8, Fedora and newer.</p>
+        </div>
+        <div class="install-panel" id="panel-windows" aria-labelledby="method-windows">
+          <h3 class="install-method" id="method-windows">Windows PowerShell</h3>
+          <div class="install">
+            <code id="cmd-windows" tabindex="0" role="region" aria-label="Windows PowerShell install command">irm https://udpstp.com/install.ps1 | iex</code>
+            <button type="button" class="copy" data-copy="cmd-windows" aria-label="Copy the Windows PowerShell install command" hidden>Copy</button>
+          </div>
+          <p class="install-note">Installs the latest release after checking its checksum, and adds it to your PATH. Or use <code>winget install pederbe.udpstp</code>.</p>
+        </div>
+        <div class="install-panel" id="panel-cargo" aria-labelledby="method-cargo">
+          <h3 class="install-method" id="method-cargo">Cargo</h3>
+          <div class="install">
+            <code id="cmd-cargo" tabindex="0" role="region" aria-label="Cargo install command">cargo install --locked udpstp</code>
+            <button type="button" class="copy" data-copy="cmd-cargo" aria-label="Copy the Cargo install command" hidden>Copy</button>
+          </div>
+          <p class="install-note">Builds from source with Rust 1.98 or later. With cargo-binstall, <code>cargo binstall udpstp</code> fetches the release binary.</p>
+        </div>
+        <p class="install-alt"><a href="getting-started.html">Installation and your first Test <span aria-hidden="true">→</span></a><br><a class="source-build" href="guides/installing-udpstp.html">All installation options</a><br><a class="source-build" href="guides/hosting-a-server.html">Run a Server with systemd or a container</a></p>
+    </aside>
+  </section>
+
+  <section class="run" aria-labelledby="run-title">
+    <div class="section-head run-copy" data-reveal>
+      <p class="eyebrow">Beyond a single number</p>
+      <h2 id="run-title">Read the result</h2>
+      <p>See how the path behaves throughout the measurement. Check the IP-Layer Capacity and Loss Ratio of every Sub-Interval, then see the maximum that meets your Performance Criterion.</p>
+      <p>Read the result in your terminal or use <code>--format json</code> to feed your own dashboards and measurement tools. The JSON is compatible with OB-UDPST's format. This example is a Downstream Test.</p>
+      <p class="more"><a href="reference/json-output.html">Explore the result format <span aria-hidden="true">→</span></a></p>
+    </div>
+    <figure class="terminal" data-reveal>
+      <div class="terminal-bar"><span>udpstp client</span><span class="terminal-origin">Sample output</span></div>
+      <pre tabindex="0" role="region" aria-label="Example output of udpstp client, scroll horizontally for long lines"><code><!-- terminal -->
+<span class="prompt">$</span> <span class="cursor" aria-hidden="true"></span></code></pre>
+    </figure>
+  </section>
+
+  <section class="why" aria-labelledby="why-title">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">Built for repeatable measurement</p>
+      <h2 id="why-title">Why udpstp</h2>
+      <p>Build measurements on an open standard and results you can verify. For Operators, Consumers and the platforms that serve them.</p>
+    </div>
+    <ul class="why-grid" data-reveal>
+      <li>
+        <p class="feature-index" aria-hidden="true">01</p>
+        <h3>Traced to the RFCs</h3>
+        <p>Follow the method from the standard to the code. Each of the <strong class="figure">@REQ_TOTAL@</strong> Requirements has an ID, with proving tests or a recorded reason.</p>
+      </li>
+      <li>
+        <p class="feature-index" aria-hidden="true">02</p><h3>Authenticated by default</h3>
+        <p>Control who can measure against your Server. Tests and Status PDUs are authenticated, keys stay off the command line, and Fixed-Rate Tests require an Operator Key.</p>
+      </li>
+      <li>
+        <p class="feature-index" aria-hidden="true">03</p><h3>Memory-safe Rust</h3>
+        <p>It parses untrusted network input safely. udpstp's own crates forbid <code>unsafe</code>, from the PDU parsers to the Data Phase Engine.</p>
+      </li>
+      <li>
+        <p class="feature-index" aria-hidden="true">04</p><h3>Works with OB-UDPST</h3>
+        <p>Bring udpstp into an existing setup. It reads OB-UDPST key files, writes compatible JSON, and is tested against OB-UDPST in both directions through a shaped bottleneck.</p>
+      </li>
+    </ul>
+  </section>
+
+  <section class="how" aria-labelledby="how-title">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">A feedback loop, in two phases</p>
+      <h2 id="how-title">How a Test works</h2>
+      <p>The Client starts the Test. The Server admits it, agrees its parameters, and controls the sending rate using reception statistics. Here is a Downstream Test, where the Server sends the measurement load.</p>
+    </div>
+    <figure class="test-illustration" id="data-phase-illustration" data-reveal>
+      <div class="phase-grid">
+        <div class="phase control-phase">
+          <p class="phase-number" aria-hidden="true">01</p><h3>Control Phase</h3>
+          <p>Before measurement, the Client asks the Server to start a Test Connection.</p>
+          <ol class="control-steps">
+            <li><strong>Setup exchange</strong><span>The Server admits the Test Connection and assigns an Ephemeral Port.</span></li>
+            <li><strong>Activation exchange</strong><span>The Server accepts, coerces or rejects the requested Test parameters.</span></li>
+          </ol>
+          <p class="phase-end">Accepted parameters start the Data Phase <span aria-hidden="true">→</span></p>
+        </div>
+        <div class="phase data-phase">
+          <p class="phase-number" aria-hidden="true">02</p><h3>Data Phase</h3>
+          <div class="endpoints"><p><strong>Client</strong><span>Load Receiver</span></p><p><strong>Server</strong><span>Load Sender</span></p></div>
+          <div class="pdu-route to-client"><p><strong>Load PDUs</strong><span>Server to Client: measurement load</span></p><span class="route-line" aria-hidden="true"><span class="packet" data-packet="load"></span><span class="packet" data-packet="load"></span><span class="packet" data-packet="load"></span><span class="packet" data-packet="load"></span><span class="packet" data-packet="load"></span><span class="packet" data-packet="load"></span></span></div>
+          <div class="pdu-route to-server"><p><strong>Status PDUs</strong><span>Client to Server: reception statistics every Trial Interval</span></p><span class="route-line" aria-hidden="true"><span class="packet status" data-packet="status"></span></span></div>
+          <div class="algorithm" data-packet="algorithm"><p class="algorithm-location">On the Server</p><h4>Load Rate Adjustment Algorithm</h4><p>Uses loss and delay variation to raise, hold or lower the next sending rate.</p><p class="feedback-return"><span aria-hidden="true">↻</span> The next Load PDUs use that rate</p></div>
+        </div>
+      </div>
+      <figcaption>A Downstream Test illustration. The Server controls the sending rate in both directions. In an Upstream Test the Client sends Load PDUs, and the Server returns Status PDUs with the next sending parameters. After the Test Interval, the STOP exchange ends the Test Connection.</figcaption>
+    </figure>
+    <details class="exchange-details"><summary>See the full PDU exchange</summary><figure class="diagram"><div class="diagram-scroll" tabindex="0" role="region" aria-label="Full Downstream Test PDU exchange, scroll horizontally on narrow screens"><!-- sequence --></div><figcaption>The Client sends a Setup Request to the Standard Port, 24601. The Server answers with a Setup Response and sends a Null Request from the Test Connection's Ephemeral Port. Activation Requests and Activation Responses carry the Test parameters. Load PDUs and Status PDUs then carry the measurement load and reception statistics, ending with the STOP exchange.</figcaption></figure></details>
+    <p class="more"><a href="glossary.html">Every term, defined</a></p>
+  </section>
+
+  <section class="proof" aria-labelledby="proof-title">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">RFC 9946 and RFC 9097</p>
+      <h2 id="proof-title">Conformance you can check</h2>
+      <p>Every number here is generated from the repository when the site is built.</p>
+    </div>
+    <div class="proof-frame" data-reveal>
+      <dl class="figures">
+        <div><dt>Requirements proven by tests</dt><dd><span class="figure">@REQ_TESTED@</span> of @REQ_TOTAL@</dd></div>
+        <div><dt>Operational Requirements</dt><dd><span class="figure">@REQ_OPERATIONAL@</span></dd></div>
+        <div><dt>Not-applicable Requirements</dt><dd><span class="figure">@REQ_NOT_APPLICABLE@</span></dd></div>
+      </dl>
+      <p class="table-note" id="coverage-note">Tested Requirements have proving tests. Operational Requirements concern deployment or use. Not-applicable Requirements concern other implementations or roles. A Requirement with a Deviation has a recorded departure from the RFC.</p>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Requirements by RFC section">
+        <table class="coverage">
+          <caption>Requirements by RFC section</caption>
+          <thead><tr><th scope="col">Section</th><th scope="col">Requirements</th><th scope="col">Tested</th><th scope="col">Deviation</th><th scope="col">Operational</th><th scope="col">Not applicable</th></tr></thead>
+          <tbody>
+<!-- conformance-table -->
+          </tbody>
+        </table>
+      </div>
+      <div class="record-heading"><h3>Read the reasons</h3><p>@RECORDS@ Conformance Records, grouped by what they explain.</p></div>
+      <dl class="record-grid">
+        <div><dt><a href="conformance/deviations.html">Deviations</a></dt><dd><strong class="figure">@DEVIATIONS@</strong> recorded departures from Requirements, each with its reason.</dd></div>
+        <div><dt><a href="conformance/interpretations.html">Interpretations</a></dt><dd><strong class="figure">@INTERPRETATIONS@</strong> readings of ambiguous Requirements or choices the RFC leaves open.</dd></div>
+        <div><dt><a href="conformance/obudpst-differences.html">OB-UDPST Differences</a></dt><dd><strong class="figure">@OBUDPST_DIFFERENCES@</strong> differences from OB-UDPST where udpstp conforms to the RFC.</dd></div>
+      </dl>
+    </div>
+    <p class="more"><a href="conformance/index.html">Every Requirement, its state and its proving tests</a></p>
+  </section>
+
+  <section class="better" aria-labelledby="better-title">
+    <div class="section-head" data-reveal>
+      <p class="eyebrow">Know what the result means</p>
+      <h2 id="better-title">Measure at the IP layer</h2>
+      <p>A TCP-based speed test measures what its connections' congestion control achieves. UDPSTP measures what the IP layer delivers.</p>
+    </div>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Comparison with a typical TCP-based speed test" data-reveal>
+      <table class="compare" role="table">
+        <caption>Different methods answer different questions</caption>
+        <thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader">Aspect</th><th scope="col" role="columnheader">Typical TCP-based speed test</th><th scope="col" role="columnheader">udpstp</th></tr></thead>
+        <tbody role="rowgroup">
+          <tr role="row"><th scope="row" role="rowheader">What it measures</th><td role="cell"><span class="compare-label" aria-hidden="true">TCP-based</span>The goodput TCP's congestion control reaches, headers excluded</td><td role="cell"><span class="compare-label" aria-hidden="true">udpstp</span>IP-Layer Capacity, headers included, as RFC 9097 defines it</td></tr>
+          <tr role="row"><th scope="row" role="rowheader">How the rate is found</th><td role="cell"><span class="compare-label" aria-hidden="true">TCP-based</span>The sender's congestion control, which differs by operating system and algorithm</td><td role="cell"><span class="compare-label" aria-hidden="true">udpstp</span>A Load Rate Adjustment Algorithm the RFC specifies, fed loss and delay variation every Trial Interval</td></tr>
+          <tr role="row"><th scope="row" role="rowheader">Loss</th><td role="cell"><span class="compare-label" aria-hidden="true">TCP-based</span>Hidden by retransmission</td><td role="cell"><span class="compare-label" aria-hidden="true">udpstp</span>Measured: a Loss Ratio for every Sub-Interval, with delay variation and RTT</td></tr>
+          <tr role="row"><th scope="row" role="rowheader">The result</th><td role="cell"><span class="compare-label" aria-hidden="true">TCP-based</span>Usually one average over the test</td><td role="cell"><span class="compare-label" aria-hidden="true">udpstp</span>Every Sub-Interval, and the maximum that meets a stated Performance Criterion</td></tr>
+          <tr role="row"><th scope="row" role="rowheader">The method</th><td role="cell"><span class="compare-label" aria-hidden="true">TCP-based</span>Defined by each service</td><td role="cell"><span class="compare-label" aria-hidden="true">udpstp</span>IETF Standards Track: the metric of RFC 9097 and the protocol of RFC 9946, with implementations that interoperate</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="adoption" aria-labelledby="adoption-title">
+    <div class="adoption-frame" data-reveal>
+      <p class="eyebrow">Put it to work</p>
+      <h2 id="adoption-title">Bring your network.<br>Tell us what you find.</h2>
+      <p>Try a Test on a path you know. Read the results, connect them to your tools, and help shape udpstp with feedback from your setup.</p>
+      <div class="actions">
+        <a class="button primary" href="getting-started.html">Run your first Test</a>
+        <a class="button accent-edge" href="https://github.com/pederbe/udpstp/issues">Share feedback</a>
+      </div>
+      <p class="adoption-note">A useful result, a problem or a feature idea: feedback helps improve compatibility, diagnostics and the docs.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <!-- released --><p id="fine-print" class="fine-print">* udpstp @VERSION@. The <a href="https://github.com/pederbe/udpstp#status">Status table</a> says what works today, and the <a href="changelog.html">changelog</a> what changed.</p><!-- /released -->
+  <p>udpstp is free software under MIT OR Apache-2.0.</p>
+  <p><a href="getting-started.html">Docs</a> · <a href="https://github.com/pederbe/udpstp">Source</a> · <a href="security-policy.html">Security</a> · <a href="llms.txt">llms.txt</a> · <a href="sitemap.xml">Sitemap</a></p>
+  <p class="author">Created by <a href="https://pederbe.dev" rel="author me">Peder Bergan</a>
+    <span class="profiles"><a href="https://github.com/pederbe" rel="me">GitHub</a> · <a href="https://www.linkedin.com/in/pederbergan/" rel="me">LinkedIn</a> · <a href="https://bsky.app/profile/pederbe.dev" rel="me">Bluesky</a></span></p>
+  <p class="sibling">Also by Peder: <a href="https://fastmash.io/">fastmash</a>, a faster GNU datamash</p>
+</footer>
+<p class="sr-only" id="copy-status" role="status" aria-live="polite"></p>
+<button type="button" class="motion-toggle" id="motion-toggle" hidden>Pause motion</button>
+
+</body>
+</html>

@@ -1,0 +1,29 @@
+name: Bug report
+description: udpstp does something wrong, or crashes.
+labels: [bug, needs-triage]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you ran, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Output
+      description: The output of both the Client and the Server, if you have it. Remove any keys first.
+      render: text
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: udpstp --version, or a commit hash
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Operating systems
+      placeholder: e.g. Client on Ubuntu 24.04, Server on Debian 12

@@ -1,0 +1,41 @@
+[package]
+name = "udpstp-runtime"
+version = "0.1.0"
+description = "I/O for udpstp's protocol core: sockets, clocks and the Tokio Control Phase"
+edition.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+readme = "README.md"
+keywords = ["rfc9946", "udpstp", "tokio", "capacity", "measurement"]
+categories = ["network-programming", "asynchronous"]
+
+[features]
+# Test-only: faults injected into the Data Phase Engine through
+# UDPSTP_FAULTS (src/socket/faults.rs). Only the udpstp binary's tests enable it.
+fault-injection = []
+
+[dependencies]
+udpstp-core.workspace = true
+tokio.workspace = true
+socket2.workspace = true
+
+[target.'cfg(any(target_os = "linux", target_os = "android"))'.dependencies]
+rustix.workspace = true
+
+[target.'cfg(any(target_os = "linux", target_os = "android", target_vendor = "apple"))'.dependencies]
+# process: the Data Phase Engine's timer slack on Linux (prctl); poll and
+# signal: its readiness wait (ppoll, which nix gates behind both); event: the
+# pooled executor's epoll set and eventfd.
+nix = { workspace = true, features = ["socket", "net", "uio", "process", "poll", "signal", "event"] }
+
+[target.'cfg(windows)'.dependencies]
+quinn-udp.workspace = true
+
+[dev-dependencies]
+udpstp-req.workspace = true
+stats_alloc.workspace = true
+
+[lints]
+workspace = true

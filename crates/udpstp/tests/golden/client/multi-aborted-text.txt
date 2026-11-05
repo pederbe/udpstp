@@ -1,0 +1,81 @@
+ErrorStatus 203, not completed: exit 203
+--- stdout
+--------------------------------------------------------------------------------
+Endpoints
+  Test Connection 0: Client unknown; Server 192.0.2.1:24601
+  Test Connection 1: Client unknown; Server 192.0.2.2:24601
+All 2 Test Connections together:
+Results Summary
+  Downstream Search Test with 192.0.2.1:24601, started 2026-09-21T14:13:20Z (T0)
+  Test Interval (I) 5 s · 5 Sub-Intervals (dt) 1000 ms · Trial Interval (FT) and
+    st 50 ms
+  2 Test Connections (F) · MaxHops 16 · DSCP 0 agreed
+  Performance Criterion: loss ≤ 1% or one Load PDU · Tmax ≤ 1000 ms
+  Late Load PDUs count in the Sub-Interval where their gap was seen.
+  The Server set testIntTime to 5 (asked for 10)
+
+  Sub-Interval results
+  Active = Test Connections that received in the Sub-Interval.
+  SI      C (Mbps)  Loss Ratio  Lost  Reordered  Duplicates
+   1         92.00    0.000000     0          0           0
+   2         94.00    0.000000     0          0           0
+   3  not measured           -     -          -           -
+   4  not measured           -     -          -           -
+   5  not measured           -     -          -           -
+
+  SI  DV (ms)  RTTV (ms)  Active  B (Mbps)*
+   1   0/7/12    0-12, 8       2      90.00
+   2   0/7/12    0-12, 8       2      90.00
+   3        -          -       -          -
+   4        -          -       -          -
+   5        -          -       -          -
+
+  SI: Sub-Interval · C: IP-Layer Capacity · B: IP-Layer Sender Bit Rate
+  DV: delay variation (min/avg/max) · RTTV: RTT variation (min-max, avg) · -: no
+    measurement
+  * Estimated from the Server's lpduSeqNo span on its st clock.
+  Lost Load PDUs use the size of surrounding Load PDUs.
+
+Final metrics
+  Maximum IP-Layer Capacity: 94.00 Mbps (Sub-Interval 2)
+  Maximum Sub-Interval result received at 2026-09-21T14:13:22.023000000Z
+  Loss Ratio 0.000000, RTT minimum 1 ms, maximum 13 ms, estimated IP-Layer
+    Sender Bit Rate 90.00 Mbps; 3 Sub-Intervals not measured
+  RTT minimum 1 ms
+
+  Warnings
+    4 invalid Load PDUs ignored
+    Test Connection 0 ended without the Server's STOP: Stopped
+    Test Connection 1 ended without the Server's STOP: Stopped
+    3 datagrams discarded by this host before udpstp read them: its receive
+      buffer overflowed (Receive Buffer Overflows), and a Load Receiver counts
+      them as lost
+
+  This host: DF set, socket buffers receive 4194304 and send 4194304 bytes;
+    portable Data Phase Engine, no fast paths
+Test Connection 0 to 192.0.2.1:24601: Stopped
+
+Final metrics
+  Maximum IP-Layer Capacity: 62.00 Mbps (Sub-Interval 2)
+  Maximum Sub-Interval result received at 2026-09-21T14:13:22.017000000Z
+  Loss Ratio 0.000000, RTT minimum 1 ms, maximum 13 ms, estimated IP-Layer
+    Sender Bit Rate 60.00 Mbps; 3 Sub-Intervals not measured
+  RTT minimum 1 ms
+  Minimum one-way delay 0 ms (clockDeltaMin; valid only if the clocks are
+    synchronized)
+Test Connection 1 to 192.0.2.2:24601: Stopped
+
+Final metrics
+  Maximum IP-Layer Capacity: 32.00 Mbps (Sub-Interval 2)
+  Maximum Sub-Interval result received at 2026-09-21T14:13:22.023000000Z
+  Loss Ratio 0.000000, RTT minimum 1 ms, maximum 13 ms, estimated IP-Layer
+    Sender Bit Rate 30.00 Mbps; 3 Sub-Intervals not measured
+  RTT minimum 1 ms
+  Minimum one-way delay 0 ms (clockDeltaMin; valid only if the clocks are
+    synchronized)
+--- stderr
+udpstp: the Test was aborted: the Server gave Test Connection 1 other parameters
+  than the first
+--- stdout
+--------------------------------------------------------------------------------
+Test outcome: aborted

@@ -1,0 +1,77 @@
+# RFC 9946 section 9: Stopping a Test.
+# Format and ID convention: docs/conformance/README.md.
+
+[[requirement]]
+id = "RFC9946-9-1"
+text = "When the test duration timer (testIntTime) on the server expires, it SHALL set the local connection test action to TEST_ACT_STOP1 (phase 1 of graceful termination)."
+text_sha256 = "034f83ef47ecd9e0"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-9-2"
+text = "Upon transmission of the next Load or Status PDUs, the server SHALL set the local connection test action to TEST_ACT_STOP2 (phase 2 of graceful termination) and mark any outgoing PDUs with a testAction value of TEST_ACT_STOP2."
+text_sha256 = "ccd6971c07e06296"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-9-3"
+text = "While in this state, the server MAY reduce any Load PDU bursts to a size of one."
+text_sha256 = "bca8a0a5ebbc59c2"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-9-4"
+text = "When the client receives a Load or Status PDU with the TEST_ACT_STOP2 indication, it SHALL finalize testing, display the test results, and mark its local connection with a test action of TEST_ACT_STOP2 (so that any PDUs subsequently received can be ignored)."
+text_sha256 = "9dd8b3930309315b"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-9-5"
+text = "With the test action of the client's connection set to TEST_ACT_STOP2, the very next expiry of a send timer, for either a Load or a Status PDU, SHALL result in it and any subsequent PDUs being sent with a testAction value of TEST_ACT_STOP2 (as confirmation to the server)."
+text_sha256 = "ff51c0c3f4f7598b"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-9-6"
+text = "While in this state, the client MAY reduce any Load PDU bursts to a size of one."
+text_sha256 = "da85ec2e3dbda47b"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-9-7"
+text = "The client SHALL then schedule an immediate end time for the connection."
+text_sha256 = "fb30653d5eaff77a"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-9-8"
+text = "When the server receives the TEST_ACT_STOP2 confirmation in the Load or Status PDU, the server SHALL schedule an immediate end time for the connection that closes the socket and deallocates the associated resources."
+text_sha256 = "7ad01b49eb2ea3e2"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-9-9"
+text = "In a non-graceful test stop due to path failure, the watchdog timeouts at each endpoint will expire (sometimes at one endpoint first); notifications in logs, STDOUT, and/or formatted output SHALL be made; and the endpoint SHALL schedule an immediate end time for the connection."
+text_sha256 = "a3f22e85bb07a599"
+state = "pending"
+note = "Timeouts per ADR 0002."
+
+[[requirement]]
+id = "RFC9946-9-10"
+text = "If an attacker clears the TEST_ACT_STOP2 indication, then the configured test duration timer (testIntTime) at the server and client SHALL take precedence and the endpoint SHALL schedule an immediate end time for the connection."
+text_sha256 = "0bb2717e175d21e0"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-9-L1"
+text = "This is simply a non-reversible state awaiting the next message(s) to be sent from the server."
+text_sha256 = "2b56312e1b5ea64a"
+state = "pending"
+note = "TEST_ACT_STOP1."
+
+[[requirement]]
+id = "RFC9946-9-L2"
+text = "During this time, any received Load or Status PDUs are processed normally."
+text_sha256 = "dcfdd2280d5f1d1a"
+state = "pending"
+note = "TEST_ACT_STOP1."

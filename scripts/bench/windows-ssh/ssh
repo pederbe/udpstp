@@ -1,0 +1,5 @@
+#!/bin/sh
+# Windows' OpenSSH, for a round run in WSL (round.py --ssh-dir
+# scripts/bench/windows-ssh): its keys and its ssh config, where the home
+# lab's hosts are, are Windows'.
+exec /mnt/c/Windows/System32/OpenSSH/ssh.exe "$@"

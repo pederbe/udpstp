@@ -1,0 +1,59 @@
+
+[round]
+kind = "server-scale"
+server_type = "c6in.2xlarge"
+client_type = "c6in.2xlarge"
+test_interval = 10
+warm_up = 2
+engines = ["udpstp", "prototype-b", "obudpst"]
+calibration = ["prototype-a", "prototype-b-core"]
+obudpst_pinned = true
+must_have = "obudpst"
+runs_at_target = { udpstp = 15, prototype-b = 15, obudpst = 15, prototype-a = 15, prototype-b-core = 3 }
+runs_elsewhere = 6
+probe_stop_engines = ["udpstp", "prototype-b"]
+probe_stop_cases = ["W3", "W3b", "W3u"]
+close_call_runs = 5
+close_call_most = 60
+
+[[case]]
+name = "W3"
+direction = "downstream"
+row = 50
+counts = [50, 100, 150, 200]
+target = 200
+
+[[case]]
+name = "W3l"
+direction = "downstream"
+row = 20
+counts = [100, 150, 200, 250]
+target = 200
+judged = false
+
+[[case]]
+name = "W3b"
+direction = "downstream"
+row = 500
+counts = [5, 10, 15, 20]
+target = 20
+
+[[case]]
+name = "W3u"
+direction = "upstream"
+row = 500
+counts = [5, 10, 15, 20]
+target = 20
+
+[[case]]
+name = "W5"
+direction = "downstream"
+row = 1002
+counts = [2, 4, 6, 8]
+target = 8
+
+[p1]
+engines = ["udpstp", "prototype-a", "prototype-b"]
+rows = [20, 50, 500, 1002]
+test_connections = 6
+repeats = 3

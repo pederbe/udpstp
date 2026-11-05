@@ -1,0 +1,33 @@
+[round]
+kind = "server-scale"
+test_interval = 5
+warm_up = 1
+engines = ["udpstp", "prototype-b", "obudpst"]
+calibration = ["prototype-a", "prototype-b-core"]
+obudpst_pinned = true
+runs_at_target = { udpstp = 2 }
+runs_elsewhere = 1
+probe_stop_engines = ["udpstp", "prototype-b"]
+probe_stop_cases = ["S"]
+close_call_runs = 1
+close_call_most = 2
+
+[[case]]
+name = "S"
+direction = "downstream"
+row = 10
+counts = [2, 4]
+target = 4
+
+[[case]]
+name = "U"
+direction = "upstream"
+row = 10
+counts = [3]
+target = 3
+
+[p1]
+engines = ["udpstp", "prototype-b"]
+rows = [10]
+test_connections = 2
+repeats = 1

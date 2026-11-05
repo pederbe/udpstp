@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+message: "If you use udpstp in research or a publication, please cite it as below."
+type: software
+title: "udpstp: the UDP Speed Test Protocol (RFC 9946) in Rust"
+abstract: >-
+  A memory-safe, RFC 9946-conformant implementation of the UDP Speed Test
+  Protocol, which measures Maximum IP-Layer Capacity as defined in RFC 9097.
+authors:
+  - family-names: Bergan
+    given-names: Peder
+repository-code: "https://github.com/pederbe/udpstp"
+license:
+  - MIT
+  - Apache-2.0
+keywords:
+  - RFC 9946
+  - RFC 9097
+  - UDPSTP
+  - IP capacity
+  - network measurement
+  - speed test
+  - Rust
+references:
+  - type: standard
+    title: "The UDP Speed Test Protocol (UDPSTP) for One-Way IP Capacity Metric Measurement"
+    identifiers:
+      - type: doi
+        value: 10.17487/RFC9946
+    authors:
+      - family-names: Morton
+        given-names: A.
+      - family-names: Ciavattone
+        given-names: L.
+      - family-names: Geib
+        given-names: R.
+    year: 2026
+    institution:
+      name: Internet Engineering Task Force

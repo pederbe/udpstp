@@ -1,0 +1,41 @@
+[package]
+name = "udpstp-core"
+version = "0.1.0"
+description = "Sans-IO UDPSTP (RFC 9946) protocol core"
+edition.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+readme = "README.md"
+# The tests need the workspace (udpstp-req, testdata/), so they aren't
+# packaged.
+exclude = ["tests/"]
+keywords = ["rfc9946", "udpstp", "sans-io", "capacity", "measurement"]
+categories = ["network-programming"]
+
+[features]
+# Fuzzing only: `udpstp_core::fuzzing` drives modules the public interface
+# doesn't expose, such as Admission (src/admission.rs). Only the fuzz
+# targets (fuzz/) enable it; it is no stable interface.
+fuzzing = []
+# Local layout assessment only, outside the stable protocol interface.
+layout-diagnostics = []
+hotpath = ["dep:hotpath", "hotpath/hotpath"]
+hotpath-cpu = ["hotpath", "hotpath/hotpath-cpu"]
+hotpath-alloc = ["hotpath", "hotpath/hotpath-alloc"]
+
+[dependencies]
+udpstp-wire.workspace = true
+hotpath = { workspace = true, optional = true }
+
+[dev-dependencies]
+udpstp-req.workspace = true
+stats_alloc.workspace = true
+
+[[example]]
+name = "layout_cost"
+required-features = ["layout-diagnostics"]
+
+[lints]
+workspace = true

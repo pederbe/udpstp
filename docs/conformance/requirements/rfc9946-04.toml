@@ -1,0 +1,107 @@
+# RFC 9946 section 4: Protocol Overview.
+# Section 4 is informative apart from its first sentence; its lowercase
+# entries are the statements no later section specifies.
+# Format and ID convention: docs/conformance/README.md.
+
+[[requirement]]
+id = "RFC9946-4-1"
+text = "All messages defined by this document SHALL use UDP transport [RFC0768]."
+text_sha256 = "9293baf7741d3b39"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-4-L1"
+text = "It is the responsibility of the client process to manage the inter-related connections such as handling the individual connection setup successes and failures, cleaning up connections during a test (should some fail), and aggregating the individual test results into an overall set of performance statistics."
+text_sha256 = "086200ee3114685c"
+state = "pending"
+note = "Multi-Connection Test: Minimum Test Connections, failed Test Connections, the aggregate Sub-Interval."
+
+[[requirement]]
+id = "RFC9946-4-L2"
+text = "The server instance(s) would process each connection independently, as if they were coming from separate clients."
+text_sha256 = "7759d1bc94bc283d"
+state = "pending"
+
+[[requirement]]
+id = "RFC9946-4-L3"
+text = "Test Setup Request and Response: If a server instance is identified with a host name that resolves to both IPv4/IPv6 addresses, it is recommended to use the first address returned in the name resolution response, regardless of whether it is IPv4 or IPv6."
+text_sha256 = "15d2b36c8301c22e"
+state = "pending"
+note = "Client host name resolution."
+
+[[requirement]]
+id = "RFC9946-4-L4"
+text = "Distinct UDP port numbers will be assigned if all Setup Response messages originate from the same server in that case."
+text_sha256 = "112eaa0fd49debb7"
+state = "pending"
+note = "An Ephemeral Port per Test Connection."
+
+[[requirement]]
+id = "RFC9946-4.1-1"
+text = "Fixed-rate testing SHOULD only be activated for operation and maintenance purposes by operators within their local network domain."
+text_sha256 = "3c66e9b0460fd9be"
+state = "operational"
+note = "Who runs a Fixed-Rate Test, and where; the software limits it to Operator Keys (RFC9946-4.1-3)."
+
+[[requirement]]
+id = "RFC9946-4.1-2"
+text = "If a subscriber requests a diagnostic test from the network operator, it strongly implies that there is no certainty on the bottleneck capacity and initiating a UDP Speed Test based on the load adjustment algorithm is RECOMMENDED."
+text_sha256 = "582acc646a2b6ca3"
+state = "operational"
+note = "An operator's choice of test."
+
+[[requirement]]
+id = "RFC9946-4.1-3"
+text = "To protect against misuse, a client (and in general, a consumer) MUST NOT be able to initiate a fixed-rate test."
+text_sha256 = "3370877b0b2747f6"
+state = "pending"
+note = "A Fixed-Rate Test needs an Operator Key."
+
+[[requirement]]
+id = "RFC9946-4.1-L1"
+text = "A network operator may conduct a fixed-rate test for a stable measurement at or near the maximum determined by the load rate adjustment algorithm for debugging purposes."
+text_sha256 = "d1caf83c189e1a21"
+state = "pending"
+note = "srIndexConf a row with CHTA_SRIDX_ISSTART clear, under an Operator Key."
+
+[[requirement]]
+id = "RFC9946-4.2-L1"
+text = "Measurements that generate traffic on shared paths (including Wi-Fi and Internet paths) need to consider the impact on other traffic."
+text_sha256 = "53ff884eaa9a569a"
+state = "operational"
+note = "A deployment statement."
+
+[[requirement]]
+id = "RFC9946-4.2-L2"
+text = "Fixed-rate testing operates without congestion control and therefore must not be executed over other operators' network segments."
+text_sha256 = "b61449a8f87623ef"
+state = "operational"
+note = "Where an operator runs a Fixed-Rate Test."
+
+[[requirement]]
+id = "RFC9946-4.2-L3"
+text = "Fixed- rate testing, therefore, is limited to paths within a domain entirely managed and operated section-wise and end-to-end by the network operator performing the measurement."
+text_sha256 = "a36cbca2b820a5ae"
+state = "operational"
+note = "Where an operator runs a Fixed-Rate Test."
+
+[[requirement]]
+id = "RFC9946-4.2-L4"
+text = "When the risks of disruption to other flows has been considered, testing could be extended to include adjacent operational domains for which there is also a testing agreement."
+text_sha256 = "92f08a2c87332948"
+state = "operational"
+note = "Where an operator runs a Fixed-Rate Test."
+
+[[requirement]]
+id = "RFC9946-4.2-1"
+text = "The number of concurrent independent tests of a path SHALL be limited to one, regardless of the number of flows."
+text_sha256 = "ae42498aeecbaa12"
+state = "deviation"
+reference = "tests-per-source-above-one"
+note = "Server admission: one activated Test per source."
+
+[[requirement]]
+id = "RFC9946-4.2-L5"
+text = "A load rate adjustment algorithm (see Section 5.1) is required to mitigate the impact of this congestion and to limit the duration of any congestion by terminating the test when sudden impairments or a loss of connectivity is detected."
+text_sha256 = "517e6087a8652242"
+state = "pending"

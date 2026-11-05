@@ -1,0 +1,7 @@
+* text=auto eol=lf
+
+# Vendored third-party files stay byte-identical to upstream (docs/provenance.md).
+testdata/** -text
+docs/rfc/*.txt -text
+# Fuzz seeds are binary PDUs.
+fuzz/seeds/** -text

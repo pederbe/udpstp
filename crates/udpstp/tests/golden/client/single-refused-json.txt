@@ -1,0 +1,26 @@
+ErrorStatus 110, not completed: exit 110
+--- stderr
+udpstp: 192.0.2.1:24601 refused the Test: it has no room for the --max-bandwidth asked for; retry later or ask for less
+--- stdout
+{
+	"IPLayerMaxConnections":	24,
+	"IPLayerMaxIncrementalResult":	655350,
+	"IPLayerCapSupported":	{
+		"SoftwareVersion":	"udpstp 0.1.0",
+		"ControlProtocolVersion":	20,
+		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
+	},
+	"ErrorStatus":	110,
+	"ErrorMessage":	"192.0.2.1:24601 refused the Test: it has no room for the --max-bandwidth asked for; retry later or ask for less",
+	"ErrorMessage2":	"",
+	"udpstp":	{
+		"Warnings":	[],
+		"EndReason":	"ControlPhaseFailed",
+		"ControlPhaseFailure":	"SetupRejectedCapacityExceeded",
+		"Coercions":	[],
+		"DontFragment":	true,
+		"SocketBuffers":	null,
+		"DataPhaseEngine":	"portable",
+		"FastPaths":	[]
+	}
+}

@@ -1,0 +1,15 @@
+[defaults]
+test_interval = 5
+repeats = 1
+jumbo = false
+
+[[test]]
+name = "smoke search"
+rate = "search"
+pairs = ["udpstp/udpstp"]
+
+[[test]]
+name = "smoke row 100"
+rate = 100
+directions = ["upstream"]
+pairs = ["udpstp/udpstp"]
