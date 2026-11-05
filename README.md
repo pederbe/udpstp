@@ -16,13 +16,25 @@ Use it to check access lines and circuits, compare network paths, or collect mea
 
 ## Install
 
-With [Rust installed](https://rustup.rs), build the current source on Linux, macOS or Windows with one command.
+**Linux**
 
 ```sh
-cargo install --locked --git https://github.com/pederbe/udpstp udpstp
+curl -fsSL https://udpstp.com/install.sh | sh
 ```
 
-See the [installation guide](https://udpstp.com/guides/installing-udpstp.html) for portable binaries, installers and current package manager availability.
+**macOS**
+
+```sh
+brew install pederbe/tap/udpstp
+```
+
+**Windows**, in PowerShell
+
+```powershell
+irm https://udpstp.com/install.ps1 | iex
+```
+
+The [installation guide](https://udpstp.com/guides/installing-udpstp.html) covers signed Linux packages, portable downloads, Cargo and updates.
 
 ## Run a Test
 
@@ -79,7 +91,7 @@ udpstp runs complete Tests and reports their results.
 | Linux systemd unit and Windows service | Done |
 | Conformance Records and interoperability tests with OB-UDPST | Done |
 | Hosted documentation | Done |
-| Release binaries, packages and installers | [Current availability](https://udpstp.com/guides/installing-udpstp.html) |
+| Release binaries, signed Linux packages and installers | Done |
 
 [Platform differences](docs/platforms.md) describes options that depend on the operating system. JSON results, exit statuses, key files and address pseudonyms are stable from 0.1.0. The command line, configuration and Server JSON logs can change in minor 0.x releases, with changes listed in the [changelog](CHANGELOG.md).
 
