@@ -8,7 +8,7 @@ Include what an attacker can do, the steps or PDUs that reproduce it, and the ve
 
 ## Supported versions
 
-udpstp is pre-release, so only the latest commit on `main` is supported. After the first release, the latest release gets security fixes.
+The latest published release receives security fixes. Update to that release when reporting a vulnerability, or include the version affected if you cannot update.
 
 ## Scope
 

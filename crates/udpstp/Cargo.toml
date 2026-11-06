@@ -1,12 +1,13 @@
 [package]
 name = "udpstp"
-version = "0.1.1"
-description = "udpstp: Client and Server for UDPSTP (RFC 9946)"
+version = "0.1.2"
+description = "Measure network-path capacity, loss and delay with authenticated tests and JSON results"
 edition.workspace = true
 authors.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
+homepage = "https://udpstp.com"
 readme = "README.md"
 # The tests need the workspace (udpstp-req, testdata/), so they aren't
 # packaged.

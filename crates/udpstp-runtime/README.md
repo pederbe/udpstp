@@ -1,9 +1,11 @@
 # udpstp-runtime
 
-The I/O for the UDP Speed Test Protocol ([RFC 9946](https://www.rfc-editor.org/rfc/rfc9946)) core, [`udpstp-core`](https://crates.io/crates/udpstp-core): UDP sockets with their IP options, clocks, the Tokio Control Phase and the Data Phase Engine. It makes no protocol decisions. `serve` runs a Server and `run_test` runs one Test as a Client.
+Run a UDP Speed Test Protocol Client or Server from Rust with `udpstp-runtime`. It connects [`udpstp-core`](https://crates.io/crates/udpstp-core) to UDP sockets, clocks, the Tokio Control Phase and the Data Phase Engine.
 
-Part of [udpstp](https://github.com/pederbe/udpstp). **Pre-release:** the API will change before 1.0.
+Use `serve` to run a Server and `run_test` to run a Client Test. The core handles protocol decisions while the runtime moves packets and schedules their delivery. See the [API reference](https://docs.rs/udpstp-runtime).
+
+Part of [udpstp](https://github.com/pederbe/udpstp), a Rust tool for measuring network-path capacity, loss and delay.
 
 ## Licence
 
-Licensed under either of [Apache License, Version 2.0](LICENSE-APACHE) or [MIT license](LICENSE-MIT) at your option.
+Licensed under either [Apache-2.0](https://github.com/pederbe/udpstp/blob/main/LICENSE-APACHE) or [MIT](https://github.com/pederbe/udpstp/blob/main/LICENSE-MIT).

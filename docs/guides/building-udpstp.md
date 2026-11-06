@@ -1,6 +1,6 @@
 # Building udpstp
 
-Use a source build to try the pre-release version, develop udpstp, or use a platform without a release binary. For normal installation, see [Installing udpstp](installing-udpstp.md).
+Build udpstp from source to develop it, try changes on `main`, or use a platform without a release binary. To install a published release, see [Installing udpstp](installing-udpstp.md).
 
 You need Git and Rust installed through rustup. The repository's `rust-toolchain.toml` selects the toolchain; Cargo uses the checked-in dependency versions with `--locked`.
 

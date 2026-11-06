@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>udpstp: measure your true network capacity</title>
-<meta name="description" content="Measure what your network can carry with udpstp. Inspect capacity, loss and delay, automate authenticated Tests, and trace the method to the RFCs.">
+<title>udpstp · measure network capacity, loss and delay</title>
+<meta name="description" content="Check access lines, compare network paths and collect capacity, loss and delay with udpstp. Run authenticated tests on Linux, macOS and Windows, with text and JSON results.">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
 <meta name="color-scheme" content="dark light">
 <meta name="theme-color" content="#121214" media="(prefers-color-scheme: dark)">
@@ -18,15 +18,15 @@
 <meta property="og:site_name" content="udpstp">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://udpstp.com/">
-<meta property="og:title" content="udpstp: measure your true network capacity">
-<meta property="og:description" content="Measure what your network can carry with udpstp. Inspect capacity, loss and delay, automate authenticated Tests, and trace the method to the RFCs.">
+<meta property="og:title" content="udpstp · measure network capacity, loss and delay">
+<meta property="og:description" content="Check access lines, compare network paths and collect capacity, loss and delay with udpstp. Run authenticated tests on Linux, macOS and Windows, with text and JSON results.">
 <meta property="og:image" content="https://udpstp.com/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="udpstp: measure the capacity your network really delivers. A Rust implementation of UDPSTP (RFC 9946).">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="udpstp: measure your true network capacity">
-<meta name="twitter:description" content="Measure what your network can carry with udpstp. Inspect capacity, loss and delay, automate authenticated Tests, and trace the method to the RFCs.">
+<meta name="twitter:title" content="udpstp · measure network capacity, loss and delay">
+<meta name="twitter:description" content="Check access lines, compare network paths and collect capacity, loss and delay with udpstp. Run authenticated tests on Linux, macOS and Windows, with text and JSON results.">
 <meta name="twitter:image" content="https://udpstp.com/og.png">
 <meta name="twitter:image:alt" content="udpstp: measure the capacity your network really delivers. A Rust implementation of UDPSTP (RFC 9946).">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -109,10 +109,10 @@
       </svg>
     </div>
     <div class="hero-copy">
-      <p class="eyebrow">A Rust implementation of UDPSTP <span class="badge">Version @VERSION@<!-- released --><a class="star" href="#fine-print" aria-label="About this version">*</a><!-- /released --></span></p>
+      <p class="eyebrow">Network capacity testing in Rust <span class="badge">Version @VERSION@</span></p>
       <h1 id="hero-title"><span class="word"><span data-word>Measure</span></span> <span class="word"><span data-word>the</span></span> <span class="word"><span data-word>capacity</span></span> <span class="word"><span data-word>your</span></span> <span class="word"><span data-word>network</span></span> <span class="glow-line"><span class="word"><span data-word>really</span></span> <span class="word"><span data-word>delivers.</span></span></span></h1>
-      <p class="lede">Get the capacity number and the evidence behind it. Find <strong>Maximum IP-Layer Capacity</strong>, follow loss and delay throughout a Test, and bring structured results into your own tools.</p>
-      <p class="hero-context">For investigating a network path or building a measurement platform. udpstp puts the metric of <a href="https://www.rfc-editor.org/rfc/rfc9097">RFC&nbsp;9097</a> and the UDP Speed Test Protocol (<a href="https://www.rfc-editor.org/rfc/rfc9946">RFC&nbsp;9946</a>) in a memory-safe Rust tool with authenticated Tests.</p>
+      <p class="lede">Check a circuit, compare network paths or investigate a change in performance. Measure <strong>Maximum IP-Layer Capacity</strong>, loss and delay together, then read the results in your terminal or collect JSON.</p>
+      <p class="hero-context">Run udpstp at both ends of a path and measure in either direction. It implements the UDP Speed Test Protocol in <a href="https://www.rfc-editor.org/rfc/rfc9946">RFC&nbsp;9946</a> and the IP-layer capacity method in <a href="https://www.rfc-editor.org/rfc/rfc9097">RFC&nbsp;9097</a>.</p>
       <div class="actions">
         <a class="button primary" href="getting-started.html">Try udpstp</a>
         <a class="button accent-edge" href="#how-title">How a Test works</a>
@@ -208,25 +208,25 @@
     <div class="section-head" data-reveal>
       <p class="eyebrow">Built for repeatable measurement</p>
       <h2 id="why-title">Why udpstp</h2>
-      <p>Build measurements on an open standard and results you can verify. For Operators, Consumers and the platforms that serve them.</p>
+      <p>Use it for a quick circuit check, repeatable path comparisons or automated measurement.</p>
     </div>
     <ul class="why-grid" data-reveal>
       <li>
         <p class="feature-index" aria-hidden="true">01</p>
-        <h3>Traced to the RFCs</h3>
-        <p>Follow the method from the standard to the code. Each of the <strong class="figure">@REQ_TOTAL@</strong> Requirements has an ID, with proving tests or a recorded reason.</p>
+        <h3>See the whole Test</h3>
+        <p>Follow capacity, loss and delay throughout the measurement. The interval results help you see when a path changes under load.</p>
       </li>
       <li>
         <p class="feature-index" aria-hidden="true">02</p><h3>Authenticated by default</h3>
         <p>Control who can measure against your Server. Tests and Status PDUs are authenticated, keys stay off the command line, and Fixed-Rate Tests require an Operator Key.</p>
       </li>
       <li>
-        <p class="feature-index" aria-hidden="true">03</p><h3>Memory-safe Rust</h3>
-        <p>It parses untrusted network input safely. The PDU parsers, protocol core and Data Phase Engine forbid <code>unsafe</code> Rust.</p>
+        <p class="feature-index" aria-hidden="true">03</p><h3>Ready for your tools</h3>
+        <p>Read compact results in your terminal or export JSON. Use the Rust libraries to add protocol support to your own application.</p>
       </li>
       <li>
         <p class="feature-index" aria-hidden="true">04</p><h3>Works with OB-UDPST</h3>
-        <p>Bring udpstp into an existing setup. It reads OB-UDPST key files, writes compatible JSON, and is tested against OB-UDPST in both directions through a shaped bottleneck.</p>
+        <p>Bring udpstp into an existing setup with OB-UDPST key files and compatible JSON output. Explore the <a href="https://github.com/pederbe/udpstp/blob/main/docs/testing.md">interoperability checks</a> for the two implementations.</p>
       </li>
     </ul>
   </section>
@@ -265,10 +265,10 @@
   <section class="proof" aria-labelledby="proof-title">
     <div class="section-head" data-reveal>
       <p class="eyebrow">RFC 9946 and RFC 9097</p>
-      <h2 id="proof-title">Conformance you can check</h2>
-      <p>Every number here is generated from the repository when the site is built.</p>
+      <h2 id="proof-title">Follow the measurement method</h2>
+      <p>udpstp uses the published IP-layer capacity method. The <a href="understanding-results.html">results guide</a> explains the numbers, and the <a href="conformance/index.html">protocol documentation</a> connects the implementation to the RFCs.</p>
     </div>
-    <div class="proof-frame" data-reveal>
+    <details class="exchange-details"><summary>RFC conformance details</summary><div class="proof-frame">
       <dl class="figures">
         <div><dt>Requirements proven by tests</dt><dd><span class="figure">@REQ_TESTED@</span> of @REQ_TOTAL@</dd></div>
         <div><dt>Operational Requirements</dt><dd><span class="figure">@REQ_OPERATIONAL@</span></dd></div>
@@ -291,25 +291,24 @@
         <div><dt><a href="conformance/obudpst-differences.html">OB-UDPST Differences</a></dt><dd><strong class="figure">@OBUDPST_DIFFERENCES@</strong> differences from OB-UDPST where udpstp conforms to the RFC.</dd></div>
       </dl>
     </div>
-    <p class="more"><a href="conformance/index.html">Every Requirement, its state and its proving tests</a></p>
+    </details>
+    <p class="more"><a href="conformance/index.html">Explore the protocol documentation</a></p>
   </section>
 
   <section class="better" aria-labelledby="better-title">
     <div class="section-head" data-reveal>
-      <p class="eyebrow">Know what the result means</p>
-      <h2 id="better-title">Measure at the IP layer</h2>
-      <p>A TCP-based speed test measures what its connections' congestion control achieves. UDPSTP measures what the IP layer delivers.</p>
+      <p class="eyebrow">Choose your measurement</p>
+      <h2 id="better-title">Put the results to work</h2>
+      <p>Measure a path you use, compare alternatives or collect results over time.</p>
     </div>
-    <div class="table-scroll" tabindex="0" role="region" aria-label="Comparison with a typical TCP-based speed test" data-reveal>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Ways to use udpstp" data-reveal>
       <table class="compare" role="table">
-        <caption>Different methods answer different questions</caption>
-        <thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader">Aspect</th><th scope="col" role="columnheader">Typical TCP-based speed test</th><th scope="col" role="columnheader">udpstp</th></tr></thead>
+        <caption>From a circuit check to automated collection</caption>
+        <thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader">Task</th><th scope="col" role="columnheader">Measure</th><th scope="col" role="columnheader">Use the result</th></tr></thead>
         <tbody role="rowgroup">
-          <tr role="row"><th scope="row" role="rowheader">What it measures</th><td role="cell"><span class="compare-label" aria-hidden="true">TCP-based</span>The goodput TCP's congestion control reaches, headers excluded</td><td role="cell"><span class="compare-label" aria-hidden="true">udpstp</span>IP-Layer Capacity, headers included, as RFC 9097 defines it</td></tr>
-          <tr role="row"><th scope="row" role="rowheader">How the rate is found</th><td role="cell"><span class="compare-label" aria-hidden="true">TCP-based</span>The sender's congestion control, which differs by operating system and algorithm</td><td role="cell"><span class="compare-label" aria-hidden="true">udpstp</span>A Load Rate Adjustment Algorithm the RFC specifies, fed loss and delay variation every Trial Interval</td></tr>
-          <tr role="row"><th scope="row" role="rowheader">Loss</th><td role="cell"><span class="compare-label" aria-hidden="true">TCP-based</span>Hidden by retransmission</td><td role="cell"><span class="compare-label" aria-hidden="true">udpstp</span>Measured: a Loss Ratio for every Sub-Interval, with delay variation and RTT</td></tr>
-          <tr role="row"><th scope="row" role="rowheader">The result</th><td role="cell"><span class="compare-label" aria-hidden="true">TCP-based</span>Usually one average over the test</td><td role="cell"><span class="compare-label" aria-hidden="true">udpstp</span>Every Sub-Interval, and the maximum that meets a stated Performance Criterion</td></tr>
-          <tr role="row"><th scope="row" role="rowheader">The method</th><td role="cell"><span class="compare-label" aria-hidden="true">TCP-based</span>Defined by each service</td><td role="cell"><span class="compare-label" aria-hidden="true">udpstp</span>IETF Standards Track: the metric of RFC 9097 and the protocol of RFC 9946, with implementations that interoperate</td></tr>
+          <tr role="row"><th scope="row" role="rowheader">Check an access line or circuit</th><td role="cell"><span class="compare-label" aria-hidden="true">Measure</span>Capacity, loss and delay under load</td><td role="cell"><span class="compare-label" aria-hidden="true">Use the result</span>See how the path delivers traffic throughout the Test</td></tr>
+          <tr role="row"><th scope="row" role="rowheader">Compare network paths</th><td role="cell"><span class="compare-label" aria-hidden="true">Measure</span>Upstream and Downstream Tests between chosen hosts</td><td role="cell"><span class="compare-label" aria-hidden="true">Use the result</span>Compare directions, routes or changes to a circuit</td></tr>
+          <tr role="row"><th scope="row" role="rowheader">Collect measurements</th><td role="cell"><span class="compare-label" aria-hidden="true">Measure</span>Structured results with <code>--format json</code></td><td role="cell"><span class="compare-label" aria-hidden="true">Use the result</span>Feed your dashboards, scripts and measurement tools</td></tr>
         </tbody>
       </table>
     </div>
@@ -318,25 +317,25 @@
   <section class="adoption" aria-labelledby="adoption-title">
     <div class="adoption-frame" data-reveal>
       <p class="eyebrow">Put it to work</p>
-      <h2 id="adoption-title">Bring your network.<br>Tell us what you find.</h2>
-      <p>Try a Test on a path you know. Read the results, connect them to your tools, and help shape udpstp with feedback from your setup.</p>
+      <h2 id="adoption-title">Put your network<br>to the test.</h2>
+      <p>Install udpstp on two hosts, share a key and run your first measurement. Switch direction to check the return path, or collect JSON for your own tools.</p>
       <div class="actions">
         <a class="button primary" href="getting-started.html">Run your first Test</a>
         <a class="button accent-edge" href="https://github.com/pederbe/udpstp/issues">Share feedback</a>
       </div>
-      <p class="adoption-note">A useful result, a problem or a feature idea: feedback helps improve compatibility, diagnostics and the docs.</p>
+      <p class="adoption-note">Found something to improve? Share a result, report a problem or suggest a feature.</p>
     </div>
   </section>
 
 </main>
 
 <footer class="footer">
-  <!-- released --><p id="fine-print" class="fine-print">* udpstp @VERSION@. The <a href="https://github.com/pederbe/udpstp#status">Status table</a> says what works today, and the <a href="changelog.html">changelog</a> what changed.</p><!-- /released -->
+  <p id="fine-print" class="fine-print">udpstp @VERSION@ · <a href="changelog.html">Changelog</a></p>
   <p>udpstp is free software under MIT OR Apache-2.0.</p>
   <p><a href="getting-started.html">Docs</a> · <a href="https://github.com/pederbe/udpstp">Source</a> · <a href="security-policy.html">Security</a> · <a href="llms.txt">llms.txt</a> · <a href="sitemap.xml">Sitemap</a></p>
   <p class="author">Created by <a href="https://pederbe.dev" rel="author me">Peder Bergan</a>
     <span class="profiles"><a href="https://github.com/pederbe" rel="me">GitHub</a> · <a href="https://www.linkedin.com/in/pederbergan/" rel="me">LinkedIn</a> · <a href="https://bsky.app/profile/pederbe.dev" rel="me">Bluesky</a></span></p>
-  <p class="sibling">Also by Peder: <a href="https://fastmash.io/">fastmash</a>, a faster GNU datamash</p>
+  <p class="sibling">Also by Peder: <a href="https://fastmash.io/">Fastmash</a> · <a href="https://ripscope.com/">Ripscope</a> · <a href="https://esdieff.com/">Esdieff</a></p>
 </footer>
 <p class="sr-only" id="copy-status" role="status" aria-live="polite"></p>
 <button type="button" class="motion-toggle" id="motion-toggle" hidden>Pause motion</button>

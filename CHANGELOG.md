@@ -2,6 +2,13 @@
 
 User-facing changes in udpstp, including capabilities, installation and compatibility.
 
+## [0.1.2] - 2026-11-06
+
+### Fixed
+
+- Align the crates.io overview with the project README and update the documentation for published releases.
+- Refresh the website's product overview and link Fastmash, Ripscope and Esdieff from About and the footer.
+
 ## [0.1.1] - 2026-11-05
 
 ### Added

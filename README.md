@@ -8,11 +8,11 @@ udpstp is a Rust implementation of the UDP Speed Test Protocol in [RFC 9946](htt
 
 Use it to check access lines and circuits, compare network paths, or collect measurements for your own tools.
 
-- Authenticated Tests by default, with Upstream and Downstream measurement.
-- Multi-Connection Tests and Operator-only Fixed-Rate Tests.
-- Capacity, loss, delay variation and RTT in readable text or JSON.
-- Requirements traced to tests and [recorded protocol decisions](docs/conformance/README.md).
-- Interoperability with OB-UDPST within the [documented test scope](docs/testing.md#ob-udpst-interop-s2c).
+- **Measure in both directions.** Run authenticated Upstream and Downstream Tests.
+- **See how the path behaves.** Inspect capacity, loss, delay variation and RTT in your terminal or collect JSON for your own tools.
+- **Choose the load.** Combine Test Connections or use an Operator Key for Fixed-Rate Tests.
+- **Use your existing setup.** Read OB-UDPST key files and export compatible JSON.
+- **Build on the libraries.** Use the [wire codecs](https://docs.rs/udpstp-wire), [protocol core](https://docs.rs/udpstp-core) and [network runtime](https://docs.rs/udpstp-runtime) in Rust applications.
 
 ## Install
 

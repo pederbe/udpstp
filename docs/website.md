@@ -104,7 +104,7 @@ Options:
 - **`--dev`** builds a local preview (it sets `UDPSTP_SITE_DEV=1`): from a tree with uncommitted changes, or without the release tag, with links to repository files pinned to the current commit, and links to untracked files dropped with a warning, keeping their text.
 - **`--audit`** also runs `npm audit` on the build tools. It asks the npm registry, so the default build leaves it out.
 
-Without `--dev`, the build is a release build: it fails unless the tag `v<version>` is the checked-out commit, or `UDPSTP_SITE_REF` names the ref that links pin, and unless the tree has no uncommitted changes; and it fails on a link to a file Git doesn't track. The badge always shows the version; install notes, fine print and llms.txt keep their pre-release wording until the tag `v<version>` exists. Repository links pin to a release tag or to the exact revision supplied through `UDPSTP_SITE_REF`.
+Without `--dev`, the build requires a clean tree and either the tag `v<version>` on the checked-out commit or `UDPSTP_SITE_REF` naming the revision used for repository links. It also checks that linked files are tracked. The badge shows the version. For an untagged source revision, llms.txt links to the latest published release and the source build instructions. Repository links pin to the release tag or the exact revision supplied through `UDPSTP_SITE_REF`.
 
 **Supply chain.** The npm packages are pinned by the lock file, which records their hashes, and installed without running their install scripts. Puppeteer's Chrome is pinned by version, through the lock file's Puppeteer, but its download is not checked against a hash. Everything runs at build time only; none of it is served.
 
