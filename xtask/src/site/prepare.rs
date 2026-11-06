@@ -871,7 +871,8 @@ fn llms_txt(pages: &[Page], version: &str, released: bool, facts: &Facts) -> Str
         )
     } else {
         format!(
-            "Version {version}, pre-release: there has been no release yet, so build it from \
+            "Source revision for version {version}. Install the latest published release \
+             from https://udpstp.com/getting-started.html or build this revision from \
              source (https://github.com/pederbe/udpstp)."
         )
     };
@@ -1116,7 +1117,8 @@ mod tests {
         ];
         let text = llms_txt(&pages, "0.1.0", false, &facts());
         assert!(text.starts_with("# udpstp\n\n> "));
-        assert!(text.contains("Version 0.1.0, pre-release"));
+        assert!(text.contains("Source revision for version 0.1.0."));
+        assert!(!text.contains("pre-release"));
         assert!(text.contains("9 of its 10 RFC Requirements"));
         assert!(text.contains(
             "## Docs\n\n- [Getting started](https://udpstp.com/getting-started.md): About Getting started."

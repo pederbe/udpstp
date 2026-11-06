@@ -2,6 +2,12 @@
 
 User-facing changes in udpstp, including capabilities, installation and compatibility.
 
+## Unreleased
+
+### Fixed
+
+- Align the crates.io overview with the project README and update the documentation for published releases.
+
 ## [0.1.1] - 2026-11-05
 
 ### Added
