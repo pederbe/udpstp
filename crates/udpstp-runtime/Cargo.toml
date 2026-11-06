@@ -1,6 +1,6 @@
 [package]
 name = "udpstp-runtime"
-version = "0.1.0"
+version = "0.1.1"
 description = "I/O for udpstp's protocol core: sockets, clocks and the Tokio Control Phase"
 edition.workspace = true
 authors.workspace = true

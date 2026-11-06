@@ -1,6 +1,6 @@
 [package]
 name = "udpstp-core"
-version = "0.1.0"
+version = "0.1.1"
 description = "Sans-IO UDPSTP (RFC 9946) protocol core"
 edition.workspace = true
 authors.workspace = true

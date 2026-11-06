@@ -8,7 +8,7 @@ It implements the UDP Speed Test Protocol in [RFC 9946](https://www.rfc-editor.o
 
 udpstp is created by [Peder Bergan](https://pederbe.dev). You can also find him on [GitHub](https://github.com/pederbe), [LinkedIn](https://www.linkedin.com/in/pederbergan/) and [Bluesky](https://bsky.app/profile/pederbe.dev).
 
-Also by Peder: [fastmash](https://fastmash.io/), a faster GNU datamash.
+Also by Peder are [Fastmash](https://fastmash.io/), [Ripscope](https://ripscope.com/) and [Esdieff](https://esdieff.com/).
 
 ## Licence
 

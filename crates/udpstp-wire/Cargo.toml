@@ -1,6 +1,6 @@
 [package]
 name = "udpstp-wire"
-version = "0.1.0"
+version = "0.1.1"
 description = "UDPSTP (RFC 9946) PDU layouts and codecs"
 edition.workspace = true
 authors.workspace = true

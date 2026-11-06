@@ -6,7 +6,7 @@ udpstp: the Test was interrupted
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.1",
+		"SoftwareVersion":	"udpstp 0.1.2",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},

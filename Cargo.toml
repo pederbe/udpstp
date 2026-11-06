@@ -29,11 +29,11 @@ unsafe_code = "forbid"
 all = { level = "warn", priority = -1 }
 
 [workspace.dependencies]
-udpstp-wire = { path = "crates/udpstp-wire", version = "0.1.0" }
-udpstp-core = { path = "crates/udpstp-core", version = "0.1.0" }
+udpstp-wire = { path = "crates/udpstp-wire", version = "0.1.1" }
+udpstp-core = { path = "crates/udpstp-core", version = "0.1.1" }
 # Tests only: never published, so cargo drops it from the packages.
 udpstp-req = { path = "crates/udpstp-req" }
-udpstp-runtime = { path = "crates/udpstp-runtime", version = "0.1.0" }
+udpstp-runtime = { path = "crates/udpstp-runtime", version = "0.1.1" }
 udpstp-key-permissions = { path = "crates/udpstp-key-permissions", version = "0.1.0" }
 # The bench tooling's general machinery: never published, and only
 # udpstp-bench uses it.
