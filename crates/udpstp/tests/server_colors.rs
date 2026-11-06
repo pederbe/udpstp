@@ -8,10 +8,14 @@ use std::net::UdpSocket;
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Output, Stdio};
 use std::sync::atomic::{AtomicUsize, Ordering};
-use std::sync::mpsc;
+use std::sync::{Mutex, MutexGuard, mpsc};
 use std::time::{Duration, Instant};
 
 const LIMIT: Duration = Duration::from_secs(10);
+
+// The CLI requires a nonzero port. Keep these fixtures serial so a parallel
+// probe cannot reuse the released port before its Server binds it.
+static SERVER_FIXTURE: Mutex<()> = Mutex::new(());
 
 fn command() -> Command {
     let mut command = Command::new(env!("CARGO_BIN_EXE_udpstp"));
@@ -64,10 +68,14 @@ struct RunningServer {
     stdout: Option<std::thread::JoinHandle<Vec<u8>>>,
     stderr: Option<std::thread::JoinHandle<Vec<u8>>>,
     lines: mpsc::Receiver<String>,
+    _fixture: MutexGuard<'static, ()>,
 }
 
 impl RunningServer {
     fn start(mode: &str, format: &str, file: Option<&Path>) -> Self {
+        let fixture = SERVER_FIXTURE
+            .lock()
+            .unwrap_or_else(|error| error.into_inner());
         let socket = UdpSocket::bind("127.0.0.1:0").expect("free loopback port");
         let port = socket.local_addr().expect("bound address").port();
         drop(socket);
@@ -108,6 +116,7 @@ impl RunningServer {
             stdout: Some(stdout),
             stderr: None,
             lines,
+            _fixture: fixture,
         }
     }
 
@@ -231,6 +240,10 @@ fn redirected_human_console_logs_honor_each_color_mode() {
 fn server_with_terminal(terminal_stdout: bool) -> Output {
     use nix::pty::{Winsize, openpty};
 
+    let fixture = SERVER_FIXTURE
+        .lock()
+        .unwrap_or_else(|error| error.into_inner());
+
     let pty = openpty(
         Some(&Winsize {
             ws_row: 40,
@@ -299,6 +312,7 @@ fn server_with_terminal(terminal_stdout: bool) -> Output {
         stdout: Some(stdout),
         stderr: Some(stderr),
         lines,
+        _fixture: fixture,
     };
     server.wait_until_listening(None);
     server.stop()
