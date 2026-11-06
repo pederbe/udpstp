@@ -333,7 +333,11 @@ jobs:
 
   deploy-website:
     needs: [ci, select, website]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.select.outputs.website == 'true' && vars.WEBSITE_ENABLED == 'true' && !github.event.repository.private
+    if: >-
+      !cancelled() && needs.ci.result == 'success' && needs.select.result == 'success' &&
+      needs.website.result == 'success' && github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' && needs.select.outputs.website == 'true' &&
+      vars.WEBSITE_ENABLED == 'true' && !github.event.repository.private
     uses: ./.github/workflows/website.yml
     with:
       source: ${{ github.sha }}
