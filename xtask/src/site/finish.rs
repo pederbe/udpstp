@@ -231,7 +231,9 @@ const ACCESSIBILITY_FIXES: &[(&str, &str, Expect)] = &[
          <a href=\"https://github.com/pederbe\" rel=\"me\">GitHub</a> · \
          <a href=\"https://www.linkedin.com/in/pederbergan/\" rel=\"me\">LinkedIn</a> · \
          <a href=\"https://bsky.app/profile/pederbe.dev\" rel=\"me\">Bluesky</a></span></p>\
-         <p>Also by Peder: <a href=\"https://fastmash.io/\">fastmash</a>, a faster GNU datamash</p></footer>",
+         <p>Also by Peder: <a href=\"https://fastmash.io/\">Fastmash</a> · \
+         <a href=\"https://ripscope.com/\">Ripscope</a> · \
+         <a href=\"https://esdieff.com/\">Esdieff</a></p></footer>",
         Expect::EveryPage,
     ),
     // Code blocks and wide tables scroll, so they take keyboard focus.
