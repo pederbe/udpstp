@@ -3,7 +3,7 @@
 
 mod common;
 
-use std::io::{BufRead as _, BufReader};
+use std::io::{BufRead as _, BufReader, Read as _};
 use std::net::UdpSocket;
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Output, Stdio};
@@ -62,6 +62,7 @@ impl Drop for LogDirectory {
 struct RunningServer {
     child: Option<Child>,
     stdout: Option<std::thread::JoinHandle<Vec<u8>>>,
+    stderr: Option<std::thread::JoinHandle<Vec<u8>>>,
     lines: mpsc::Receiver<String>,
 }
 
@@ -105,6 +106,7 @@ impl RunningServer {
         Self {
             child: Some(child),
             stdout: Some(stdout),
+            stderr: None,
             lines,
         }
     }
@@ -123,10 +125,21 @@ impl RunningServer {
                     }
                 }
             }
-            assert!(
-                self.child.as_mut().unwrap().try_wait().unwrap().is_none(),
-                "Server exited before listening"
-            );
+            if let Some(status) = self.child.as_mut().unwrap().try_wait().unwrap() {
+                let stderr = if let Some(reader) = self.stderr.take() {
+                    reader.join().expect("stderr reader ends")
+                } else {
+                    let mut bytes = Vec::new();
+                    if let Some(mut pipe) = self.child.as_mut().unwrap().stderr.take() {
+                        pipe.read_to_end(&mut bytes).expect("Server stderr");
+                    }
+                    bytes
+                };
+                panic!(
+                    "Server exited before listening ({status})\nstderr: {}",
+                    String::from_utf8_lossy(&stderr)
+                );
+            }
             assert!(
                 Instant::now() < until,
                 "Server didn't listen within {LIMIT:?}"
@@ -145,6 +158,9 @@ impl RunningServer {
             .unwrap()
             .join()
             .expect("stdout reader ends");
+        if let Some(stderr) = self.stderr.take() {
+            output.stderr = stderr.join().expect("stderr reader ends");
+        }
         output
     }
 }
@@ -157,6 +173,9 @@ impl Drop for RunningServer {
         }
         if let Some(stdout) = self.stdout.take() {
             let _ = stdout.join();
+        }
+        if let Some(stderr) = self.stderr.take() {
+            let _ = stderr.join();
         }
     }
 }
@@ -211,7 +230,6 @@ fn redirected_human_console_logs_honor_each_color_mode() {
 #[cfg(unix)]
 fn server_with_terminal(terminal_stdout: bool) -> Output {
     use nix::pty::{Winsize, openpty};
-    use std::io::Read as _;
 
     let pty = openpty(
         Some(&Winsize {
@@ -279,12 +297,11 @@ fn server_with_terminal(terminal_stdout: bool) -> Output {
     let mut server = RunningServer {
         child: Some(child),
         stdout: Some(stdout),
+        stderr: Some(stderr),
         lines,
     };
     server.wait_until_listening(None);
-    let mut output = server.stop();
-    output.stderr = stderr.join().expect("stderr terminal reader ends");
-    output
+    server.stop()
 }
 
 // ADR 0013: each destination resolves auto color independently from its

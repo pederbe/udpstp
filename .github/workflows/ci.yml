@@ -114,6 +114,19 @@ jobs:
           $PSVersionTable.PSVersion
           Get-Command Get-Acl | Select-Object Name, Source
           [Security.AccessControl.FileSecurity]::new() | Out-Null
+      - name: Diagnose Intel terminal startup
+        if: matrix.os == 'macos-15-intel'
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in {1..1000}; do
+            if ! cargo test --locked -p udpstp --test server_colors > "$RUNNER_TEMP/server-colors.log" 2>&1; then
+              echo "Server presentation failed on repetition $attempt"
+              cat "$RUNNER_TEMP/server-colors.log"
+              exit 1
+            fi
+          done
+          echo 'All 1000 Intel presentation repetitions passed'
       - run: cargo test --locked --workspace
       - name: Traceability check
         run: cargo run --locked --package xtask -- req
