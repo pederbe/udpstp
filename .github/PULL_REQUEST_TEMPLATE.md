@@ -8,8 +8,8 @@ Closes #
 
 <!-- Use a conventional, user-facing title, such as "fix: ..." or "feat: ...".
      Summarize compatibility consequences and required upgrade actions here.
-     Put essential upgrade instructions in the squash commit's BREAKING CHANGE:
-     paragraph too. Use ci:, chore:, test: or refactor: for internal changes.
+     Put essential upgrade instructions in a BREAKING CHANGE: paragraph.
+     Use ci:, chore:, test: or refactor: for internal changes.
      Release-plz generates CHANGELOG.md. See CONTRIBUTING.md. -->
 
 ## Checklist
