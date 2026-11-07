@@ -36,6 +36,8 @@ Open a pull request with a focused change. Fill in the template, describe the be
 
 Write a conventional pull request title describing the change for users, such as `fix: Read key files with Windows line endings` or `feat: Add JSON results for Tests`. Squash merges turn these titles into the [changelog](CHANGELOG.md). Use `fix(deps):` for dependency fixes and `ci:`, `build:`, `chore:`, `test:` or `refactor:` for internal work. Mark breaking changes with `!`, such as `feat!: Rename a command-line option`, and explain required upgrade actions in the description. Follow the [interface policy](docs/interfaces.md).
 
+For interface deprecations, use `feat(deprecate):`. For removals, use `feat(remove)!:`. These produce the Deprecated and Removed sections required by the interface policy. Other breaking changes appear under Changed and carry a bold Breaking label.
+
 Describe capabilities, fixes, installation and compatibility consequences in the pull request's Changelog section. Include essential upgrade instructions in the title or a `BREAKING CHANGE:` paragraph in the description. The repository preserves the pull request title and description in the squash commit, so release-plz can include those instructions in the generated notes. Do not add hand-written Unreleased entries. The weekly release pull request commits dated notes before publication. See [Releasing](docs/releasing.md#release-process).
 
 ## Licence and conduct

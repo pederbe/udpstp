@@ -62,7 +62,7 @@ body = """
 {% for group, commits in commits | group_by(attribute="group") %}
 ### {{ group | striptags | trim }}
 {% for commit in commits | unique(attribute="message") %}
-- {{ commit.message | split(pat="\n") | first | trim | upper_first }}\
+- {% if commit.breaking %}**Breaking:** {% endif %}{{ commit.message | split(pat="\n") | first | trim | upper_first }}\
 {% if commit.breaking and commit.breaking_description and commit.breaking_description != commit.message %}
 
 {{ commit.breaking_description | trim }}
@@ -78,8 +78,10 @@ commit_preprocessors = [
   { pattern = '\(#(\d+)\)', replace = "([#${1}](https://github.com/pederbe/udpstp/pull/${1}))" },
 ]
 commit_parsers = [
-  { message = "^[a-z]+(\\([^)]*\\))?!:", group = "<!-- 0 -->Breaking changes" },
-  { footer = "^BREAKING[ -]CHANGE:", group = "<!-- 0 -->Breaking changes" },
+  { message = "^feat\\(remove\\)!?:", group = "<!-- 0 -->Removed" },
+  { message = "^feat\\(deprecate\\)!?:", group = "<!-- 1 -->Deprecated" },
+  { message = "^[a-z]+(\\([^)]*\\))?!:", group = "<!-- 0 -->Changed" },
+  { footer = "^BREAKING[ -]CHANGE:", group = "<!-- 0 -->Changed" },
   { message = "^feat(\\([^)]*\\))?:", group = "<!-- 1 -->Added" },
   { message = "^fix\\(deps\\):", group = "<!-- 4 -->Dependencies" },
   { message = "^fix(\\([^)]*\\))?:", group = "<!-- 2 -->Fixed" },
