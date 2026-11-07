@@ -1,24 +1,8 @@
 name: Website
 
 on:
-  workflow_call:
-    inputs:
-      source:
-        description: Exact checked source commit
-        type: string
-        required: true
-      artifact:
-        description: Checked website artifact from the calling run
-        type: string
-        required: true
-      deploy:
-        type: boolean
-        default: false
-    secrets:
-      CLOUDFLARE_API_TOKEN:
-        required: false
-      CLOUDFLARE_ACCOUNT_ID:
-        required: false
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       deploy:
@@ -36,7 +20,7 @@ concurrency:
 
 jobs:
   build:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' || !github.event.repository.private
     runs-on: ubuntu-26.04
     timeout-minutes: 25
     steps:
@@ -68,21 +52,20 @@ jobs:
   deploy:
     needs: build
     if: >-
-      !cancelled() && inputs.deploy && vars.WEBSITE_ENABLED == 'true' &&
+      !cancelled() && (github.event_name == 'push' || inputs.deploy) &&
+      vars.WEBSITE_ENABLED == 'true' &&
       !github.event.repository.private && github.ref == 'refs/heads/main' &&
-      (needs.build.result == 'success' ||
-       (needs.build.result == 'skipped' && inputs.artifact != ''))
+      needs.build.result == 'success'
     runs-on: ubuntu-26.04
     timeout-minutes: 15
     environment: website
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.source || github.sha }}
           persist-credentials: false
       - uses: actions/download-artifact@v8.0.2
         with:
-          name: ${{ inputs.artifact || format('website-{0}', github.sha) }}
+          name: website-${{ github.sha }}
           path: target/site/public
       - uses: actions/setup-node@v7
         with:
@@ -90,7 +73,7 @@ jobs:
       - name: Require the checked main revision and deploy its retained files
         env:
           GH_TOKEN: ${{ github.token }}
-          SOURCE: ${{ inputs.source || github.sha }}
+          SOURCE: ${{ github.sha }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |

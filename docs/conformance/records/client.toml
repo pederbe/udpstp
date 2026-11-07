@@ -315,7 +315,7 @@ rfc = "RFC 9097 §6.3"
 requirements = ["RFC9097-6.3-L1"]
 obudpst = "OB-UDPST's `AtMax` is the Highest IP-Layer Capacity: the Sub-Interval with the greatest rate, whatever its loss."
 reference = []
-tests = ["crates/udpstp/src/json.rs::without_a_maximum_at_max_is_left_out"]
+tests = ["crates/udpstp/src/json.rs::without_a_maximum_at_max_is_left_out", "crates/udpstp/tests/interop.rs::four_connection_tests_work_in_both_pairings"]
 
 [[record]]
 id = "json-summary-delays-from-samples"

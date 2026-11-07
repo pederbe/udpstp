@@ -99,7 +99,11 @@ impl ObServer {
                 Err(_) => panic!("the OB-UDPST Server didn't start"),
             }
         }
-        std::thread::spawn(move || while received.recv().is_ok() {});
+        std::thread::spawn(move || {
+            while let Ok(line) = received.recv() {
+                eprintln!("OB-UDPST Server: {line}");
+            }
+        });
         Self(child)
     }
 }
@@ -537,7 +541,11 @@ impl OurServer {
                 Err(_) => panic!("our Server didn't start listening"),
             }
         }
-        std::thread::spawn(move || while received.recv().is_ok() {});
+        std::thread::spawn(move || {
+            while let Ok(line) = received.recv() {
+                eprintln!("udpstp Server: {line}");
+            }
+        });
         Self(child)
     }
 }
@@ -680,9 +688,73 @@ fn at_max(what: &str, output: &Output) -> f64 {
         .unwrap_or_else(|| panic!("{what}: a Maximum IP-Layer Capacity: {results:#}"))
 }
 
+/// Keep the full results in the test's captured output, including successful
+/// runs selected with `--show-output`, so a capacity failure retains its
+/// Sub-Intervals, connection counts, warnings and runtime diagnostics.
+fn four_connection_results(what: &str, output: &Output, rate: f64) -> serde_json::Value {
+    eprintln!(
+        "{what}: stdout: {}\nstderr: {}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    succeeded(what, output);
+    let results: serde_json::Value =
+        serde_json::from_slice(&output.stdout).expect("the Client's JSON results");
+    let intervals = results["Output"]["IncrementalResult"]
+        .as_array()
+        .expect("Sub-Interval results");
+    assert_eq!(results["Input"]["NumberOfConnections"], 4, "{what}");
+    assert!(
+        intervals
+            .last()
+            .is_some_and(|i| i["ActiveConnections"] == 4),
+        "{what}: four active Test Connections through the final Sub-Interval"
+    );
+    // Both Clients report the observed rate here. Their AtMax fields differ:
+    // ours applies the loss criterion, while OB-UDPST's ignores it.
+    // (conformance: json-at-max-is-the-maximum)
+    let highest = intervals
+        .iter()
+        .map(|i| i["IPLayerCapacity"].as_f64().expect("IP-Layer Capacity"))
+        .fold(0.0, f64::max);
+    check_rate(what, highest, rate, 0.10);
+    results
+}
+
+/// Independently apply the fixture's default 1% loss criterion to the
+/// reported Sub-Intervals, with one lost Load PDU allowed per active Test
+/// Connection. A Sub-Interval with no received traffic cannot qualify.
+fn check_qualified_maximum(results: &serde_json::Value) {
+    let expected = results["Output"]["IncrementalResult"]
+        .as_array()
+        .expect("Sub-Interval results")
+        .iter()
+        .filter(|i| {
+            i["LossRatio"].as_f64().is_some_and(|loss| loss <= 0.01)
+                || i["LossCount"].as_u64().expect("lost Load PDUs")
+                    <= i["ActiveConnections"]
+                        .as_u64()
+                        .expect("active Test Connections")
+        })
+        .map(|i| i["IPLayerCapacity"].as_f64().expect("IP-Layer Capacity"))
+        .filter(|capacity| *capacity > 0.0)
+        .reduce(f64::max)
+        .expect("a Sub-Interval meeting the Performance Criterion");
+    assert_eq!(
+        results["Output"]["AtMax"]["MaxIPLayerCapacity"]
+            .as_f64()
+            .expect("Maximum IP-Layer Capacity"),
+        expected,
+        "our Maximum IP-Layer Capacity is the highest qualifying Sub-Interval"
+    );
+}
+
 // docs/spec.md Seam 2(c) (4-connection Tests in both pairings, their
 // aggregate against the bottleneck); Multi-Connection Tests, RFC 9946 §4;
-//
+// RFC 9097 §6.3: our Maximum uses only qualifying Sub-Intervals, which
+// can be below the bottleneck after a lossy search overshoot.
+// (conformance: json-at-max-is-the-maximum)
+#[udpstp_req::req("RFC9097-6.3-L1")]
 #[test]
 fn four_connection_tests_work_in_both_pairings() {
     const TEST: &str = "four_connection_tests_work_in_both_pairings";
@@ -706,13 +778,15 @@ fn four_connection_tests_work_in_both_pairings() {
             .args(["--test-connections", "4", "--test-interval", "10"])
             .args(["--format", "json", addr::SERVER_V4_SECOND]);
         let output = run_bounded(ours, Duration::from_secs(40));
-        succeeded(&format!("{direction}: our Client, 4 connections"), &output);
-        check_rate(
-            &format!("{direction}: our Client"),
-            at_max("ours", &output),
-            rate,
-            0.10,
+        let results = four_connection_results(&format!("{direction}: our Client"), &output, rate);
+        let connections = results["udpstp"]["TestConnections"]
+            .as_array()
+            .expect("individual Test Connection results");
+        assert!(
+            connections.len() == 4 && connections.iter().all(|c| c["EndReason"] == "Completed"),
+            "{direction}: our Client: all four Test Connections completed"
         );
+        check_qualified_maximum(&results);
 
         let flag = if direction == "downstream" {
             "-d"
@@ -726,16 +800,7 @@ fn four_connection_tests_work_in_both_pairings() {
             ])
             .arg(addr::SERVER_V4);
         let output = run_bounded(theirs, Duration::from_secs(40));
-        succeeded(
-            &format!("{direction}: OB-UDPST's Client, 4 connections"),
-            &output,
-        );
-        check_rate(
-            &format!("{direction}: OB-UDPST's Client"),
-            at_max("theirs", &output),
-            rate,
-            0.10,
-        );
+        four_connection_results(&format!("{direction}: OB-UDPST's Client"), &output, rate);
     }
 }
 
