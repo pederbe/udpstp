@@ -72,18 +72,6 @@ jobs:
       - run: cargo run --locked --package xtask -- links
       - run: cargo run --locked --package xtask -- glossary
 
-  release-changelog:
-    name: Release changelog tooling
-    if: github.event_name == 'workflow_dispatch' || !github.event.repository.private
-    runs-on: ubuntu-26.04
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - run: rustup toolchain install
-      - run: bash scripts/check-release-changelog.sh
-
   check:
     name: ${{ matrix.os }}
     needs: select
@@ -311,7 +299,7 @@ jobs:
   ci:
     name: CI
     if: always() && (github.event_name == 'workflow_dispatch' || !github.event.repository.private)
-    needs: [select, docs, release-changelog, check, install, audit, msrv, obudpst, website]
+    needs: [select, docs, check, install, audit, msrv, obudpst, website]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -321,7 +309,7 @@ jobs:
         run: |
           printf '%s\n' "$RESULTS" | jq -e '
             all(.[]; .result == "success" or .result == "skipped") and
-            .select.result == "success" and .["release-changelog"].result == "success" and
+            .select.result == "success" and
             (if .select.outputs.full == "true" then
               [.check, .install, .audit, .msrv, .obudpst] | all(.[]; .result == "success")
             else .docs.result == "success" end) and

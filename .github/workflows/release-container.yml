@@ -1,6 +1,6 @@
 name: Release container
 
-# Publication is the maintainer's decision after downloaded-asset qualification.
+# Starts after the binary release assets have been built and published.
 on:
   release:
     types: [published]

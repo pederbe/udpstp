@@ -34,7 +34,9 @@ When work completes a feature, update the README Status table and any documentat
 
 Open a pull request with a focused change. Fill in the template, describe the behavior and validation, and link the relevant public issue when one exists.
 
-Include a concise Unreleased entry in [CHANGELOG.md](CHANGELOG.md) for user-visible work. Cover capabilities, fixes, installation, compatibility consequences and required upgrade actions. If none is needed, explain why in the pull request's Changelog section. Follow the [interface policy](docs/interfaces.md).
+Write a conventional pull request title describing the change for users, such as `fix: Read key files with Windows line endings` or `feat: Add JSON results for Tests`. Squash merges turn these titles into the [changelog](CHANGELOG.md). Use `fix(deps):` for dependency fixes and `ci:`, `build:`, `chore:`, `test:` or `refactor:` for internal work. Mark breaking changes with `!`, such as `feat!: Rename a command-line option`, and explain required upgrade actions in the description. Follow the [interface policy](docs/interfaces.md).
+
+Describe capabilities, fixes, installation and compatibility consequences in the pull request's Changelog section. Include essential upgrade instructions in the title or a `BREAKING CHANGE:` paragraph in the squash commit message, which release-plz can include in the generated notes. Do not add hand-written Unreleased entries. The weekly release pull request commits dated notes before publication. See [Releasing](docs/releasing.md#release-process).
 
 ## Licence and conduct
 

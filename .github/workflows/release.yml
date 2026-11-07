@@ -1,18 +1,7 @@
 name: Release
 
-# The protected approval job runs before any source build, uploaded artifact
-# or attestation. Publishing the completed draft starts release-container.yml.
 on:
   workflow_dispatch:
-    inputs:
-      approved_commit:
-        description: Full commit SHA approved for this tagged release
-        type: string
-        required: true
-      prerelease:
-        description: Mark the draft as a pre-release
-        type: boolean
-        default: false
 
 concurrency:
   group: release-${{ github.ref }}
@@ -25,58 +14,12 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  approve:
-    if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
-    name: Approve the tagged release
-    runs-on: ubuntu-26.04
-    timeout-minutes: 5
-    environment: release
-    permissions:
-      contents: read
-      actions: read
-    steps:
-      # A missing environment is created without protection by GitHub.
-      # Reject that case before checking out source or producing artifacts.
-      - name: Check the approval boundary
-        env:
-          GH_TOKEN: ${{ github.token }}
-          APPROVED_COMMIT: ${{ inputs.approved_commit }}
-        run: |
-          [[ "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]
-          [[ "$APPROVED_COMMIT" =~ ^[0-9a-f]{40}$ ]]
-          test "$GITHUB_SHA" = "$APPROVED_COMMIT"
-          gh api "repos/$GITHUB_REPOSITORY" | jq -e '.private == false' > /dev/null
-          gh api "repos/$GITHUB_REPOSITORY/environments/release" | jq -e '
-            .deployment_branch_policy.custom_branch_policies == true and
-            ([.protection_rules[] | select(.type == "required_reviewers") |
-              .reviewers[] | {type, login: .reviewer.login}] ==
-              [{type: "User", login: "pederbe"}])' > /dev/null
-          gh api "repos/$GITHUB_REPOSITORY/environments/release/deployment-branch-policies" |
-            jq -e '.total_count == 1 and .branch_policies[0].type == "tag" and
-              .branch_policies[0].name == "v*"' > /dev/null
-          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/approvals" |
-            jq -e 'any(.[]; .state == "approved" and .user.login == "pederbe" and
-              any(.environments[]; .name == "release"))' > /dev/null
-
-  changelog:
-    needs: approve
-    name: Check the finalized changelog
-    runs-on: ubuntu-26.04
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - run: rustup toolchain install
-      - name: Validate the frozen release section
-        run: cargo run --locked --manifest-path tools/release-changelog/Cargo.toml -- check "$GITHUB_REF_NAME"
-
   # One archive per target. Linux builds link against glibc 2.28 (RHEL 8,
   # Debian 10, Ubuntu 20.04 and later) through cargo-zigbuild, so one
   # binary runs on every current distribution. The musl builds are static,
   # for Alpine, routers and other embedded Linux without glibc.
   build:
-    needs: changelog
+    if: github.repository == 'pederbe/udpstp' && github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
     name: ${{ matrix.target }}
     strategy:
       fail-fast: true
@@ -186,11 +129,10 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-  # The archives, their checksums and the SBOM, attested, as a draft
-  # release: publishing it is the maintainer's step (docs/releasing.md).
+  # Attach verified assets to the release-plz draft, then publish it.
   release:
     if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
-    name: Draft release
+    name: Publish release
     needs: build
     runs-on: ubuntu-26.04
     timeout-minutes: 15
@@ -203,8 +145,13 @@ jobs:
         with:
           persist-credentials: false
       - run: rustup toolchain install
-      - name: Read the finalized release notes
-        run: cargo run --locked --manifest-path tools/release-changelog/Cargo.toml -- notes "$GITHUB_REF_NAME" "$RUNNER_TEMP/RELEASE-NOTES.md"
+      - name: Require the release-plz draft
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_PLZ_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh release view "$GITHUB_REF_NAME" --json isDraft,body |
+            jq -e ' .isDraft == true and (.body | length > 0)' > /dev/null
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           path: dist
@@ -244,12 +191,11 @@ jobs:
           mkdir "$RUNNER_TEMP/gh"
           tar xzf "$RUNNER_TEMP/gh.tar.gz" --strip-components=1 -C "$RUNNER_TEMP/gh"
           echo "$RUNNER_TEMP/gh/bin" >> "$GITHUB_PATH"
-      - name: Draft the release
+      - name: Publish the completed release
         env:
-          GH_TOKEN: ${{ github.token }}
-          PRERELEASE: ${{ inputs.prerelease }}
+          # A personal token lets publication start container and package delivery.
+          GH_TOKEN: ${{ secrets.RELEASE_PLZ_TOKEN }}
         run: |
-          flags=()
-          if [ "$PRERELEASE" = true ]; then flags+=(--prerelease); fi
-          gh release create "$GITHUB_REF_NAME" --draft --verify-tag \
-            --title "udpstp $GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/RELEASE-NOTES.md" "${flags[@]}" dist/*
+          set -euo pipefail
+          gh release upload "$GITHUB_REF_NAME" --clobber dist/*
+          gh release edit "$GITHUB_REF_NAME" --draft=false
