@@ -18,7 +18,13 @@ Configure crates.io trusted publishing for `udpstp`, `udpstp-wire`, `udpstp-core
 
 ### Recovery
 
-If preparation or Cargo publication fails, fix the reported cause and rerun the failed Release-plz job. It skips crate versions already published. If dispatching the binary build fails after tagging, dispatch Release on the existing `vVERSION` tag. Rerunning Release-plz alone will not repeat the dispatch for an already released version. If packaging or qualification fails, the GitHub release remains a draft. Rerun the failed Release jobs. Asset uploads replace only files in the unpublished draft. Published releases are immutable.
+If preparation or a Cargo upload fails, fix the reported cause and rerun the original failed Release-plz job to finish still-unpublished packages. Check which versions were accepted before retrying.
+
+Cargo publication, tag creation and GitHub draft creation are separate operations. If Cargo accepts a version but creating its tag or draft fails, rerunning release-plz does not restore the missing GitHub state. A green retry alone does not establish that the release finished. Recover using the exact source commit from the failed run, cross-checking each version uploaded by that run against its published crate's `.cargo_vcs_info.json`. For versions already accepted by Cargo, restore only missing version tags at that commit with `git tag` and `git push`. For an already-uploaded binary version, restore its missing draft with `gh release create --draft --verify-tag --notes-file`, using the dated changelog section from that same commit. Leave still-unpublished packages to the original job retry. Precreating their tags would cause release-plz to skip their Cargo uploads. Existing tags and drafts must match the intended release. Do not move tags or overwrite published releases.
+
+After restoring missing items for accepted versions, rerun the original Release-plz job for any remaining unpublished packages. If the binary had already been uploaded before that retry, explicitly dispatch Release on its `vVERSION` tag. Otherwise the retry dispatches Release when it newly publishes the binary. Explicit dispatch is also the recovery if dispatching the binary build failed after successful tagging. Rerunning Release-plz alone will not repeat that dispatch for an already-published binary.
+
+If packaging or qualification fails, the GitHub release remains a draft. Rerun the failed Release jobs. Asset uploads replace only files in the unpublished draft. Published releases are immutable.
 
 The Release-plz workflow can also be dispatched on `main` to prepare a release before the next weekly run. A failure stops the affected delivery stage and is visible in GitHub Actions.
 
