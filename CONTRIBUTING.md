@@ -38,7 +38,7 @@ Write a conventional pull request title describing the change for users, such as
 
 For interface deprecations, use `feat(deprecate):`. For removals, use `feat(remove)!:`. These produce the Deprecated and Removed sections required by the interface policy. Other breaking changes appear under Changed and carry a bold Breaking label.
 
-Describe capabilities, fixes, installation and compatibility consequences in the pull request's Changelog section. Include essential upgrade instructions in the title or a `BREAKING CHANGE:` paragraph in the description. The repository preserves the pull request title and description in the squash commit, so release-plz can include those instructions in the generated notes. Do not add hand-written Unreleased entries. The weekly release pull request commits dated notes before publication. See [Releasing](docs/releasing.md#release-process).
+Describe capabilities, fixes, installation and compatibility consequences in the pull request's Changelog section. Include essential upgrade instructions in the title or a `BREAKING CHANGE:` paragraph at the end of the description, after any checklists. The repository preserves the pull request title and description in the squash commit, so release-plz can include those instructions in the generated notes. Do not add hand-written Unreleased entries. The weekly release pull request commits dated notes before publication. See [Releasing](docs/releasing.md#release-process).
 
 ## Licence and conduct
 
