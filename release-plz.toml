@@ -79,7 +79,7 @@ commit_preprocessors = [
 ]
 commit_parsers = [
   { message = "^[a-z]+(\\([^)]*\\))?!:", group = "<!-- 0 -->Breaking changes" },
-  { body = "(?m)^BREAKING[ -]CHANGE:", group = "<!-- 0 -->Breaking changes" },
+  { footer = "^BREAKING[ -]CHANGE:", group = "<!-- 0 -->Breaking changes" },
   { message = "^feat(\\([^)]*\\))?:", group = "<!-- 1 -->Added" },
   { message = "^fix\\(deps\\):", group = "<!-- 4 -->Dependencies" },
   { message = "^fix(\\([^)]*\\))?:", group = "<!-- 2 -->Fixed" },
