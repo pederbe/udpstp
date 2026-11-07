@@ -1540,14 +1540,11 @@ operator = true
 fn a_multi_connection_test_runs_against_one_server_and_against_two() {
     let first = Server::start(&[]);
     let second = Server::start(&[]);
-    for used in [vec![&first], vec![&first, &second]] {
-        let servers: Vec<String> = used
-            .iter()
-            .map(|server| format!("127.0.0.1:{}", server.port))
-            .collect();
-        let mut args = vec!["--unauthenticated", "--test-connections", "2"];
-        args.extend(servers.iter().map(String::as_str));
-        let output = client(&args);
+    // One live text round. Exact multi-Server text layout and Upstream
+    // approximation wording are covered by test_results.rs transcripts.
+    {
+        let server = format!("127.0.0.1:{}", first.port);
+        let output = client(&["--unauthenticated", "--test-connections", "2", &server]);
         let printed = stdout(&output);
         let messages = prose(&printed);
         assert!(
@@ -1559,21 +1556,47 @@ fn a_multi_connection_test_runs_against_one_server_and_against_two() {
                 && messages.contains("All 2 Test Connections together:")
                 && printed.contains("Active")
                 && printed.lines().filter(|line| line.trim_start().starts_with("Maximum IP-Layer Capacity: ")).count() == 3,
-            "{servers:?}: status {:?}
+            "{server}: status {:?}
 stdout: {printed}
 stderr: {}",
             output.status,
             stderr(&output)
         );
-        let last = servers.last().unwrap();
         assert!(
-            printed.contains(&format!("Test Connection 1 to {last}")),
-            "the second Test Connection went to {last}: {printed}"
+            printed.contains(&format!("Test Connection 1 to {server}")),
+            "the second Test Connection went to {server}: {printed}"
         );
-        for server in used {
-            server.wait_for_the_test_summary();
-        }
+        first.wait_for_the_test_summary();
     }
+    let servers = [
+        format!("127.0.0.1:{}", first.port),
+        format!("127.0.0.1:{}", second.port),
+    ];
+    let assert_connections = |json: &serde_json::Value| {
+        let each = json["udpstp"]["TestConnections"]
+            .as_array()
+            .unwrap_or_else(|| panic!("missing Test Connections: {json:#}"));
+        assert_eq!(each.len(), 2, "{json:#}");
+        for (index, server) in servers.iter().enumerate() {
+            let connection = each
+                .iter()
+                .find(|c| c["McIndex"] == index)
+                .unwrap_or_else(|| panic!("missing Test Connection {index}: {json:#}"));
+            assert!(
+                connection["Server"] == *server
+                    && connection["EndReason"] == "Completed"
+                    && connection["CapacityModes"].is_array(),
+                "Test Connection {index} to {server}: {json:#}"
+            );
+        }
+        assert!(
+            json["Output"]["IncrementalResult"]
+                .as_array()
+                .is_some_and(|r| r.iter().any(|s| s["ActiveConnections"] == 2))
+                && json["udpstp"]["EndReason"] == "Completed",
+            "both Test Connections were active and completed: {json:#}"
+        );
+    };
     // docs/spec.md (: JSON of a Downstream Multi-Connection Test, with
     // OB-UDPST's connection counts)
     let output = client(&[
@@ -1582,44 +1605,22 @@ stderr: {}",
         "2",
         "--format",
         "json",
-        &format!("127.0.0.1:{}", first.port),
-        &format!("127.0.0.1:{}", second.port),
+        &servers[0],
+        &servers[1],
     ]);
     let json: serde_json::Value = serde_json::from_str(&stdout(&output))
         .unwrap_or_else(|e| panic!("{e}: {}", stdout(&output)));
-    let incremental = json["Output"]["IncrementalResult"].as_array();
     assert!(
         output.status.success()
             && json["Input"]["NumberOfConnections"] == 2
-            && json["Input"]["NumberOfHosts"] == 2
-            && incremental.is_some_and(|r| r.iter().any(|s| s["ActiveConnections"] == 2)),
+            && json["Input"]["NumberOfHosts"] == 2,
         "{json:#}"
     );
+    assert_connections(&json);
     first.wait_for_the_test_summary();
     second.wait_for_the_test_summary();
-    // docs/spec.md story 62 (: Upstream results summed, marked
-    // approximate with the largest offset shown)
-    let output = client(&[
-        "--unauthenticated",
-        "--test-connections",
-        "2",
-        "--direction",
-        "upstream",
-        &format!("127.0.0.1:{}", first.port),
-        &format!("127.0.0.1:{}", second.port),
-    ]);
-    let printed = stdout(&output);
-    assert!(
-        output.status.success()
-            && prose(&printed).contains("All 2 Test Connections together:")
-            && prose(&printed).contains("Upstream results are approximate"),
-        "{printed}
-{}",
-        stderr(&output)
-    );
-    first.wait_for_the_test_summary();
-    second.wait_for_the_test_summary();
-    // In JSON, a warning in the extension, not an error.
+    // docs/spec.md story 62: Upstream results summed, with the
+    // approximation warning in the JSON extension, not an error.
     let output = client(&[
         "--unauthenticated",
         "--test-connections",
@@ -1628,28 +1629,18 @@ stderr: {}",
         "upstream",
         "--format",
         "json",
-        &format!("127.0.0.1:{}", first.port),
-        &format!("127.0.0.1:{}", second.port),
+        &servers[0],
+        &servers[1],
     ]);
     let json: serde_json::Value = serde_json::from_str(&stdout(&output))
         .unwrap_or_else(|e| panic!("{e}: {}", stdout(&output)));
     let warned = json["udpstp"]["Warnings"]
         .as_array()
         .is_some_and(|w| w.iter().any(|w| w["Code"] == "UpstreamResultsApproximate"));
-    // : each Test Connection's own results too, as the text shows them.
-    let each = json["udpstp"]["TestConnections"]
-        .as_array()
-        .map_or(0, |each| {
-            each.iter()
-                .filter(|c| c["EndReason"] == "Completed" && c["CapacityModes"].is_array())
-                .count()
-        });
+    assert_connections(&json);
     assert!(
         output.status.success()
             && warned
-            && each == 2
-            // : the Test's own end.
-            && json["udpstp"]["EndReason"] == "Completed"
             && !json["ErrorMessage"]
                 .as_str()
                 .unwrap_or_default()
