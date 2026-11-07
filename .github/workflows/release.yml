@@ -99,7 +99,7 @@ jobs:
           persist-credentials: false
       - run: rustup toolchain install
       - run: rustup target add ${{ matrix.target }}
-      - uses: taiki-e/install-action@c509219cf42fba86913069efd0ade2458c59337b # v2
+      - uses: taiki-e/install-action@3a3daafd3b7f23b8f65d9f5ba2db203fb59b79e2 # v2
         if: matrix.target != 'x86_64-apple-darwin'
         with:
           tool: cargo-about@0.9.3
