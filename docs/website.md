@@ -150,4 +150,6 @@ Set `CHROME_PATH` to the existing Chrome executable if Lighthouse does not find 
 
 The [hosting configuration](../website/wrangler.jsonc) serves `target/site/public` as Cloudflare Workers static assets. The [website workflow](../.github/workflows/website.yml) builds and checks that output. Its build and delivery are separate from binary release packaging.
 
+Each push to the protected `main` branch builds and checks the website, then deploys the retained output when website delivery is enabled. Deployment verifies that the checked revision is still the current `main` revision. Pull requests retain their website checks in CI. A manual website run builds without deployment unless `deploy` is selected.
+
 The site includes `/install.sh` and `/install.ps1`, copied from `install/` at the same source revision as the documentation. They are served as plain text with `no-cache`. They find the latest published binary through GitHub's `releases/latest` endpoint.
