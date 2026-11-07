@@ -4,6 +4,7 @@
 git_release_enable = false
 changelog_update = false
 release_always = false
+features_always_increment_minor = true
 pr_name = "chore: release{% if version %} v{{ version }}{% endif %}"
 release_commits = '^(feat|fix|perf|docs|revert)(\([^)]*\))?!?:|^[a-z]+(\([^)]*\))?!:|^[A-Z]|BREAKING[ -]CHANGE'
 
