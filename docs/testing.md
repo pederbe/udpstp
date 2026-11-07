@@ -107,6 +107,11 @@ fn reserved_field_is_ignored_on_receipt() {
 
 ### Core tests with the simulator harness (S1)
 
+Response-only fixed-rate checks stop after Activation. Finite algorithm and
+classification scripts use `reported_then_stopped` to end Load traffic after
+their reports. Checks observing later Load PDUs, silence or watchdog expiry
+keep `reported` or the timed `reported_at` helper and their observation windows.
+
 This is the main seam and holds most of the tests. They cover the Setup, Activation and STOP exchanges, the Client's Multi-Connection Coordinator against one Server or several (`Scenario::coordinated`, `add_server`), mode 1 and the Key Table, Coercion, the Sending Rate Table, Downstream and Upstream Load PDUs, Status PDUs with Sequence Errors, and Fixed-Rate Tests. Each file in `crates/udpstp-core/tests/` covers one feature.
 
 Tests describe a scenario through the harness in `crates/udpstp-core/tests/harness/` and never call the core API directly, so a change to the core's interface is absorbed in one place:
@@ -255,6 +260,10 @@ the precision suite's measurement.
 The wait between turns (`wait.rs`) is tested at its own interface, on every OS, as it is pure: how long a wait lasts, the receive hold-off's length and the arrival rate it follows, that a hold-off is taken only when more than one datagram is due within it, and the spin guard. A model of the engine's waits counts the wake-ups it decides for a Load Receiver: once per Load PDU at row 4, once per hold-off at rows 100 and 1000, as before, and twice a Burst at row 50, whose Bursts of five arrive back to back, as before too.
 
 ### Fault injection (S2b)
+
+The batch, receive-timestamp and polling fault scenarios in `fault_tests.rs`
+run only on Linux and Android, where those hooks exist. Portable send failures,
+slow sends and panic containment remain covered on every supported OS.
 
 Faults are injected into a Test Connection's socket by the fault adapter (`crates/udpstp-runtime/src/socket/faults.rs`), which wraps the platform's adapter and fails or alters its calls: `panic_after=N` panics the engine at its Nth send, once for every engine given the same faults; `panic_on_open=1` panics as the socket opens on the engine's thread; `would_block_every=N` and `no_buffers_every=N` fail every Nth send with EAGAIN or ENOBUFS, so a Send Plan goes out partly; `slow_send_us=N` makes every send wait first, a host slower than its schedule; on Linux, where a `sendmmsg` call counts as one send, `partial_batch_every=N` makes the kernel take only the first message of every Nth call, and `gso_unsupported=1` and `sendmmsg_unsupported=1` refuse GSO or `sendmmsg`; `qdisc_drop_every=N` makes every Nth call lose a message as a queue discipline's drop does, after the kernel really numbered and refused it for its send timestamp: the call's second, its first going and the call answering 1, as `sendmmsg` does, or its only one, the call failing with ENOBUFS, and `ts_opt_id_unsupported=1` makes the kernel number the send timestamps, as before Linux 6.13; `recvmmsg_unsupported=1` and `rx_timestamps_unsupported=1` refuse `recvmmsg` or kernel receive timestamps; `pollerr_stuck=1` makes every `ppoll` return at once with an error that can't be drained, and `ppoll_unsupported=1` refuses `ppoll`; the same two reach the Linux Server's pooled executor's own wait through the recipe's hooks, stuck returning at once with its epoll set readable and nothing to harvest, and `engine_thread_panic_after_opens=N` panics an Engine Thread in its own loop once it has opened N Test Connections. Only tests build it: release builds can't inject anything.
 

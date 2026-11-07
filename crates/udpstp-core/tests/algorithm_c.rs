@@ -20,7 +20,7 @@ mod harness;
 use std::time::Duration;
 
 use harness::status_script::{
-    DEFAULTS, Params, Report, classifications, clean, errored, hold, reported,
+    DEFAULTS, Params, Report, classifications, clean, errored, hold, reported_then_stopped,
 };
 use harness::{Outcome, Scenario, TraceEntry};
 use udpstp_core::{Classification, DataEvent, Direction, EndReason, RateAdjAlgorithm};
@@ -32,7 +32,7 @@ const C: Params = Params {
 };
 
 fn check_rows(seed: u64, params: Params, reports: Vec<Report>, expected: &[u16]) {
-    let (outcome, got) = reported(Scenario::new(seed), params, reports);
+    let (outcome, got) = reported_then_stopped(Scenario::new(seed), params, reports);
     let got: Vec<Option<u16>> = got.iter().map(|c| c.row).collect();
     let expected: Vec<Option<u16>> = expected.iter().copied().map(Some).collect();
     outcome.check(

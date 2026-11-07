@@ -19,14 +19,14 @@ mod harness;
 use std::time::Duration;
 
 use harness::status_script::{
-    DEFAULTS, Params, Report, classifications, clean, errored, hold, reported,
+    DEFAULTS, Params, Report, classifications, clean, errored, hold, reported_then_stopped,
 };
 use harness::{Outcome, RowRequest, Scenario, TraceEntry};
 use udpstp_core::{Classification, DataEvent, Direction, EndReason, IntervalClass};
 use udpstp_wire::StatusPdu;
 
 fn rows(seed: u64, params: Params, reports: Vec<Report>) -> (Outcome, Vec<Option<u16>>) {
-    let (outcome, got) = reported(Scenario::new(seed), params, reports);
+    let (outcome, got) = reported_then_stopped(Scenario::new(seed), params, reports);
     let rows = got.iter().map(|c| c.row).collect();
     (outcome, rows)
 }

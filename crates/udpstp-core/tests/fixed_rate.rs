@@ -29,10 +29,11 @@ enum As {
 }
 
 fn upstream(seed: u64, who: As, request: RowRequest) -> Outcome {
-    test(seed, who, Direction::Upstream, request)
+    // These assertions observe the Activation Response, before sustained Load.
+    scenario(seed, who, Direction::Upstream, request).run_for(Duration::from_millis(1))
 }
 
-fn test(seed: u64, who: As, direction: Direction, request: RowRequest) -> Outcome {
+fn scenario(seed: u64, who: As, direction: Direction, request: RowRequest) -> Scenario {
     let scenario = Scenario::new(seed);
     let scenario = match who {
         As::Operator => scenario.operator(KEY_ID, KEY),
@@ -44,7 +45,6 @@ fn test(seed: u64, who: As, direction: Direction, request: RowRequest) -> Outcom
     scenario
         .client_direction(direction)
         .client_requests_row(request)
-        .run_for(Duration::from_secs(1))
 }
 
 fn response(outcome: &Outcome) -> ActivationPdu {
@@ -106,12 +106,13 @@ fn an_operator_runs_a_fixed_rate_test_at_the_requested_row() {
 #[udpstp_req::req("RFC9946-4.1-3")]
 #[test]
 fn a_refused_downstream_fixed_rate_test_sends_no_load() {
-    let outcome = test(
+    let outcome = scenario(
         13,
         As::Consumer,
         Direction::Downstream,
         RowRequest::FixedRate(123),
-    );
+    )
+    .run_for(Duration::from_secs(1));
 
     outcome.check(outcome.client_activation_rejected(0), "refused");
     outcome.check(
