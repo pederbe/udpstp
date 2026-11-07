@@ -7,12 +7,12 @@
 
 mod harness;
 
-use harness::status_script::{DEFAULTS, Params, Report, clean, errored, reported};
+use harness::status_script::{DEFAULTS, Params, Report, clean, errored, reported_then_stopped};
 use harness::{ActivationParameter, Outcome, Scenario};
 use udpstp_core::Event;
 
 fn rows(seed: u64, params: Params, reports: Vec<Report>) -> (Outcome, Vec<Option<u16>>) {
-    let (outcome, got) = reported(Scenario::new(seed), params, reports);
+    let (outcome, got) = reported_then_stopped(Scenario::new(seed), params, reports);
     let rows = got.iter().map(|c| c.row).collect();
     (outcome, rows)
 }

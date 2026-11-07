@@ -204,11 +204,46 @@ pub fn reported(
     params: Params,
     reports: Vec<Report>,
 ) -> (Outcome, Vec<Classification>) {
+    reported_with_stop(scenario, params, reports, false)
+}
+
+/// As [`reported`], but sends a fresh STOP after the finite report sequence.
+/// For row and classification checks only: callers observing silence, later
+/// Load PDUs or watchdog expiry must use [`reported`] or [`reported_at`].
+pub fn reported_then_stopped(
+    scenario: Scenario,
+    params: Params,
+    reports: Vec<Report>,
+) -> (Outcome, Vec<Classification>) {
+    reported_with_stop(scenario, params, reports, true)
+}
+
+fn reported_with_stop(
+    scenario: Scenario,
+    params: Params,
+    reports: Vec<Report>,
+    stop_after_reports: bool,
+) -> (Outcome, Vec<Classification>) {
     let setup_time = Rc::new(Cell::new(0u32));
     let t = setup_time.clone();
     let mut test_port = None;
     // The first row sends a Load PDU every 50 ms.
     let run = Duration::from_millis(50 * (reports.len() as u64 + 2));
+    let mut stop = stop_after_reports.then(|| {
+        let last = reports
+            .iter()
+            .enumerate()
+            .map(|(i, r)| r.spdu_seq_no.unwrap_or(i as u32 + 1))
+            .max()
+            .unwrap_or(0);
+        status(
+            last.wrapping_add(1),
+            Report {
+                stop: true,
+                ..delay(0, 1)
+            },
+        )
+    });
     let mut to_send = reports
         .into_iter()
         .enumerate()
@@ -235,7 +270,7 @@ pub fn reported(
                 if !pdu.starts_with(&[0xBE, 0xEF]) {
                     return None;
                 }
-                Some((test_port?, to_send.next()?))
+                Some((test_port?, to_send.next().or_else(|| stop.take())?))
             },
         )
         .run_for(run);

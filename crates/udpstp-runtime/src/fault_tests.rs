@@ -364,6 +364,7 @@ fn start_on(
 
 /// Runs each of `tests` at once, each on a thread of its own: what each
 /// run's Test reported, in order.
+#[cfg(any(target_os = "linux", target_os = "android"))]
 fn run_tests(tests: &[(Direction, u16, End, Faults)]) -> Vec<Test> {
     run_tests_on(Executor::PerTestConnection, tests)
 }
@@ -383,17 +384,9 @@ fn run_tests_on(executor: Executor, tests: &[(Direction, u16, End, Faults)]) -> 
     })
 }
 
-/// The fast paths `linux` names on Linux, which alone has them.
-fn on_linux(linux: FastPaths) -> FastPaths {
-    if cfg!(any(target_os = "linux", target_os = "android")) {
-        linux
-    } else {
-        FastPaths::default()
-    }
-}
-
 /// The fast paths an engine that falls back from none of them uses: a
 /// Load Receiver sends no Load PDUs.
+#[cfg(any(target_os = "linux", target_os = "android"))]
 const RECEIVING: FastPaths = FastPaths {
     sendmmsg: false,
     udp_gso: false,
@@ -535,6 +528,7 @@ fn a_host_that_sends_slower_than_its_schedule_still_stops_the_test() {
 // and an Add-on, sent without GSO here so that each batch holds several
 // messages, of which the kernel takes one; the Deferred Datagrams pile up
 // until Bursts are withheld.
+#[cfg(any(target_os = "linux", target_os = "android"))]
 #[test]
 fn partial_batched_sends_produce_no_reported_loss() {
     let faults = Faults::parse("gso_unsupported=1,partial_batch_every=1");
@@ -559,6 +553,7 @@ fn partial_batched_sends_produce_no_reported_loss() {
 // with sendmmsg alone; where it refuses sendmmsg, one Load PDU at a time.
 // Either way the Test completes without loss, and the engine reports the
 // fast paths it used.
+#[cfg(any(target_os = "linux", target_os = "android"))]
 #[test]
 fn sending_falls_back_when_gso_or_sendmmsg_is_refused() {
     let cases = [
@@ -576,7 +571,7 @@ fn sending_falls_back_when_gso_or_sendmmsg_is_refused() {
     );
     for ((faults, linux_paths), test) in cases.iter().zip(tests) {
         test.completes_without_loss(faults);
-        assert_eq!(test.client.fast_paths, on_linux(*linux_paths), "{faults}");
+        assert_eq!(test.client.fast_paths, *linux_paths, "{faults}");
     }
 }
 
@@ -585,6 +580,7 @@ fn sending_falls_back_when_gso_or_sendmmsg_is_refused() {
 // it reads in batches without them. Either way the Test completes without
 // loss, as Load Receiver (Downstream) and as Load Sender (Upstream), and
 // the engine reports the fast paths it used.
+#[cfg(any(target_os = "linux", target_os = "android"))]
 #[test]
 fn receiving_falls_back_when_recvmmsg_or_timestamps_are_refused() {
     let only_ppoll = FastPaths {
@@ -622,7 +618,7 @@ fn receiving_falls_back_when_recvmmsg_or_timestamps_are_refused() {
     for ((direction, faults, linux_paths), test) in cases.iter().zip(tests) {
         let what = format!("{direction:?} {faults}");
         test.completes_without_loss(&what);
-        assert_eq!(test.client.fast_paths, on_linux(*linux_paths), "{what}");
+        assert_eq!(test.client.fast_paths, *linux_paths, "{what}");
     }
 }
 
@@ -636,6 +632,7 @@ fn receiving_falls_back_when_recvmmsg_or_timestamps_are_refused() {
 // executor the fault keeps its Engine Thread's epoll set readable
 // with nothing to harvest, and its ppoll calls, one a wait, are bounded
 // alike (its turns read only sockets that signalled).
+#[cfg(any(target_os = "linux", target_os = "android"))]
 #[test]
 fn a_stuck_pending_error_does_not_spin_the_engine() {
     for executor in executors() {
@@ -678,6 +675,7 @@ fn a_stuck_pending_error_does_not_spin_the_engine() {
 // : where the kernel refuses ppoll, the engine sleeps between turns as
 // before: the Test completes without loss, as Load Receiver (Downstream)
 // and as Load Sender (Upstream), and the engine doesn't report ppoll.
+#[cfg(any(target_os = "linux", target_os = "android"))]
 #[test]
 fn waiting_falls_back_to_sleeping_when_ppoll_is_refused() {
     let faults = Faults::parse("ppoll_unsupported=1");
@@ -701,7 +699,7 @@ fn waiting_falls_back_to_sleeping_when_ppoll_is_refused() {
     for (test, linux_paths) in tests.iter().zip(expected) {
         let what = format!("{:?}", test.direction);
         test.completes_without_loss(&what);
-        assert_eq!(test.client.fast_paths, on_linux(linux_paths), "{what}");
+        assert_eq!(test.client.fast_paths, linux_paths, "{what}");
     }
 }
 

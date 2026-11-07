@@ -13,15 +13,19 @@ mod harness;
 
 use std::time::Duration;
 
-use harness::status_script::{DEFAULTS, NODEL, Params, Report, classifications, delay, reported};
+use harness::status_script::{
+    DEFAULTS, NODEL, Params, Report, classifications, delay, reported_then_stopped,
+};
 use harness::{Outcome, RowRequest, Scenario};
-use udpstp_core::{Classification, DelayVarStatistic, Direction, IntervalClass};
+use udpstp_core::{
+    Classification, DataEvent, DelayVarStatistic, Direction, EndReason, IntervalClass,
+};
 use udpstp_wire::StatusPdu;
 
 use IntervalClass::{Clean, Errored, Hold};
 
 fn classified(seed: u64, params: Params, reports: Vec<Report>) -> (Outcome, Vec<Classification>) {
-    reported(Scenario::new(seed), params, reports)
+    reported_then_stopped(Scenario::new(seed), params, reports)
 }
 
 fn classes(got: &[Classification]) -> Vec<IntervalClass> {
@@ -34,7 +38,7 @@ fn classes(got: &[Classification]) -> Vec<IntervalClass> {
 #[udpstp_req::req("RFC9946-5.1-9", "RFC9946-7.1-L4", "RFC9097-8.1-L13", "RFC9946-8.1-L1")]
 #[test]
 fn the_average_rounds_and_clean_is_strictly_below_the_low_threshold() {
-    let (outcome, got) = reported(
+    let (outcome, got) = reported_then_stopped(
         Scenario::new(1).server_delay_var(DelayVarStatistic::Average),
         DEFAULTS,
         vec![
@@ -54,6 +58,13 @@ fn the_average_rounds_and_clean_is_strictly_below_the_low_threshold() {
             && delays == [Some(29), Some(30), Some(30), Some(90), Some(91), Some(91)]
             && numbers == [1, 2, 3, 4, 5, 6],
         &format!("{got:#?}"),
+    );
+    outcome.check(
+        outcome
+            .server_data_events
+            .iter()
+            .any(|(_, e)| matches!(e, DataEvent::Ended(EndReason::StoppedByClient))),
+        "the finite script ends the Test after its six classified reports",
     );
 }
 
@@ -75,7 +86,7 @@ fn the_maximum_is_the_default_and_the_average_a_setting() {
         &format!("{got:#?}"),
     );
 
-    let (outcome, got) = reported(
+    let (outcome, got) = reported_then_stopped(
         Scenario::new(12).server_delay_var(DelayVarStatistic::Average),
         DEFAULTS,
         vec![spread(91)],
@@ -222,12 +233,14 @@ fn an_upstream_server_classifies_the_status_pdus_it_sends() {
         .client_unauthenticated()
         .client_direction(Direction::Upstream)
         .client_requests_row(RowRequest::StartAt(20))
+        .client_max_bandwidth(20)
+        .client_config(|c| c.test_int_time = 5)
         .network_drops(
             [0xBE, 0xEF],
             Duration::from_millis(300),
             Some(Duration::from_millis(330)),
         )
-        .run_for(Duration::from_millis(10_600));
+        .run_for(Duration::from_millis(5_600));
 
     let (stops, sent): (Vec<StatusPdu>, Vec<StatusPdu>) = outcome
         .trace
