@@ -5,10 +5,27 @@ git_release_enable = false
 changelog_update = false
 release_always = false
 pr_name = "chore: release{% if version %} v{{ version }}{% endif %}"
-release_commits = '^(feat|fix|perf|docs|revert)(\([^)]*\))?!?:|^[A-Z]|BREAKING[ -]CHANGE'
+release_commits = '^(feat|fix|perf|docs|revert)(\([^)]*\))?!?:|^[a-z]+(\([^)]*\))?!:|^[A-Z]|BREAKING[ -]CHANGE'
+
+[[package]]
+name = "udpstp-wire"
+version_group = "udpstp"
+
+[[package]]
+name = "udpstp-core"
+version_group = "udpstp"
+
+[[package]]
+name = "udpstp-runtime"
+version_group = "udpstp"
+
+[[package]]
+name = "udpstp-key-permissions"
+version_group = "udpstp"
 
 [[package]]
 name = "udpstp"
+version_group = "udpstp"
 changelog_update = true
 changelog_path = "CHANGELOG.md"
 changelog_include = ["udpstp-wire", "udpstp-core", "udpstp-runtime", "udpstp-key-permissions"]
