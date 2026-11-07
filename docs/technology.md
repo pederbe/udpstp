@@ -34,7 +34,7 @@ Exact dependency versions and features live in the Cargo manifests and lockfiles
 
 ## Build and CI
 
-[CI](../.github/workflows/ci.yml) runs for pull requests, changes to `main` and manual dispatch. The full profile covers native Linux, macOS and Windows checks. Documentation-only changes use the documentation profile.
+[CI](../.github/workflows/ci.yml) runs for pull requests and manual dispatch. The full profile covers native Linux, macOS and Windows checks. Documentation-only changes use the documentation profile. The protected `main` branch requires an up-to-date pull request with passing CI. Website delivery builds and checks the merged revision separately, without repeating the full test matrix.
 
 The maintained commands check formatting, Clippy, workspace tests, RFC traceability, links and glossary terms. Linux integration checks cover network namespaces, OB-UDPST, systemd, containers and packaged crate verification. Windows checks cover the installer and Server service. The website has its own build and metadata checks.
 
