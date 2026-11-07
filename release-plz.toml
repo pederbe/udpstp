@@ -6,7 +6,7 @@ changelog_update = false
 release_always = false
 features_always_increment_minor = true
 pr_name = "chore: release{% if version %} v{{ version }}{% endif %}"
-release_commits = '^(feat|fix|perf|docs|revert)(\([^)]*\))?!?:|^[a-z]+(\([^)]*\))?!:|^[A-Z]|BREAKING[ -]CHANGE'
+release_commits = '^(feat|fix|perf|docs|revert)(\([^)]*\))?!?:|^[a-z]+(\([^)]*\))?!:|^[A-Z]|(?m:^BREAKING[ -]CHANGE:)'
 
 [[package]]
 name = "udpstp-wire"
@@ -79,7 +79,7 @@ commit_preprocessors = [
 ]
 commit_parsers = [
   { message = "^[a-z]+(\\([^)]*\\))?!:", group = "<!-- 0 -->Breaking changes" },
-  { body = "BREAKING[ -]CHANGE", group = "<!-- 0 -->Breaking changes" },
+  { body = "(?m)^BREAKING[ -]CHANGE:", group = "<!-- 0 -->Breaking changes" },
   { message = "^feat(\\([^)]*\\))?:", group = "<!-- 1 -->Added" },
   { message = "^fix\\(deps\\):", group = "<!-- 4 -->Dependencies" },
   { message = "^fix(\\([^)]*\\))?:", group = "<!-- 2 -->Fixed" },
