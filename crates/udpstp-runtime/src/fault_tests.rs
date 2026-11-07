@@ -140,6 +140,7 @@ impl Test {
 
 /// Runs a Fixed-Rate Test at `row` in `direction` over loopback, `faulty`'s
 /// socket with `faults`: what each end's engine reported.
+#[cfg(any(target_os = "linux", target_os = "android"))]
 fn run_test(direction: Direction, row: u16, faulty: End, faults: &Faults) -> Test {
     run_test_on(
         Executor::PerTestConnection,
