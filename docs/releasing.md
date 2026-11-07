@@ -18,7 +18,7 @@ Configure crates.io trusted publishing for `udpstp`, `udpstp-wire`, `udpstp-core
 
 ### Recovery
 
-If preparation or publication fails, fix the reported cause and rerun the failed Release-plz job. It skips crate versions already published. If binary packaging fails after crate publication, the GitHub release remains a draft. Rerun the failed Release job, or dispatch Release on the existing version tag. Asset uploads replace only files in the unpublished draft. Published releases are immutable.
+If preparation or Cargo publication fails, fix the reported cause and rerun the failed Release-plz job. It skips crate versions already published. If dispatching the binary build fails after tagging, dispatch Release on the existing `vVERSION` tag. Rerunning Release-plz alone will not repeat the dispatch for an already released version. If packaging or qualification fails, the GitHub release remains a draft. Rerun the failed Release jobs. Asset uploads replace only files in the unpublished draft. Published releases are immutable.
 
 The Release-plz workflow can also be dispatched on `main` to prepare a release before the next weekly run. A failure stops the affected delivery stage and is visible in GitHub Actions.
 
