@@ -13,6 +13,10 @@ Run the WinGet workflow on `main` with a published tag to retry delivery. Submis
 defaults to off for manual runs. Enabling it requires `WINGET_ENABLED=true` and
 `WINGET_TOKEN` in the `distribution` environment. The token must support Komac
 submission and editing its author's PR in `microsoft/winget-pkgs`.
+A separate `WINGET_FORK_TOKEN` in the same environment synchronizes the submission
+fork before submission. Limit it to that fork with Contents and Workflows write
+permissions, keeping `WINGET_TOKEN` public-only. Preparation does not use the fork
+credential. Synchronization does not force or overwrite a divergent fork.
 Retries reuse a matching open PR and preserve manual description edits. The CLA
 checkbox reflects Microsoft's official check and never signs an agreement.
 
