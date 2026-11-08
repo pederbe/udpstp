@@ -31,6 +31,12 @@ allow = [
 ]
 confidence-threshold = 0.9
 
+# WHATWG encoding data used by the unpublished WinGet manifest checker.
+# encoding_rs keeps the required notice in LICENSE-WHATWG.
+[[licenses.exceptions]]
+name = "encoding_rs"
+allow = ["BSD-3-Clause"]
+
 [bans]
 # Two versions of one crate are reported, not refused: some come from
 # dependencies' own dependencies.

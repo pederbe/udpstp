@@ -11,6 +11,7 @@ workspace = true
 
 [dependencies]
 serde.workspace = true
+serde-saphyr = { version = "=2.1.1", default-features = false, features = ["deserialize"] }
 serde_json.workspace = true
 sha2.workspace = true
 toml.workspace = true
