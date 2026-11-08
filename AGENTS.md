@@ -29,7 +29,7 @@ Third-party sources under `/reference/` are ignored and never committed. CI's ve
 
 When work completes a feature, update the README Status table and any page that still describes it as planned in the same change. Mark a feature Done only when a user can run it.
 
-Include a concise Unreleased changelog entry for user-visible work, with compatibility consequences and required upgrade actions. Otherwise explain why no entry is needed in the pull request's Changelog section.
+Release-plz generates dated changelog entries from conventional pull request titles. Keep `## [Unreleased]` empty. Describe compatibility consequences and required upgrade actions in the pull request description, using a `BREAKING CHANGE:` paragraph when needed. Follow [CONTRIBUTING.md](CONTRIBUTING.md) for title conventions and upgrade instructions.
 
 ## Project guides
 

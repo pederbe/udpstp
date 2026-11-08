@@ -2,6 +2,32 @@
 
 The [Release workflow](../.github/workflows/release.yml) builds the archives, native packages and verification files described here. Distribution channels become available when their first release is published. See [Installing udpstp](guides/installing-udpstp.md) for availability and installation instructions.
 
+## Release process
+
+Every Monday at 07:37 UTC, [release-plz](https://release-plz.dev) opens or updates one release pull request when there are unreleased changes. It updates Cargo versions and writes a dated section in the root changelog from merged pull request titles. Internal changes do not trigger releases. The pull request merges automatically after the required CI checks pass. New commits on `main` refresh an open release pull request so its checks cover the current source.
+
+Merging the release pull request publishes changed crates to crates.io in dependency order and creates their tags. The five published crates share a version group so a feature or breaking change in a library also raises the binary's version appropriately. Unchanged crates may keep their previous versions. The binary uses `vVERSION`, while the libraries use `PACKAGE-vVERSION`. Only the binary creates a GitHub draft release, using its combined changelog section as the release notes. The Release workflow builds and attests the assets, attaches them to that draft, runs the existing downloaded-archive and native-package qualification, and publishes it after those checks pass. Publication starts the existing container and signed package repository workflows. No manual dispatch or per-release approval is needed.
+
+Published notes are already on `main` before tagging, and stay under their dated version heading. Keep `## [Unreleased]` empty. Release-plz manages version numbers and dependency requirements, including the library crates required by `cargo install udpstp`. Test helpers, benchmarks, fuzzing and `xtask` are not released.
+
+### One-time setup
+
+The repository needs auto-merge enabled and its `CI` check required on `main`. Set squash merge defaults to the pull request title and body, preserving conventional titles and upgrade instructions. Set `RELEASE_PLZ_TOKEN` to a repository-scoped token with Contents and Pull requests write access. This lets release pull requests run CI and lets published releases start distribution workflows. Release-plz uses the built-in workflow token for tags and drafts, then explicitly dispatches the Release workflow because workflow-token events do not start other workflows.
+
+Configure crates.io trusted publishing for `udpstp`, `udpstp-wire`, `udpstp-core`, `udpstp-runtime` and `udpstp-key-permissions`, with repository `pederbe/udpstp` and workflow `release-plz.yml`. The workflow uses short-lived OpenID Connect credentials, so no crates.io API token is stored in GitHub. See the [release-plz setup guide](https://release-plz.dev/docs/github/quickstart).
+
+### Recovery
+
+If preparation or a Cargo upload fails, fix the reported cause and rerun the original failed Release-plz job to finish still-unpublished packages. Check which versions were accepted before retrying.
+
+Cargo publication, tag creation and GitHub draft creation are separate operations. If Cargo accepts a version but creating its tag or draft fails, rerunning release-plz does not restore the missing GitHub state. A green retry alone does not establish that the release finished. Recover using the exact source commit from the failed run, cross-checking each version uploaded by that run against its published crate's `.cargo_vcs_info.json`. For versions already accepted by Cargo, restore only missing version tags at that commit with `git tag` and `git push`. For an already-uploaded binary version, restore its missing draft with `gh release create --draft --verify-tag --notes-file`, using the dated changelog section from that same commit. Leave still-unpublished packages to the original job retry. Precreating their tags would cause release-plz to skip their Cargo uploads. Existing tags and drafts must match the intended release. Do not move tags or overwrite published releases.
+
+After restoring missing items for accepted versions, rerun the original Release-plz job for any remaining unpublished packages. If the binary had already been uploaded before that retry, explicitly dispatch Release on its `vVERSION` tag. Otherwise the retry dispatches Release when it newly publishes the binary. Explicit dispatch is also the recovery if dispatching the binary build failed after successful tagging. Rerunning Release-plz alone will not repeat that dispatch for an already-published binary.
+
+If packaging or qualification fails, the GitHub release remains a draft. Rerun the failed Release jobs. Asset uploads replace only files in the unpublished draft. Published releases are immutable.
+
+The Release-plz workflow can also be dispatched on `main` to prepare a release before the next weekly run. A failure stops the affected delivery stage and is visible in GitHub Actions.
+
 ## What a release contains
 
 | Artifact | Contents and build |

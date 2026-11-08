@@ -103,7 +103,7 @@ fn only_independent_documentation_selects_documentation_checks() {
         "scripts/check.sh",
         "xtask/fixtures/README.md",
         "fuzz/README.md",
-        "tools/release-changelog/README.md",
+        "tools/example/README.md",
         "tests/fixtures/model.md",
         "fixtures/model.md",
         "examples/README.md",

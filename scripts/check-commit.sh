@@ -148,5 +148,4 @@ Linux)
     fi
     ;;
 esac
-bash scripts/check-release-changelog.sh
 echo "Checks passed for $(git log -1 --format=%h) on $platform"
