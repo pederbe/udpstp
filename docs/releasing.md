@@ -6,12 +6,12 @@ After publishing qualified Windows assets, the release workflow dispatches
 `winget.yml` for that tag. The WinGet workflow verifies the published executable,
 generates its portable manifest, and checks validation, installation, authenticated
 loopback operation and removal on Windows. With submission enabled it uses
-WinGetCreate to submit the version, then completes and reads back the PR description.
+Komac to submit the version, then completes and reads back the PR description.
 Microsoft still controls catalog admission.
 
 Run the WinGet workflow on `main` with a published tag to retry delivery. Submission
 defaults to off for manual runs. Enabling it requires `WINGET_ENABLED=true` and
-`WINGET_TOKEN` in the `distribution` environment. The token must support WinGetCreate
+`WINGET_TOKEN` in the `distribution` environment. The token must support Komac
 submission and editing its author's PR in `microsoft/winget-pkgs`.
 Retries reuse a matching open PR and preserve manual description edits. The CLA
 checkbox reflects Microsoft's official check and never signs an agreement.

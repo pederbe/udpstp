@@ -43,7 +43,7 @@ pub fn run(args: &[String]) -> Result<(), String> {
             "defaultLocale",
             "pederbe.udpstp.locale.en-US.yaml",
             format!(
-                "PackageLocale: en-US\nPublisher: Peder Bergan\nPublisherUrl: https://pederbe.dev\nPackageName: udpstp\nPackageUrl: https://udpstp.com\nLicense: MIT OR Apache-2.0\nLicenseUrl: https://github.com/pederbe/udpstp/blob/v{version}/LICENSE-MIT\nShortDescription: Measure network-path capacity, loss and delay\nMoniker: udpstp\nReleaseNotesUrl: https://github.com/pederbe/udpstp/releases/tag/v{version}\n"
+                "PackageLocale: en-US\nPublisher: Peder Bergan\nPublisherUrl: https://pederbe.dev/\nPackageName: udpstp\nPackageUrl: https://udpstp.com/\nLicense: MIT OR Apache-2.0\nLicenseUrl: https://github.com/pederbe/udpstp/blob/v{version}/LICENSE-MIT\nShortDescription: Measure network-path capacity, loss and delay\nMoniker: udpstp\nReleaseNotesUrl: https://github.com/pederbe/udpstp/releases/tag/v{version}\n"
             ),
         ),
     ];
