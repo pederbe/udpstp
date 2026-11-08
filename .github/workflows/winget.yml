@@ -1,0 +1,120 @@
+name: WinGet
+
+# Dispatched after release.yml publishes qualified Windows assets.
+# Retry a published tag to reuse its bytes and any existing upstream PR.
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Published stable release tag
+        required: true
+        type: string
+      submit:
+        description: Submit or complete this version's WinGet pull request
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  attestations: read
+
+concurrency:
+  group: winget
+  cancel-in-progress: false
+
+jobs:
+  manifests:
+    runs-on: windows-2025
+    timeout-minutes: 30
+    environment: ${{ inputs.submit && 'distribution' || '' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: rustup toolchain install
+      - name: Require submission setup
+        if: inputs.submit
+        shell: bash
+        env:
+          ENABLED: ${{ vars.WINGET_ENABLED }}
+          TOKEN: ${{ secrets.WINGET_TOKEN }}
+        run: |
+          test "$ENABLED" = true || { echo 'WinGet submission is disabled' >&2; exit 1; }
+          test -n "$TOKEN" || { echo 'WINGET_TOKEN is not configured in distribution' >&2; exit 1; }
+      - name: Download and verify the published Windows executable
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json isDraft,isPrerelease --jq '(.isDraft == false) and (.isPrerelease == false)' | grep -qx true
+          mkdir -p artifacts
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --dir artifacts --pattern udpstp.exe --pattern SHA256SUMS
+          (cd artifacts && grep '  udpstp.exe$' SHA256SUMS | sha256sum -c -)
+          gh attestation verify artifacts/udpstp.exe --repo "$GITHUB_REPOSITORY" --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/release.yml" --source-ref "refs/tags/$TAG"
+          cargo run --locked -p xtask -- winget "${TAG#v}" artifacts/udpstp.exe artifacts
+      - name: Validate and install the manifest
+        shell: pwsh
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Install-PSResource -Name Microsoft.WinGet.Client -Scope CurrentUser -Repository PSGallery -TrustRepository
+          Import-Module Microsoft.WinGet.Client
+          Repair-WinGetPackageManager -Latest -Force
+          winget settings --enable LocalManifestFiles
+          if ($LASTEXITCODE -ne 0) { throw 'Cannot enable local manifests' }
+          $manifest = "artifacts/manifests/p/pederbe/udpstp/$($env:TAG.Substring(1))"
+          winget validate --manifest $manifest
+          if ($LASTEXITCODE -ne 0) { throw 'Manifest validation failed' }
+          winget install --manifest $manifest --accept-package-agreements --accept-source-agreements --disable-interactivity
+          if ($LASTEXITCODE -ne 0) { throw 'Manifest installation failed' }
+          try {
+            $env:Path = [Environment]::ExpandEnvironmentVariables([Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User'))
+            $binary = (Get-Command udpstp).Source
+            if ((Get-FileHash $binary).Hash -ne (Get-FileHash artifacts/udpstp.exe).Hash) { throw 'Installed executable differs from the release' }
+            cargo run --locked -p xtask -- release-smoke $binary ($env:TAG.Substring(1)) "$env:RUNNER_TEMP/winget-smoke"
+            if ($LASTEXITCODE -ne 0) { throw 'Installed command check failed' }
+          } finally {
+            winget uninstall --manifest $manifest --disable-interactivity
+            if ($LASTEXITCODE -ne 0) { throw 'WinGet removal failed' }
+          }
+      - name: Check the official WinGet Create client
+        if: inputs.submit
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $release = gh api repos/microsoft/winget-create/releases/latest | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0) { throw 'Cannot select WinGetCreate' }
+          $asset = $release.assets | Where-Object name -eq wingetcreate.exe
+          if (!$asset -or $asset.digest -notmatch '^sha256:([0-9a-f]{64})$') { throw 'WinGetCreate checksum unavailable' }
+          $client = "$env:RUNNER_TEMP/wingetcreate.exe"
+          Invoke-WebRequest $asset.browser_download_url -OutFile $client
+          if ((Get-FileHash $client -Algorithm SHA256).Hash.ToLower() -ne $asset.digest.Substring(7)) { throw 'WinGetCreate checksum mismatch' }
+      - name: Prepare or complete the WinGet pull request
+        shell: bash
+        env:
+          TAG: ${{ inputs.tag }}
+          SUBMIT: ${{ inputs.submit }}
+          GH_TOKEN: ${{ inputs.submit && secrets.WINGET_TOKEN || github.token }}
+          WINGET_CREATE_GITHUB_TOKEN: ${{ secrets.WINGET_TOKEN }}
+          WINGET_CHECKED: 'true'
+        run: |
+          set -euo pipefail
+          export WINGET_CREATE="$RUNNER_TEMP/wingetcreate.exe"
+          mode=--prepare
+          if [ "$SUBMIT" = true ]; then mode=--submit; fi
+          cargo run --locked -p xtask -- winget-submit \
+            "artifacts/manifests/p/pederbe/udpstp/${TAG#v}" pederbe.udpstp "${TAG#v}" "$mode"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: winget-${{ inputs.tag }}
+          path: |
+            artifacts/manifests
+            winget-pr-body.md
+          if-no-files-found: ignore

@@ -211,6 +211,9 @@ jobs:
     needs: qualify
     runs-on: ubuntu-26.04
     timeout-minutes: 5
+    permissions:
+      contents: write
+      actions: write
     steps:
       - name: Publish the qualified release
         env:
@@ -219,3 +222,7 @@ jobs:
         run: |
           set -euo pipefail
           gh release edit "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --draft=false
+      - name: Dispatch WinGet after binary publication
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run winget.yml --repo "$GITHUB_REPOSITORY" --ref main -f tag="$GITHUB_REF_NAME" -f submit=true

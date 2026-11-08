@@ -9,6 +9,8 @@ mod records;
 mod release_smoke;
 mod req;
 mod site;
+mod winget;
+mod winget_submission;
 
 #[cfg(test)]
 mod check_selection_tests;
@@ -53,6 +55,11 @@ fn main() -> ExitCode {
         },
         Some("site") => site::run(&std::env::args().skip(2).collect::<Vec<_>>()),
         Some("release-smoke") => release_smoke::run(&std::env::args().skip(2).collect::<Vec<_>>()),
+        Some("winget-submit") => {
+            winget_submission::run(&std::env::args().skip(2).collect::<Vec<_>>())
+                .map_err(|e| e.to_string())
+        }
+        Some("winget") => winget::run(&std::env::args().skip(2).collect::<Vec<_>>()),
         None | Some("help") => {
             println!("{USAGE}");
             Ok(())
