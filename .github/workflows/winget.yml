@@ -59,11 +59,14 @@ jobs:
         shell: pwsh
         env:
           TAG: ${{ inputs.tag }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           $ErrorActionPreference = 'Stop'
           Install-PSResource -Name Microsoft.WinGet.Client -Scope CurrentUser -Repository PSGallery -TrustRepository
           Import-Module Microsoft.WinGet.Client
-          Repair-WinGetPackageManager -Latest -Force
+          $clientVersion = gh api repos/microsoft/winget-cli/releases/latest --jq .tag_name
+          if ($LASTEXITCODE -ne 0) { throw 'Cannot select the current stable WinGet client' }
+          Repair-WinGetPackageManager -Version ($clientVersion.TrimStart('v')) -Force
           winget settings --enable LocalManifestFiles
           if ($LASTEXITCODE -ne 0) { throw 'Cannot enable local manifests' }
           $manifest = "artifacts/manifests/p/pederbe/udpstp/$($env:TAG.Substring(1))"
