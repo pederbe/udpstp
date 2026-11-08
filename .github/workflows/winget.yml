@@ -69,6 +69,9 @@ jobs:
           Repair-WinGetPackageManager -Version ($clientVersion.TrimStart('v')) -Force
           winget settings --enable LocalManifestFiles
           if ($LASTEXITCODE -ne 0) { throw 'Cannot enable local manifests' }
+          # Local-manifest lifecycle checks do not use the Microsoft Store.
+          winget source remove --name msstore
+          if ($LASTEXITCODE -ne 0) { throw 'Cannot isolate the community-source check' }
           $manifest = "artifacts/manifests/p/pederbe/udpstp/$($env:TAG.Substring(1))"
           winget validate --manifest $manifest
           if ($LASTEXITCODE -ne 0) { throw 'Manifest validation failed' }
@@ -81,11 +84,10 @@ jobs:
             cargo run --locked -p xtask -- release-smoke $binary ($env:TAG.Substring(1)) "$env:RUNNER_TEMP/winget-smoke"
             if ($LASTEXITCODE -ne 0) { throw 'Installed command check failed' }
           } finally {
-            winget uninstall --manifest $manifest --source winget --disable-interactivity
+            winget uninstall --manifest $manifest --disable-interactivity
             if ($LASTEXITCODE -ne 0) { throw 'WinGet removal failed' }
           }
       - name: Check the official WinGet Create client
-        if: inputs.submit
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
@@ -99,6 +101,8 @@ jobs:
           gh release download $release.tag_name --repo microsoft/winget-create --pattern wingetcreate.exe --dir $env:RUNNER_TEMP
           if ($LASTEXITCODE -ne 0) { throw 'Cannot download WinGetCreate' }
           if ((Get-FileHash $client -Algorithm SHA256).Hash.ToLower() -ne $asset.digest.Substring(7)) { throw 'WinGetCreate checksum mismatch' }
+          & $client --help
+          if ($LASTEXITCODE -ne 0) { throw 'WinGetCreate cannot start' }
       - name: Prepare or complete the WinGet pull request
         shell: bash
         env:
