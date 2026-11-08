@@ -84,8 +84,9 @@ jobs:
             cargo run --locked -p xtask -- release-smoke $binary ($env:TAG.Substring(1)) "$env:RUNNER_TEMP/winget-smoke"
             if ($LASTEXITCODE -ne 0) { throw 'Installed command check failed' }
           } finally {
-            winget uninstall --manifest $manifest --disable-interactivity
+            winget uninstall --name udpstp --exact --disable-interactivity
             if ($LASTEXITCODE -ne 0) { throw 'WinGet removal failed' }
+            if (Test-Path $binary) { throw 'Removal left the installed command' }
           }
       - name: Check the official WinGet Create client
         shell: pwsh
