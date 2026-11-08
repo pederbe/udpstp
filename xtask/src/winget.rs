@@ -49,7 +49,7 @@ pub fn run(args: &[String]) -> Result<(), String> {
     ];
     for (kind, name, fields) in files {
         let text = format!(
-            "# yaml-language-server: $schema=https://aka.ms/winget-manifest.{kind}.1.12.0.schema.json\n{identity}{fields}ManifestType: {kind}\nManifestVersion: 1.12.0\n"
+            "# yaml-language-server: $schema=https://aka.ms/winget-manifest.{kind}.1.28.0.schema.json\n{identity}{fields}ManifestType: {kind}\nManifestVersion: 1.28.0\n"
         );
         fs::write(directory.join(name), text).map_err(|e| e.to_string())?;
     }
