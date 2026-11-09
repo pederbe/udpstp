@@ -168,23 +168,6 @@ pub fn html_escape(text: &str) -> String {
     out
 }
 
-/// Escapes text for a JSON string.
-pub fn json_escape(text: &str) -> String {
-    let mut out = String::with_capacity(text.len());
-    for c in text.chars() {
-        match c {
-            '"' => out.push_str("\\\""),
-            '\\' => out.push_str("\\\\"),
-            '\n' => out.push_str("\\n"),
-            // Keeps a JSON-LD block from closing its <script> element.
-            '<' => out.push_str("\\u003c"),
-            c if (c as u32) < 0x20 => out.push_str(&format!("\\u{:04x}", c as u32)),
-            c => out.push(c),
-        }
-    }
-    out
-}
-
 /// A heading's anchor as mdBook makes it: lowercase, with runs of anything
 /// but letters, digits, `-` and `_` removed and spaces made hyphens.
 pub fn slug(text: &str) -> String {
@@ -214,7 +197,7 @@ pub fn version(root: &Path) -> Result<String, String> {
 
 #[cfg(test)]
 mod tests {
-    use super::{html_escape, json_escape, slug};
+    use super::{html_escape, slug};
 
     #[test]
     fn slugs_follow_mdbook() {
@@ -232,6 +215,5 @@ mod tests {
             html_escape("<a href=\"x\">&"),
             "&lt;a href=&quot;x&quot;&gt;&amp;"
         );
-        assert_eq!(json_escape("a\"b</script>"), "a\\\"b\\u003c/script>");
     }
 }
