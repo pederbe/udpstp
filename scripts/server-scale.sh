@@ -25,7 +25,7 @@
 # one network namespace and the Clients in another, joined by a veth pair,
 # inside a user namespace (as scripts/netns-test.sh does). The cases run
 # interleaved, run after run. Each run is DIR/NAME/runN; `report` is run at
-# the end. Where measure-lock is installed, the whole campaign runs under it.
+# the end. Where measure-lock is installed, the campaign shares admission with builds.
 # Without root there is no RPS, so a datagram is received on the sending
 # side's CPUs: Downstream, the Server's CPUs also carry the Clients'
 # receive work; Upstream, the Clients' CPUs carry the Server's.
@@ -167,7 +167,7 @@ netns_campaign() {
             die "unprivileged user namespaces are unavailable here"
         local wrap=()
         if [ -z "${UDPSTP_MEASURE_LOCKED:-}" ] && command -v measure-lock >/dev/null 2>&1; then
-            wrap=(measure-lock run --reason "udpstp server-scale" --max $((runs * $# * (interval + 30) + 300)) --)
+            wrap=(measure-lock build --long --timeout $((runs * $# * (interval + 30) + 300)) --)
         fi
         UDPSTP_MEASURE_LOCKED=1 SERVER_SCALE_INSIDE=1 exec "${wrap[@]}" \
             unshare --user --map-root-user --net --mount --fork --kill-child \
