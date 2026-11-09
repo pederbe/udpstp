@@ -9,7 +9,7 @@ use std::process::Command;
 
 use super::conformance::{self, Facts};
 use super::markdown::{self, Diagrams, LinkMap};
-use super::{Paths, SITE, copy, html_escape, json_escape, read, slug, write};
+use super::{Paths, SITE, copy, html_escape, read, slug, write};
 use crate::req::Status;
 
 /// One page of the book.
@@ -124,7 +124,6 @@ const SOURCES: &[(&str, &str, &str, &str)] = &[
         "Project",
         "Contributing",
     ),
-    ("CHANGELOG.md", "changelog.md", "Project", ""),
     ("website/pages/about.md", "about.md", "Project", ""),
 ];
 
@@ -294,7 +293,6 @@ pub fn run(paths: &Paths) -> Result<(), String> {
     }
     pages.push(repo("CONTRIBUTING.md", false)?);
     pages.push(generated("citation.md", "Project", false, citation(root)?));
-    pages.push(repo("CHANGELOG.md", false)?);
     pages.push(repo("website/pages/about.md", false)?);
 
     // The book: SUMMARY, pages with their diagrams, 404, theme and config.
@@ -390,7 +388,7 @@ pub fn run(paths: &Paths) -> Result<(), String> {
             &extra.join("diagrams").join(&name),
         )?;
     }
-    let landing = landing(paths, &version, &release, &conformance.facts, &sequence)?;
+    let landing = landing(paths, &release, &conformance.facts, &sequence)?;
     write(&extra.join("index.html"), landing)?;
     for name in ["landing.css", "landing.js", "_headers", "_redirects"] {
         copy(&paths.website.join(name), &extra.join(name))?;
@@ -485,15 +483,6 @@ fn git(root: &Path, args: &[&str]) -> Result<String, String> {
         ));
     }
     Ok(String::from_utf8_lossy(&output.stdout).trim().to_string())
-}
-
-/// The version the public metadata may claim, absent before its release tag.
-pub(super) fn released_version(root: &Path) -> Result<Option<String>, String> {
-    let version = super::version(root)?;
-    let tag = format!("refs/tags/v{version}^{{commit}}");
-    Ok(git(root, &["rev-parse", "--verify", "--quiet", &tag])
-        .ok()
-        .map(|_| version))
 }
 
 /// The ref links pin, from the release tag `v<version>`, or the ref in
@@ -931,7 +920,6 @@ fn llms_full(pages: &[Page]) -> String {
 /// and diagram filled in.
 fn landing(
     paths: &Paths,
-    version: &str,
     release: &Release,
     facts: &Facts,
     sequence: &markdown::Diagram,
@@ -1004,7 +992,6 @@ fn landing(
         h = sequence.height
     );
     let replacements = [
-        ("@VERSION@", version.to_string()),
         ("@REQ_TOTAL@", facts.total().to_string()),
         ("@REQ_TESTED@", tested.to_string()),
         (
@@ -1022,16 +1009,13 @@ fn landing(
         ("<!-- terminal -->", terminal),
         ("<!-- conformance-table -->", table.trim_end().to_string()),
         ("<!-- sequence -->", figure),
-        ("@JSON_VERSION@", json_escape(version)),
     ];
     fill(&template, release.released, &replacements).map_err(|e| format!("website/index.html: {e}"))
 }
 
 /// A template with the release blocks that apply kept (`release_blocks`)
 /// and its markers replaced. Every marker must be in the template, though
-/// it may sit in a block that is left out: before a release the JSON-LD's
-/// `softwareVersion` is, since search results would show it without the
-/// fine print. No marker may be left over.
+/// it may sit in a block that is left out. No marker may be left over.
 fn fill(template: &str, released: bool, replacements: &[(&str, String)]) -> Result<String, String> {
     if let Some((marker, _)) = replacements.iter().find(|(m, _)| !template.contains(m)) {
         return Err(format!("no {marker}"));
@@ -1172,20 +1156,22 @@ mod tests {
         assert!(fill("a @V@ @N@ @X@", true, &values).is_err());
     }
 
-    // : the JSON-LD, which search results show without the fine print,
-    // names a version only once it is released
+    // docs/website.md: release information belongs on GitHub.
     #[test]
-    fn the_landing_page_names_its_version_in_json_ld_only_when_released() {
+    fn the_landing_page_links_to_releases_without_a_version() {
         let template = read(&crate::workspace_root().join("website/index.html")).unwrap();
         let found = markers(&template);
         let values: Vec<(&str, String)> = found
             .iter()
             .map(|m| (m.as_str(), "9.9.9".to_string()))
             .collect();
-        let before = fill(&template, false, &values).unwrap();
-        assert!(!before.contains("softwareVersion"));
-        let after = fill(&template, true, &values).unwrap();
-        assert!(after.contains("\"softwareVersion\": \"9.9.9\","));
+        for released in [false, true] {
+            let page = fill(&template, released, &values).unwrap();
+            assert!(!page.contains("softwareVersion"));
+            assert!(!page.contains("Version "));
+            assert!(!page.contains("changelog.html"));
+            assert!(page.contains("href=\"https://github.com/pederbe/udpstp/releases\""));
+        }
     }
 
     #[test]

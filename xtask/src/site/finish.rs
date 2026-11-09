@@ -466,7 +466,7 @@ fn page_kind(book: &str) -> &'static str {
         | "conformance/deviations.md"
         | "conformance/interpretations.md"
         | "conformance/obudpst-differences.md" => "CollectionPage",
-        "citation.md" | "security-policy.md" | "contributing.md" | "changelog.md" => "WebPage",
+        "citation.md" | "security-policy.md" | "contributing.md" => "WebPage",
         _ if book.ends_with("/index.md") => "CollectionPage",
         _ => "TechArticle",
     }
@@ -645,29 +645,6 @@ fn metadata_problems(paths: &Paths) -> Result<Vec<String>, String> {
             }
         }
     }
-    let landing = read(&public.join("index.html"))?;
-    let graph: Value = serde_json::from_str(
-        landing
-            .split_once("<script type=\"application/ld+json\">")
-            .and_then(|(_, rest)| rest.split_once("</script>"))
-            .map(|(body, _)| body)
-            .ok_or("landing page has no JSON-LD")?,
-    )
-    .map_err(|e| format!("landing page JSON-LD: {e}"))?;
-    let version = graph["@graph"]
-        .as_array()
-        .and_then(|nodes| {
-            nodes
-                .iter()
-                .find(|node| node["@type"] == "SoftwareApplication")
-        })
-        .and_then(|app| app["softwareVersion"].as_str());
-    if version != super::prepare::released_version(&paths.root)?.as_deref() {
-        problems.push(
-            "index.html: softwareVersion must name the release tag, and be omitted before release"
-                .into(),
-        );
-    }
     for name in ["print.html", "toc.html", "404.html"] {
         let page = read(&public.join(name))?;
         if one_tag_value(&page, "meta", "name", "robots", "content").as_deref() != Ok("noindex") {
@@ -803,10 +780,16 @@ fn check_hosting_routes(config: &str, redirects: &str) -> Result<(), String> {
         .map(str::trim)
         .filter(|line| !line.is_empty() && !line.starts_with('#'))
         .collect();
-    if rules != ["/index.html / 301", "/ /index.html 200"] {
+    if rules
+        != [
+            "/index.html / 301",
+            "/ /index.html 200",
+            "/changelog.html https://github.com/pederbe/udpstp/releases 301",
+            "/changelog.md https://github.com/pederbe/udpstp/releases 301",
+        ]
+    {
         return Err(
-            "_redirects: root rewrite and index.html canonical redirect are missing or reordered"
-                .into(),
+            "_redirects: home routes or GitHub Releases redirects are missing or reordered".into(),
         );
     }
     Ok(())
@@ -1230,7 +1213,7 @@ mod tests {
     #[test]
     fn hosting_preserves_html_routes_and_one_canonical_home() {
         let config = "{\n\"html_handling\": \"none\",\n}";
-        let redirects = "/index.html / 301\n/ /index.html 200\n";
+        let redirects = include_str!("../../../website/_redirects");
         assert_eq!(check_hosting_routes(config, redirects), Ok(()));
         assert!(check_hosting_routes("// \"html_handling\": \"none\",", redirects).is_err());
         assert!(check_hosting_routes(config, "/ /index.html 200\n/index.html / 301\n").is_err());
