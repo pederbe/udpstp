@@ -1,19 +1,35 @@
 # Server log
 
-The Server logs one line per event: what it admitted, refused and measured. This page lists every event, field and reason. [Hosting a Server](guides/hosting-a-server.md#read-the-log) shows how to set the log up.
+The Server logs one line per event, covering what it admitted, refused and measured. Look up any event, field or reason here. [Hosting a Server](guides/hosting-a-server.md#read-the-log) shows how to set the log up.
 
 Event names, field keys and the values below settle during 0.x and become stable from 1.0, as [Stable interfaces](interfaces.md) explains. New ones may appear, so ignore those you don't know.
 
 ## Format
 
-The log is human-readable by default:
+The log is human-readable by default. A line longer than the terminal, or than 80 columns when redirected, continues on lines marked with `  | `.
 
 ```text
-2026-09-26T14:46:25.579954Z  INFO listening on 0.0.0.0:24700 event="Listening" address=0.0.0.0:24700
-2026-09-26T14:46:26.621011Z  INFO Test Connection admitted event="TestConnectionAdmitted" test_connection_id=1 client="127.0.0.1:51801" mc_ident=60798
-2026-09-26T14:46:26.621208Z  INFO Test Connection activated event="TestConnectionActivated" test_connection_id=1 direction="Downstream"
-2026-09-26T14:46:37.129642Z  INFO the Test Connection's Data Phase completed event="DataPhaseEnded" test_connection_id=1 reason="Completed" fast_paths="sendmmsg,UdpGso,recvmmsg,KernelRxTimestamps,epoll"
-2026-09-26T14:46:37.129734Z  INFO Test ended: Completed event="TestSummary" client=127.0.0.1:51801 mc_ident=60798 test_connections=1 direction="Downstream" test_interval=10 … bytes_sent=1144801422 bytes_received=1110936104 ip_layer_sender_bit_rate=933913704 result="Completed"
+2026-11-10T17:45:21.532881Z INFO listening on 0.0.0.0:24601 event="Listening"
+  | address=0.0.0.0:24601
+2026-11-10T17:45:22.533499Z INFO Test Connection admitted
+  | event="TestConnectionAdmitted" test_connection_id=1 client="127.0.0.1:45728"
+  | mc_ident=3934 key_id=1
+2026-11-10T17:45:22.533526Z INFO Test Connection activated
+  | event="TestConnectionActivated" test_connection_id=1 direction="Downstream"
+2026-11-10T17:45:33.074131Z INFO the Test Connection's Data Phase completed
+  | event="DataPhaseEnded" test_connection_id=1 reason="Completed"
+  | fast_paths="sendmmsg,UdpGso,recvmmsg,KernelRxTimestamps,epoll"
+  | receive_buffer_overflows=0 burst_lateness_p99_us=409
+2026-11-10T17:45:33.074158Z INFO Test ended: Completed event="TestSummary"
+  | client=127.0.0.1:45728 mc_ident=3934 key_id=1 test_connections=1
+  | direction="Downstream" test_interval=10 sub_interval=1000 trial_interval=50
+  | low_thresh=30 upper_thresh=90 seq_err_thresh=10 slow_adj_thresh=3
+  | high_speed_delta=10 ignore_ooo_dup=true one_way_delay_variation=true
+  | random_payload=false rate_adj_algo="B" dscp=0 sr_index_conf=65535
+  | sr_index_is_start=false bytes_sent=4089512844 bytes_received=4125335714
+  | ip_layer_sender_bit_rate=3335136496 skipped_bursts=5 skipped_datagrams=102
+  | skipped_bytes=145644 withheld_bursts=0 withheld_datagrams=0 withheld_bytes=0
+  | receive_buffer_overflows=0 result="Completed"
 ```
 
 With `log_format = "json"`, each line is one JSON object:
@@ -24,7 +40,7 @@ With `log_format = "json"`, each line is one JSON object:
 
 Every event has an `event` name and its data in fields. A field means one thing wherever it appears, and is left out when an event has nothing for it. The `message` is for people and may change, so filter on `event` and the fields.
 
-In a terminal, the human log colours its level labels: INFO cyan, WARN yellow and ERROR red. `--color auto|always|never` controls this, as [Terminal color](interfaces.md#terminal-color) describes. JSON logs and log files are always plain.
+In a terminal, the human log colours its level labels: INFO blue, WARN amber and ERROR red. `--color auto|always|never` controls this, as [Terminal color](interfaces.md#terminal-color) describes. JSON logs and log files are always plain.
 
 ## Where it goes
 

@@ -1,6 +1,6 @@
 # udpstp on Windows
 
-The Windows steps for both roles: a private key file, the firewall, a trial Server in a window, and the Windows service. Use it alongside [Running a Test](running-a-test.md) and [Hosting a Server](hosting-a-server.md). [Platform differences](../platforms.md) lists what Windows can't do yet.
+On Windows, udpstp needs a private key file for both roles, and a Server needs a firewall rule. A trial Server runs in a window, and an unattended one runs as a Windows service. Use these steps alongside [Running a Test](running-a-test.md) and [Hosting a Server](hosting-a-server.md). [Platform differences](../platforms.md) lists what Windows can't do yet.
 
 ## Generate a Shared Key
 
@@ -130,12 +130,12 @@ An unattended Server runs as the Windows service `udpstp-server`, under its own 
 
 The script:
 
-- locks `C:\ProgramData\udpstp` to Administrators and SYSTEM, with read access for the service and write access to its `logs` folder;
-- writes a starting configuration, `C:\ProgramData\udpstp\server.toml`, if there is none;
-- checks the configuration, so a mistake shows up here rather than as a service that won't start;
-- creates the service, running as `NT SERVICE\udpstp-server` with no privileges and no credential to set or expire;
-- adds the firewall rule `udpstp-server` for your `port` and `ephemeral_ports`;
-- starts the service once to check its keys, and only then sets it to start at boot and restart after a failure.
+- locks `C:\ProgramData\udpstp` to Administrators and SYSTEM, with read access for the service and write access to its `logs` folder
+- writes a starting configuration, `C:\ProgramData\udpstp\server.toml`, if there is none
+- checks the configuration, so a mistake shows up here rather than as a service that won't start
+- creates the service, running as `NT SERVICE\udpstp-server` with no privileges and no credential to set or expire
+- adds the firewall rule `udpstp-server` for your `port` and `ephemeral_ports`
+- starts the service once to check its keys, and only then sets it to start at boot and restart after a failure
 
 If a step fails, the script leaves the service stopped and disabled and reports why. Fix the problem and run `-Install` again.
 

@@ -20,5 +20,5 @@ udpstp runs on Linux, macOS and Windows. A few features depend on what the opera
 
 The Server's pool of Engine Threads has been measured carrying 150 Test Connections of 4 Mbit/s each on one CPU core. These haven't been measured yet:
 
-- 1,000,000 Load PDUs a second on one Server, or 10 Gbit/s in all;
+- 1,000,000 Load PDUs a second on one Server, or 10 Gbit/s in all
 - Test Connections of 500 Mbit/s or more each sharing an Engine Thread. Give a Server that carries high-rate Multi-Connection Tests at least as many CPUs as such a Test has Test Connections.

@@ -111,10 +111,11 @@ fn parse_help(help: &str) -> (Vec<HelpOption>, Vec<HelpOption>) {
     for line in help.lines() {
         if !line.starts_with(' ') && line.ends_with(':') {
             flush(&mut current, section, &mut arguments, &mut options);
-            section = if line == "Arguments:" {
-                "Arguments:"
-            } else {
-                "Options:"
+            // The examples that follow the options aren't options.
+            section = match line {
+                "Arguments:" => "Arguments:",
+                "Options:" => "Options:",
+                _ => "",
             };
             continue;
         }
@@ -385,13 +386,15 @@ mod tests {
 
     #[test]
     fn parses_clap_long_help() {
-        let help = "Run a Test\n\nUsage: udpstp client [OPTIONS] <SERVER>...\n\nArguments:\n  <SERVER>...\n          The Server.\n          Several.\n\nOptions:\n      --key-file <FILE>\n          The key file\n\n          [default: 2]\n\n  -h, --help\n          Print help\n";
+        let help = "Run a Test\n\nUsage: udpstp client [OPTIONS] <SERVER>...\n\nArguments:\n  <SERVER>...\n          The Server.\n          Several.\n\nOptions:\n      --key-file <FILE>\n          The key file\n\n          [default: 2]\n\n  -h, --help\n          Print help\n\nExamples:\n  udpstp client --key-file keys.toml server.example.net\n\nDocumentation: https://udpstp.com/\n";
         let (arguments, options) = parse_help(help);
         assert_eq!(arguments[0].header, "<SERVER>...");
         assert_eq!(arguments[0].description, "The Server. Several.");
         assert_eq!(options.len(), 2);
         assert_eq!(options[0].description, "The key file [default: 2]");
         assert_eq!(options[1].header, "-h, --help");
+        // The examples and the link after the options aren't options.
+        assert_eq!(options[1].description, "Print help");
     }
 
     #[test]

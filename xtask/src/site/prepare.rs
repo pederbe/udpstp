@@ -28,18 +28,29 @@ pub struct Page {
 /// A repository page on the site: (repository path, book path, part, label,
 /// or the file's heading when empty). `run` sets the order.
 const SOURCES: &[(&str, &str, &str, &str)] = &[
-    ("docs/getting-started.md", "getting-started.md", "", ""),
+    (
+        "docs/guides/installing-udpstp.md",
+        "guides/installing-udpstp.md",
+        "Getting started",
+        "Installation",
+    ),
+    (
+        "docs/guides/building-udpstp.md",
+        "guides/building-udpstp.md",
+        "Getting started",
+        "Building from source",
+    ),
+    (
+        "docs/getting-started.md",
+        "getting-started.md",
+        "Getting started",
+        "",
+    ),
     (
         "docs/guides/README.md",
         "guides/index.md",
         "Guides",
         "Overview",
-    ),
-    (
-        "docs/guides/installing-udpstp.md",
-        "guides/installing-udpstp.md",
-        "Guides",
-        "Installing udpstp",
     ),
     (
         "docs/guides/running-a-test.md",
@@ -61,18 +72,12 @@ const SOURCES: &[(&str, &str, &str, &str)] = &[
         "",
     ),
     (
-        "docs/guides/building-udpstp.md",
-        "guides/building-udpstp.md",
-        "Guides",
-        "Building from source",
-    ),
-    (
         "docs/understanding-results.md",
         "understanding-results.md",
-        "Explanations",
+        "Explanation",
         "",
     ),
-    ("docs/security.md", "security.md", "Explanations", ""),
+    ("docs/security.md", "security.md", "Explanation", ""),
     (
         "docs/interfaces.md",
         "reference/interfaces.md",
@@ -104,10 +109,11 @@ const SOURCES: &[(&str, &str, &str, &str)] = &[
         "",
     ),
     ("GLOSSARY.md", "glossary.md", "Reference", "Glossary"),
+    ("docs/troubleshooting.md", "troubleshooting.md", "Help", ""),
     (
         "docs/conformance/README.md",
         "conformance/format.md",
-        "Conformance",
+        "Project",
         "How the records work",
     ),
     (
@@ -131,7 +137,6 @@ const SOURCES: &[(&str, &str, &str, &str)] = &[
 const ALIASES: &[(&str, &str)] = &[
     // The settings' own documentation, which the page is generated from.
     ("crates/udpstp/src/config.rs", "reference/configuration.md"),
-    ("docs/adr", "decisions/index.md"),
     ("docs/conformance/summary.md", "conformance/index.md"),
     ("docs/conformance", "conformance/index.md"),
     ("docs/guides", "guides/index.md"),
@@ -181,13 +186,17 @@ pub fn run(paths: &Paths) -> Result<(), String> {
     for (source, book) in ALIASES {
         map.insert(source.to_string(), book.to_string());
     }
-    let adr_files = adr_files(root)?;
-    let mut adr_pages = BTreeMap::new();
-    for (number, file) in &adr_files {
-        let book = format!("decisions/{file}");
-        map.insert(format!("docs/adr/{file}"), book.clone());
-        adr_pages.insert(number.clone(), book);
-    }
+    // The ADRs stay in the repository: a record names one by its number
+    // and links to the file there.
+    let adr_links: BTreeMap<String, String> = adr_files(root)?
+        .into_iter()
+        .map(|(number, file)| {
+            (
+                number,
+                format!("{}/blob/{git_ref}/docs/adr/{file}", super::REPO),
+            )
+        })
+        .collect();
     let links = LinkMap {
         pages: &map,
         git_ref: &git_ref,
@@ -197,7 +206,7 @@ pub fn run(paths: &Paths) -> Result<(), String> {
     };
 
     let loaded = crate::req::load(root)?;
-    let conformance = conformance::generate(&loaded, &adr_pages, &git_ref)?;
+    let conformance = conformance::generate(&loaded, &adr_links, &git_ref)?;
     let reference = super::reference::pages(root, &binary, &conformance.record_pages)?;
 
     let mut pages: Vec<Page> = Vec::new();
@@ -244,26 +253,23 @@ pub fn run(paths: &Paths) -> Result<(), String> {
         Ok(generated(path, "Reference", false, markdown.clone()))
     };
     // In the chapter list's order.
+    pages.push(repo("docs/guides/installing-udpstp.md", false)?);
+    pages.push(repo("docs/guides/building-udpstp.md", true)?);
     pages.push(repo("docs/getting-started.md", false)?);
     for source in [
         "docs/guides/README.md",
-        "docs/guides/installing-udpstp.md",
         "docs/guides/running-a-test.md",
         "docs/guides/hosting-a-server.md",
         "docs/guides/windows.md",
         "docs/guides/operator-features.md",
-        "docs/guides/building-udpstp.md",
-        "docs/understanding-results.md",
-        "docs/security.md",
-        "docs/interfaces.md",
     ] {
         pages.push(repo(source, false)?);
     }
     pages.push(reference_page("reference/cli.md")?);
     pages.push(reference_page("reference/configuration.md")?);
-    pages.push(repo("docs/server-log.md", false)?);
-    pages.push(repo("docs/json-output.md", false)?);
     pages.push(reference_page("reference/exit-statuses.md")?);
+    pages.push(repo("docs/json-output.md", false)?);
+    pages.push(repo("docs/server-log.md", false)?);
     // The key file format, then the recorded choices from keyfile.rs.
     let mut key_files = repo("docs/key-files.md", false)?;
     key_files
@@ -271,27 +277,19 @@ pub fn run(paths: &Paths) -> Result<(), String> {
         .push_str(&reference_page("reference/key-files.md")?.markdown);
     pages.push(key_files);
     pages.push(repo("docs/platforms.md", false)?);
+    pages.push(repo("docs/interfaces.md", false)?);
     pages.push(repo("GLOSSARY.md", false)?);
+    pages.push(repo("docs/understanding-results.md", false)?);
+    pages.push(repo("docs/security.md", false)?);
     for (index, (path, markdown)) in conformance.pages.iter().enumerate() {
         pages.push(generated(path, "Conformance", index > 0, markdown.clone()));
     }
-    pages.push(repo("docs/conformance/README.md", true)?);
-    for source in ["SECURITY.md", "docs/architecture.md", "docs/technology.md"] {
-        pages.push(repo(source, false)?);
-    }
-    pages.push(generated(
-        "decisions/index.md",
-        "Project",
-        false,
-        decisions_index(root, &adr_files)?,
-    ));
-    for (number, file) in &adr_files {
-        let book = format!("decisions/{file}");
-        let mut page = from_repo(&format!("docs/adr/{file}"), &book, "Project", true, "")?;
-        page.label = format!("ADR {number}: {}", page.label);
-        pages.push(page);
-    }
+    pages.push(repo("docs/troubleshooting.md", false)?);
     pages.push(repo("CONTRIBUTING.md", false)?);
+    pages.push(repo("docs/conformance/README.md", true)?);
+    pages.push(repo("docs/architecture.md", false)?);
+    pages.push(repo("docs/technology.md", true)?);
+    pages.push(repo("SECURITY.md", false)?);
     pages.push(generated("citation.md", "Project", false, citation(root)?));
     pages.push(repo("website/pages/about.md", false)?);
 
@@ -587,38 +585,6 @@ fn adr_files(root: &Path) -> Result<Vec<(String, String)>, String> {
     Ok(out)
 }
 
-fn decisions_index(root: &Path, adrs: &[(String, String)]) -> Result<String, String> {
-    let mut out = String::from(
-        "# Decisions\n\n\
-         The Architecture Decision Records: decisions that are hard to reverse, why they were \
-         made, and the status of each.\n\n| ADR | Decision | Status |\n|---|---|---|\n",
-    );
-    for (number, file) in adrs {
-        let text = read(&root.join("docs/adr").join(file))?;
-        let title = markdown::title(&text).unwrap_or_default();
-        let _ = writeln!(
-            out,
-            "| {number} | [{}]({file}) | {} |",
-            title.replace('|', "\\|"),
-            adr_status(&text).replace('|', "\\|")
-        );
-    }
-    Ok(out)
-}
-
-/// An ADR's status: the bold `**Status: …**` that opens the paragraph
-/// after its title, or Accepted for one without. An ADR needs a status
-/// line only once its decision is revisited, so most have none.
-fn adr_status(adr: &str) -> &str {
-    adr.lines()
-        .skip_while(|l| !l.starts_with("# "))
-        .skip(1)
-        .find(|l| !l.trim().is_empty())
-        .and_then(|l| l.strip_prefix("**Status: "))
-        .and_then(|l| l.split_once("**"))
-        .map_or("Accepted", |(status, _)| status)
-}
-
 fn citation(root: &Path) -> Result<String, String> {
     let cff = read(&root.join("CITATION.cff"))?;
     Ok(format!(
@@ -636,9 +602,9 @@ fn glossary(context: &str) -> String {
     let mut out = String::from(
         "# Glossary\n\n\
          Press **Ctrl+F** (**Command+F** on macOS) to find a term on this page.\n\n\
-         The terms udpstp uses, in its code, output, docs and issues, from the repository's \
-         `GLOSSARY.md`. Each term has its own anchor, so it can be linked. _Avoid_ lists words \
-         udpstp doesn't use for it.\n",
+         udpstp uses these terms the same way in its output, documentation, code and issues. \
+         They come from the repository's `GLOSSARY.md`. Each term has its own anchor, so you \
+         can link to it. _Avoid_ lists words udpstp doesn't use for it.\n",
     );
     let mut lines = context.lines().peekable();
     // Skip the title and the introduction up to the first group of terms.
@@ -694,8 +660,9 @@ fn insert_description(readme: &str) -> String {
 const NOT_FOUND: &str = "# Page not found\n\n\
 The page you asked for isn't here. It may have moved when the docs were reorganised.\n\n\
 - [udpstp.com](https://udpstp.com/), the home page\n\
-- [Getting started](getting-started.md)\n\
+- [Quickstart](getting-started.md)\n\
 - [Guides](guides/index.md)\n\
+- [Troubleshooting](troubleshooting.md)\n\
 - [Conformance](conformance/index.md)\n\n\
 Use the search (the magnifying glass above) to find a topic.\n";
 
@@ -754,11 +721,11 @@ fn html_path(book: &str) -> String {
 }
 
 /// Search summaries of reference and navigation pages describe their contents;
-/// articles and ADRs take their summary from their own prose.
+/// articles take their summary from their own prose.
 fn page_description(page: &Page) -> String {
     let summary = match page.book.as_str() {
         "getting-started.md" => {
-            "Install udpstp, connect a Client to a Server, and measure Maximum IP-Layer Capacity with authenticated UDPSTP Tests."
+            "Share a key, connect a Client to a Server, and measure Maximum IP-Layer Capacity with authenticated UDPSTP Tests."
         }
         "guides/index.md" => {
             "Task guides for running UDPSTP Tests, reading capacity results, hosting a Server and using Operator features."
@@ -767,7 +734,7 @@ fn page_description(page: &Page) -> String {
             "Install udpstp release binaries on Linux, macOS and Windows with a package manager or the install script, and update or remove them."
         }
         "guides/running-a-test.md" => {
-            "Run Upstream and Downstream Tests, choose Client options, save JSON results, and fix common problems."
+            "Run Upstream and Downstream Tests, choose Client options, and save JSON results."
         }
         "guides/windows.md" => {
             "Set up udpstp on Windows: private key files, firewall rules, a trial Server in a window and the Windows service."
@@ -817,8 +784,8 @@ fn page_description(page: &Page) -> String {
         "glossary.md" => {
             "Definitions of udpstp's protocol roles, Tests, PDUs, measurement intervals, capacity metrics, authentication and conformance terms."
         }
-        "decisions/index.md" => {
-            "Architecture Decision Records explaining udpstp's protocol interpretations, runtime design, stable interfaces and platform choices."
+        "troubleshooting.md" => {
+            "Fix udpstp problems by symptom: no answer from the Server, refused Tests, key file errors, result warnings, socket buffers and Windows firewall rules."
         }
         "contributing.md" => {
             "Build and test udpstp, follow the Rust and protocol conventions, and prepare contributions with Requirement traceability."
@@ -1095,7 +1062,7 @@ mod tests {
             markdown: format!("# {label}\n\nAbout {label}.\n"),
         };
         let pages = [
-            page("getting-started.md", "", "Getting started"),
+            page("getting-started.md", "", "Quickstart"),
             page("guides/index.md", "Guides", "Overview"),
             page("glossary.md", "Project", "Glossary"),
         ];
@@ -1105,7 +1072,7 @@ mod tests {
         assert!(!text.contains("pre-release"));
         assert!(text.contains("9 of its 10 RFC Requirements"));
         assert!(text.contains(
-            "## Docs\n\n- [Getting started](https://udpstp.com/getting-started.md): About Getting started."
+            "## Docs\n\n- [Quickstart](https://udpstp.com/getting-started.md): About Quickstart."
         ));
         assert!(text.contains("## Guides\n\n- [Overview](https://udpstp.com/guides/index.md)"));
         assert!(text.contains("## Project\n\n- [Glossary]"));
@@ -1122,27 +1089,6 @@ mod tests {
         assert_eq!(release_blocks(page, true).unwrap(), "a R b");
         assert!(release_blocks("<!-- released -->x", true).is_err());
         assert!(release_blocks("x<!-- /pre-release -->", true).is_err());
-    }
-
-    // : the decisions index shows ADR 0008's review, not only its title
-    #[test]
-    fn an_adrs_status_is_its_status_line_or_accepted() {
-        assert_eq!(adr_status("# A decision\n\nWe decided.\n"), "Accepted");
-        assert_eq!(
-            adr_status("# A decision\n\n**Status: Accepted** (2026-09-26). It amends 0008.\n"),
-            "Accepted"
-        );
-        assert_eq!(
-            adr_status(
-                "# A decision\n\n**Status: Accepted; under review in #177** (2026-09-28).\n"
-            ),
-            "Accepted; under review in #177"
-        );
-        // Only the paragraph right after the title holds the status.
-        assert_eq!(
-            adr_status("# A decision\n\nWe decided.\n\n**Status: Superseded**\n"),
-            "Accepted"
-        );
     }
 
     #[test]

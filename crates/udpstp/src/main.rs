@@ -42,7 +42,16 @@ use crate::test_results::{Stream, coercion_text};
 /// Measure IP-Layer Capacity with UDPSTP (RFC 9946): run a Test as the
 /// Client, or serve Tests as the Server.
 #[derive(Debug, Parser)]
-#[command(name = "udpstp", version)]
+#[command(
+    name = "udpstp",
+    version,
+    after_help = "\
+Examples:
+  udpstp server --key-file keys.toml --max-hops 12
+  udpstp client --key-file keys.toml --max-hops 12 server.example.net
+
+Documentation: https://udpstp.com/getting-started.html"
+)]
 struct Cli {
     /// Terminal styling: auto for capable terminals, always for redirected
     /// human output too, or never for plain text.
@@ -55,10 +64,22 @@ struct Cli {
 #[derive(Debug, Subcommand)]
 enum Command {
     /// Run a Test against one or more Servers.
+    #[command(after_help = "\
+Examples:
+  udpstp client --key-file keys.toml server.example.net
+  udpstp client --key-file keys.toml --direction upstream server.example.net
+
+Documentation: https://udpstp.com/guides/running-a-test.html")]
     Client(Box<ClientArgs>),
     /// Serve Tests: answer Clients' Setup and Activation Requests and run
     /// their Test Connections.
     // Boxed: its settings make it far larger than the Client's arguments.
+    #[command(after_help = "\
+Examples:
+  udpstp server --key-file keys.toml --max-hops 12
+  udpstp server --config /etc/udpstp/server.toml
+
+Documentation: https://udpstp.com/guides/hosting-a-server.html")]
     Server(Box<ServerArgs>),
 }
 
@@ -121,6 +142,32 @@ struct ClientArgs {
     /// Connections in turn; they must all be IPv4 or all IPv6.
     #[arg(required = true, value_name = "SERVER")]
     servers: Vec<String>,
+    /// The key file: a TOML Key Table if its name ends in .toml, else an
+    /// OB-UDPST udpst.keys file. Group and others must not be able to read
+    /// it. Keys are never given on the command line.
+    #[arg(long, value_name = "FILE")]
+    key_file: Option<PathBuf>,
+    /// The direction of the Test: the Server sends the load (downstream)
+    /// or the Client does (upstream).
+    #[arg(long, value_enum, default_value_t = TestDirection::Downstream)]
+    direction: TestDirection,
+    /// The Test Interval to ask the Server for, in seconds (5-60; longer
+    /// only with an Operator Key that allows it).
+    #[arg(long, value_name = "SECONDS", default_value_t = 10, value_parser = clap::value_parser!(u16).range(5..))]
+    test_interval: u16,
+    /// MaxHops: the IPv4 TTL or IPv6 hop limit of test traffic, from the
+    /// expected path length.
+    #[arg(long, value_name = "HOPS", default_value_t = DEFAULT_MAX_HOPS, value_parser = clap::value_parser!(u8).range(1..))]
+    max_hops: u8,
+    /// How to print the results.
+    #[arg(long, value_enum, default_value_t = Format::Text)]
+    format: Format,
+    /// The most the Test is expected to send or receive, in Mbps
+    /// (maxBandwidth), shared equally between its Test Connections. The
+    /// Server searches no higher, and a Server with an Admitted Rate Cap
+    /// may refuse the Test.
+    #[arg(long, value_name = "MBPS", value_parser = clap::value_parser!(u16).range(1..=0x7FFF))]
+    max_bandwidth: Option<u16>,
     /// How many Test Connections the Test runs, 1 to 255 [default: one per
     /// SERVER]. OB-UDPST Servers accept at most 24.
     #[arg(long, value_name = "N", value_parser = clap::value_parser!(u8).range(1..))]
@@ -134,11 +181,6 @@ struct ClientArgs {
     /// must allow it too.
     #[arg(long, conflicts_with = "key_file")]
     unauthenticated: bool,
-    /// The key file: a TOML Key Table if its name ends in .toml, else an
-    /// OB-UDPST udpst.keys file. Group and others must not be able to read
-    /// it. Keys are never given on the command line.
-    #[arg(long, value_name = "FILE")]
-    key_file: Option<PathBuf>,
     /// Send with this keyId's key, for a key file with several keys valid
     /// now.
     #[arg(long, value_name = "KEYID", requires = "key_file")]
@@ -168,14 +210,6 @@ struct ClientArgs {
     /// Phase hasn't finished after this many seconds.
     #[arg(long, value_name = "SECONDS", default_value_t = 3, value_parser = clap::value_parser!(u64).range(1..=3))]
     time_limit: u64,
-    /// The direction of the Test: the Server sends the load (downstream)
-    /// or the Client does (upstream).
-    #[arg(long, value_enum, default_value_t = TestDirection::Downstream)]
-    direction: TestDirection,
-    /// The Test Interval to ask the Server for, in seconds (5-60; longer
-    /// only with an Operator Key that allows it).
-    #[arg(long, value_name = "SECONDS", default_value_t = 10, value_parser = clap::value_parser!(u16).range(5..))]
-    test_interval: u16,
     /// Run a Fixed-Rate Test at this Sending Rate Table row. The Server
     /// allows it only for an Operator Key.
     #[arg(long, value_name = "ROW", value_parser = clap::value_parser!(u16).range(0..=1152))]
@@ -210,19 +244,10 @@ struct ClientArgs {
     /// The Load Rate Adjustment Algorithm the Server searches with.
     #[arg(long, value_enum, default_value_t = Algorithm::B)]
     algorithm: Algorithm,
-    /// The most the Test is expected to send or receive, in Mbps
-    /// (maxBandwidth), shared equally between its Test Connections. The
-    /// Server searches no higher, and a Server with an Admitted Rate Cap
-    /// may refuse the Test.
-    #[arg(long, value_name = "MBPS", value_parser = clap::value_parser!(u16).range(1..=0x7FFF))]
-    max_bandwidth: Option<u16>,
     /// The DSCP to mark the Test's traffic with, 0 to 63, so a specific
     /// traffic class is measured. The Server may coerce it to 0.
     #[arg(long, value_name = "DSCP", default_value_t = 0, value_parser = clap::value_parser!(u8).range(0..=63))]
     dscp: u8,
-    /// How to print the results.
-    #[arg(long, value_enum, default_value_t = Format::Text)]
-    format: Format,
     /// How text and JSON results show this Client's own address: in full,
     /// pseudonymized with a keyed hash, or truncated to the IPv4 /24 or
     /// IPv6 /48.
@@ -263,10 +288,6 @@ struct ClientArgs {
     /// fragment it.
     #[arg(long, value_name = "BOOL", default_value_t = true, num_args = 0..=1, require_equals = true, default_missing_value = "true", action = clap::ArgAction::Set)]
     dont_fragment: bool,
-    /// MaxHops: the IPv4 TTL or IPv6 hop limit of test traffic, from the
-    /// expected path length.
-    #[arg(long, value_name = "HOPS", default_value_t = DEFAULT_MAX_HOPS, value_parser = clap::value_parser!(u8).range(1..))]
-    max_hops: u8,
 }
 
 #[derive(Debug, Args)]

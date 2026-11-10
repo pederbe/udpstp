@@ -4,17 +4,20 @@ udpstp	--help -h	action=Help	num_args=0
 udpstp	--version -V	action=Version	num_args=0
 udpstp client	(command)
 udpstp client	<servers>	action=Append	value=SERVER	num_args=1..	required
+udpstp client	--key-file	action=Set	value=FILE	num_args=1
+udpstp client	--direction	action=Set	value=DIRECTION	num_args=1	possible=downstream,upstream	default=downstream
+udpstp client	--test-interval	action=Set	value=SECONDS	num_args=1	default=10
+udpstp client	--max-hops	action=Set	value=HOPS	num_args=1	default=64
+udpstp client	--format	action=Set	value=FORMAT	num_args=1	possible=text,json	default=text
+udpstp client	--max-bandwidth	action=Set	value=MBPS	num_args=1
 udpstp client	--test-connections	action=Set	value=N	num_args=1
 udpstp client	--min-test-connections	action=Set	value=N	num_args=1
 udpstp client	--unauthenticated	action=SetTrue	value=UNAUTHENTICATED	num_args=0	default=false
-udpstp client	--key-file	action=Set	value=FILE	num_args=1
 udpstp client	--key-id	action=Set	value=KEYID	num_args=1
 udpstp client	--auth-mode	action=Set	value=MODE	num_args=1	default=2
 udpstp client	--mode-1-server	action=Append	value=SERVER	num_args=1
 udpstp client	--allow-server-address	action=Append	value=SERVER=IP	num_args=1
 udpstp client	--time-limit	action=Set	value=SECONDS	num_args=1	default=3
-udpstp client	--direction	action=Set	value=DIRECTION	num_args=1	possible=downstream,upstream	default=downstream
-udpstp client	--test-interval	action=Set	value=SECONDS	num_args=1	default=10
 udpstp client	--fixed-rate	action=Set	value=ROW	num_args=1
 udpstp client	--start-row	action=Set	value=ROW	num_args=1
 udpstp client	--random-payload	action=SetTrue	value=RANDOM_PAYLOAD	num_args=0	default=false
@@ -24,9 +27,7 @@ udpstp client	--checksum	action=SetTrue	value=BOOL	num_args=0..=1	possible=true,
 udpstp client	--jumbo	action=Set	value=BOOL	num_args=0..=1	possible=true,false	default=true	require_equals
 udpstp client	--traditional-mtu	action=Set	value=BOOL	num_args=0..=1	possible=true,false	default=false	require_equals
 udpstp client	--algorithm	action=Set	value=ALGORITHM	num_args=1	possible=b,c	default=b
-udpstp client	--max-bandwidth	action=Set	value=MBPS	num_args=1
 udpstp client	--dscp	action=Set	value=DSCP	num_args=1	default=0
-udpstp client	--format	action=Set	value=FORMAT	num_args=1	possible=text,json	default=text
 udpstp client	--address-privacy	action=Set	value=ADDRESS_PRIVACY	num_args=1	possible=full,pseudonymize,truncate	default=full
 udpstp client	--address-privacy-key-file	action=Set	value=FILE	num_args=1
 udpstp client	--json-extension	action=Set	value=BOOL	num_args=0..=1	possible=true,false	default=true	require_equals
@@ -35,7 +36,6 @@ udpstp client	--faster-sub-interval-margin	action=Set	value=PERCENT	num_args=1	d
 udpstp client	--first-mode-sub-intervals	action=Set	value=N	num_args=1
 udpstp client	--socket-buffer-size	action=Set	value=BYTES	num_args=1	default=2097152
 udpstp client	--dont-fragment	action=Set	value=BOOL	num_args=0..=1	possible=true,false	default=true	require_equals
-udpstp client	--max-hops	action=Set	value=HOPS	num_args=1	default=64
 udpstp client	--color	action=Set	value=COLOR	num_args=1	possible=auto,always,never	default=auto
 udpstp client	--help -h	action=Help	num_args=0
 udpstp server	(command)

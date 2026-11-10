@@ -62,14 +62,10 @@ pub fn run(paths: &Paths) -> Result<(), String> {
         let page = read(&path)?;
         // Only real index pages are breadcrumb parents. The Reference and
         // Project sidebar groups have no landing page of their own.
-        let crumb = if book.starts_with("decisions/") && book != "decisions/index.md" {
-            Some(("Decisions", "decisions/index.html"))
-        } else {
-            part_pages
-                .get(part)
-                .filter(|first| matches!(part, "Guides" | "Conformance") && **first != html_name)
-                .map(|first| (part, first.as_str()))
-        };
+        let crumb = part_pages
+            .get(part)
+            .filter(|first| matches!(part, "Guides" | "Conformance") && **first != html_name)
+            .map(|first| (part, first.as_str()));
         write(
             &path,
             head(&page, book, &html_name, title, description, crumb)?,
@@ -780,19 +776,54 @@ fn check_hosting_routes(config: &str, redirects: &str) -> Result<(), String> {
         .map(str::trim)
         .filter(|line| !line.is_empty() && !line.starts_with('#'))
         .collect();
-    if rules
-        != [
-            "/index.html / 301",
-            "/ /index.html 200",
-            "/changelog.html https://github.com/pederbe/udpstp/releases 301",
-            "/changelog.md https://github.com/pederbe/udpstp/releases 301",
-        ]
-    {
+    const FIRST: [&str; 4] = [
+        "/index.html / 301",
+        "/ /index.html 200",
+        "/changelog.html https://github.com/pederbe/udpstp/releases 301",
+        "/changelog.md https://github.com/pederbe/udpstp/releases 301",
+    ];
+    if rules.len() < FIRST.len() || rules[..FIRST.len()] != FIRST {
         return Err(
             "_redirects: home routes or GitHub Releases redirects are missing or reordered".into(),
         );
     }
+    // The decision records left the site for the repository. Each address
+    // they had, HTML and Markdown, leads to its record there.
+    let records = &rules[FIRST.len()..];
+    for rule in records {
+        if decision_redirect(rule).is_none() {
+            return Err(format!(
+                "_redirects: {rule:?} isn't a 301 from a /decisions/ address to docs/adr in the repository"
+            ));
+        }
+    }
+    for name in ["index.html", "index.md"] {
+        if !records
+            .iter()
+            .any(|rule| decision_redirect(rule).is_some_and(|(from, _)| from == name))
+        {
+            return Err(format!("_redirects: /decisions/{name} has no redirect"));
+        }
+    }
     Ok(())
+}
+
+/// A `/decisions/` redirect as (the old page's name, the path it leads to
+/// under `docs/adr/` in the repository, empty for the folder).
+fn decision_redirect(rule: &str) -> Option<(&str, &str)> {
+    let mut fields = rule.split_whitespace();
+    let from = fields.next()?.strip_prefix("/decisions/")?;
+    let to = fields.next()?;
+    if fields.next() != Some("301") || fields.next().is_some() {
+        return None;
+    }
+    let repo = super::REPO;
+    let to = if to == format!("{repo}/tree/main/docs/adr") {
+        ""
+    } else {
+        to.strip_prefix(&format!("{repo}/blob/main/docs/adr/"))?
+    };
+    Some((from, to))
 }
 
 fn check_software_graph(nodes: &[Value]) -> Result<(), String> {
@@ -1216,8 +1247,48 @@ mod tests {
         let redirects = include_str!("../../../website/_redirects");
         assert_eq!(check_hosting_routes(config, redirects), Ok(()));
         assert!(check_hosting_routes("// \"html_handling\": \"none\",", redirects).is_err());
+        let home = "/index.html / 301\n/ /index.html 200\n\
+                    /changelog.html https://github.com/pederbe/udpstp/releases 301\n\
+                    /changelog.md https://github.com/pederbe/udpstp/releases 301\n";
+        assert!(check_hosting_routes(config, home).is_err());
+        let elsewhere = format!("{redirects}/decisions/x.html https://example.com/ 301\n");
+        assert!(check_hosting_routes(config, &elsewhere).is_err());
         assert!(check_hosting_routes(config, "/ /index.html 200\n/index.html / 301\n").is_err());
         assert!(check_hosting_routes(config, "").is_err());
+    }
+
+    // The decision records were pages of the site until they moved to the
+    // repository. Every address they had redirects to a file that exists.
+    #[test]
+    fn every_decision_record_address_redirects_to_its_file() {
+        let redirects = include_str!("../../../website/_redirects");
+        let adr = crate::workspace_root().join("docs/adr");
+        let mut redirected = BTreeSet::new();
+        for (from, to) in redirects.lines().filter_map(decision_redirect) {
+            if to.is_empty() {
+                assert!(from == "index.html" || from == "index.md", "{from}");
+                continue;
+            }
+            assert!(adr.join(to).is_file(), "{to} isn't in docs/adr");
+            let stem = to.strip_suffix(".md").unwrap();
+            assert!(
+                from == format!("{stem}.html") || from == to,
+                "{from} leads to another record, {to}"
+            );
+            redirected.insert(from.to_string());
+        }
+        // ADRs 0001 to 0015 were published.
+        for number in 1..=15 {
+            for extension in ["html", "md"] {
+                assert!(
+                    redirected.iter().any(|from| {
+                        from.starts_with(&format!("{number:04}-"))
+                            && from.ends_with(&format!(".{extension}"))
+                    }),
+                    "ADR {number:04} has no .{extension} redirect"
+                );
+            }
+        }
     }
 
     #[test]

@@ -1,14 +1,13 @@
 # Guides
 
-Start with [Getting started](../getting-started.md) for your first authenticated Test, then use these guides for the task at hand. Each guide gives the steps, and links to the explanations and reference pages for the details.
+Each guide takes you through one job with udpstp, from the first command to a working result. If you haven't run a Test yet, start with the [quickstart](../getting-started.md).
 
-| Guide | For | Covers |
-|---|---|---|
-| [Installing udpstp](installing-udpstp.md) | Client users and Server administrators | Installing release binaries, platforms, upgrades and packages |
-| [Running a Test](running-a-test.md) | Client users | Key files, Authentication Modes, Upstream and Downstream Tests, JSON results, Multi-Connection Tests and common problems |
-| [Hosting a Server](hosting-a-server.md) | Server administrators | Configuration, keys, the firewall, limits, MaxHops, socket buffers, address privacy, debugging, running it as a service, and the log |
-| [udpstp on Windows](windows.md) | Windows users of either role | Private key files, the firewall, a trial Server and the Windows service |
-| [Operator features](operator-features.md) | Operators | Operator Keys, Fixed-Rate Tests, long Test Intervals, MaxHops and DSCP |
-| [Building udpstp](building-udpstp.md) | Contributors, and users who need a source build | Building and installing from the repository |
+| You want to | Read |
+|---|---|
+| Measure a path from the Client's end, in either direction, as text or JSON | [Running a Test](running-a-test.md) |
+| Run the far end for your own Clients or for the public | [Hosting a Server](hosting-a-server.md) |
+| Use either role on Windows, with its key file permissions, firewall and service | [udpstp on Windows](windows.md) |
+| Check a provisioned rate, test for longer than 60 s or measure a traffic class | [Operator features](operator-features.md) |
+| Install a release, or build from the repository | [Installing udpstp](installing-udpstp.md) and [Building udpstp](building-udpstp.md) |
 
-To understand the results, read [Understanding the results](../understanding-results.md). The [security model](../security.md) explains the defaults, and [Stable interfaces](../interfaces.md) says what scripts can rely on.
+[Understanding the results](../understanding-results.md) explains every line and warning of a result, and [Troubleshooting](../troubleshooting.md) has the fix for each message. The [security model](../security.md) explains the defaults, and [Stable interfaces](../interfaces.md) says what scripts can rely on.

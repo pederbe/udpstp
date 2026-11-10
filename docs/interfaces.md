@@ -1,6 +1,6 @@
 # Stable interfaces
 
-What you can build on from udpstp 0.1.0, and how it changes. The command line, the Server's settings and its JSON log settle during 0.x and become stable at 1.0. The decision and its reasons are [ADR 0013](adr/0013-stable-interfaces-from-0-1-0.md); every change is in the [changelog](../CHANGELOG.md).
+Scripts and tools can rely on udpstp's exit statuses, JSON results, key files, use of stdout and stderr, and address pseudonyms from 0.1.0. The command line, the Server's settings and its JSON log settle during 0.x and become stable at 1.0. [ADR 0013](adr/0013-stable-interfaces-from-0-1-0.md) records the decision and its reasons, and the [changelog](../CHANGELOG.md) lists every change.
 
 ## What is stable
 
@@ -106,7 +106,7 @@ A Client's exit status is its ErrorStatus, the one OB-UDPST reports, except that
 | 204 | The Test was interrupted, or a write to stdout failed. On Linux and macOS an interrupted Client ends by the signal (130 for Ctrl-C), and 204 is the JSON's `ErrorStatus` |
 | 255 | Any other error |
 
-[Running a Test](guides/running-a-test.md#other-exit-statuses) says what to do about each.
+[Troubleshooting](troubleshooting.md#other-exit-statuses) says what to do about each.
 
 ## stdout and stderr
 

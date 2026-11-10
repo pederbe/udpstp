@@ -98,12 +98,12 @@ fn test_link(test: &str, git_ref: &str) -> String {
     format!("[`{}`]({}/blob/{git_ref}/{file})", test, super::REPO)
 }
 
-/// A record's references, linked: ADRs to their page, tickets to GitHub.
+/// A record's references, linked: ADRs to their file in the repository,
+/// tickets to GitHub.
 /// Research notes stay off the site, so they are left out.
 fn references(
     references: &[String],
     adrs: &BTreeMap<String, String>,
-    from: &str,
     left_out: &mut usize,
 ) -> Vec<String> {
     let mut out = Vec::new();
@@ -111,10 +111,7 @@ fn references(
         let reference = reference.trim();
         if let Some(number) = reference.strip_prefix("ADR ") {
             match adrs.get(number.trim()) {
-                Some(page) => out.push(format!(
-                    "[{reference}]({})",
-                    super::markdown::relative_to(from, page)
-                )),
+                Some(url) => out.push(format!("[{reference}]({url})")),
                 None => out.push(reference.to_string()),
             }
         } else if let Some(number) = reference.strip_prefix('#') {
@@ -128,7 +125,8 @@ fn references(
     out
 }
 
-/// Generates the Conformance part. `adrs` maps ADR numbers to their pages.
+/// Generates the Conformance part. `adrs` maps ADR numbers to their files
+/// in the repository, as web addresses.
 pub fn generate(
     loaded: &Loaded,
     adrs: &BTreeMap<String, String>,
@@ -177,10 +175,7 @@ pub fn generate(
         let reference = reference.trim();
         match reference.strip_prefix("ADR ") {
             Some(number) => match adrs.get(number.trim()) {
-                Some(page) => format!(
-                    "[{reference}]({})",
-                    super::markdown::relative_to(from, page)
-                ),
+                Some(url) => format!("[{reference}]({url})"),
                 None => reference.to_string(),
             },
             None => record_link(reference, from),
@@ -342,7 +337,7 @@ pub fn generate(
         if let Some(revisit) = &record.revisit {
             facts.push(format!("**Revisit:** {}", markdown_text(revisit)));
         }
-        let refs = references(&record.reference, adrs, page, left_out);
+        let refs = references(&record.reference, adrs, left_out);
         if !refs.is_empty() {
             facts.push(format!("**References:** {}", refs.join(", ")));
         }
@@ -606,7 +601,10 @@ mod tests {
     #[test]
     fn the_real_conformance_data_makes_consistent_pages() {
         let loaded = crate::req::load(&crate::workspace_root()).unwrap();
-        let adrs = BTreeMap::from([("0009".to_string(), "decisions/0009.md".to_string())]);
+        let adrs = BTreeMap::from([(
+            "0009".to_string(),
+            "https://github.com/pederbe/udpstp/blob/v0.1.0/docs/adr/0009.md".to_string(),
+        )]);
         let output = generate(&loaded, &adrs, "v0.1.0").unwrap();
         let page = |path: &str| {
             output

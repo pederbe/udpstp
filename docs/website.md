@@ -8,12 +8,12 @@ The website combines a static landing page with documentation built from this re
 |---|---|---|
 | Landing page | `website/index.html`, `landing.css`, `landing.js` | Static HTML and CSS, one external script (copy buttons, install tabs and motion), no framework, no third-party requests, no cookies, no analytics. Strict CSP: no inline script or style. Its numbers and terminal output are filled in at build time. |
 | Docs theme | `website/book.toml`, `website/theme/` | mdBook 0.5.4's navy theme, retinted to palette D, plus a retinted light theme; `head.hbs` adds the author, Open Graph and the docs CSP, which allows mdBook's inline scripts. Without JavaScript the docs keep the navy palette, the default for every reader. |
-| Docs pages | The repository's Markdown | `docs/getting-started.md`, `docs/guides/`, `docs/interfaces.md`, `docs/json-output.md`, `docs/security.md`, `docs/architecture.md`, `docs/technology.md`, `docs/adr/`, `docs/conformance/README.md`, `GLOSSARY.md`, `SECURITY.md`, `CONTRIBUTING.md`, and `website/pages/` for About. Links to other repository files become GitHub links pinned to the release tag; a link to a file Git doesn't track fails the build. |
-| Generated pages | `xtask/src/site/` | The command line (from `udpstp --help`), Server configuration (from `--print-config` and `ServerSettings`' documentation), exit statuses (from `exit.rs`), the key files page's recorded choices (from `keyfile.rs`, after `docs/key-files.md`), the conformance pages (from `cargo xtask req`'s data: coverage, every Requirement with its state and proving tests, and the Conformance Records by kind), the glossary (from `GLOSSARY.md`, one anchor per term), the ADR index and the citation. |
+| Docs pages | The repository's Markdown | `docs/getting-started.md`, `docs/guides/`, `docs/troubleshooting.md`, `docs/interfaces.md`, `docs/json-output.md`, `docs/security.md`, `docs/architecture.md`, `docs/technology.md`, `docs/conformance/README.md`, `GLOSSARY.md`, `SECURITY.md`, `CONTRIBUTING.md`, and `website/pages/` for About. Links to other repository files become GitHub links pinned to the release tag; a link to a file Git doesn't track fails the build. |
+| Generated pages | `xtask/src/site/` | The command line (from `udpstp --help`), Server configuration (from `--print-config` and `ServerSettings`' documentation), exit statuses (from `exit.rs`), the key files page's recorded choices (from `keyfile.rs`, after `docs/key-files.md`), the conformance pages (from `cargo xtask req`'s data: coverage, every Requirement with its state and proving tests, and the Conformance Records by kind), the glossary (from `GLOSSARY.md`, one anchor per term) and the citation. |
 | Diagrams | Mermaid blocks in the Markdown | Rendered to SVG at build time by mermaid-cli, in a dark and a light variant (`website/diagrams/`), with 18px labels. Large figures keep their native label size in a named, keyboard-accessible scroll region. Each Mermaid block must be followed by a `<!-- description: … -->` line, which becomes the figure's caption and text alternative outside the scroll region. The served pages load no mermaid.js. |
 | Images | `website/og.html`, `website/og.png`, `website/render.mjs` | The committed 1200x630 link-preview image and the PNG icons rendered from the logo (`docs/assets/logo/`). `website/fonts/fontconfig.conf` fixes Linux font rendering for reproducible social-image checks. |
 | Fonts | `website/fonts/` | A subset of IBM Plex Sans Condensed Bold, renamed "udpstp Display" as its licence requires, and bundled DejaVu fonts for the social image ([provenance.md](provenance.md#website-fonts)). Body text uses the system font; code uses mdBook's Source Code Pro. |
-| Hosting files | `website/_headers`, `website/_redirects`, `website/wrangler.jsonc` | Response headers (HSTS, CSP, and others) and the configuration for Cloudflare Workers static assets. Exact `.html` documentation URLs agree with the canonical URLs and sitemap; a root rewrite serves the landing page and `/index.html` redirects to `/`. The landing page may not be framed at all; the docs may be framed by the site itself, since mdBook's chapter list falls back to an `<iframe>` of `toc.html` without JavaScript. |
+| Hosting files | `website/_headers`, `website/_redirects`, `website/wrangler.jsonc` | Response headers (HSTS, CSP, and others) and the configuration for Cloudflare Workers static assets. Exact `.html` documentation URLs agree with the canonical URLs and sitemap; a root rewrite serves the landing page and `/index.html` redirects to `/`. The ADRs are not published: each address they had under `/decisions/`, HTML and Markdown, redirects to its file in `docs/adr/` on GitHub. The landing page may not be framed at all; the docs may be framed by the site itself, since mdBook's chapter list falls back to an `<iframe>` of `toc.html` without JavaScript. |
 
 Every build also copies the install scripts (`install/install.sh` and `install/install.ps1`, [Installing udpstp](guides/installing-udpstp.md)) to the site's root, and writes `sitemap.xml`, `robots.txt`, `llms.txt`, `llms-full.txt`, a Markdown copy of every docs page beside its HTML (linked as its `text/markdown` alternate), `site.webmanifest`, `.well-known/security.txt` and a 404 page. Each content page has its own description, canonical URL, matching Open Graph and Twitter metadata, and JSON-LD appropriate to the page's content, with BreadcrumbList destinations that resolve.
 
@@ -26,25 +26,29 @@ cannot silently discard these corrections.
 
 The docs use a dark and light theme with blue and coral accents. The
 masthead carries the logo mark and name, which lead to the landing page, and a
-Docs label leading to Getting started. In the chapter list, parts are labelled
+Docs label leading to the quickstart. In the chapter list, parts are labelled
 like the landing page's eyebrows and the current chapter has a coral rail. Each
 page title sits over a coral rule that draws in once on load. Second-level
 headings carry the signal-blue rail and third-level headings are coral. Code
 blocks, tables, notes and diagrams sit on lifted panels. Commands appear in a
 signal-blue terminal like the landing page's, labelled Terminal or PowerShell,
-and configuration files are labelled TOML. Getting started and the guides
-overview open with a larger paragraph, and Getting started's closing links
+and configuration files are labelled TOML. The quickstart and the guides
+overview open with a larger paragraph, and the quickstart's closing links
 become cards.
 
 The Docs chapter list starts open on desktop and collapsed on smaller screens.
-mdBook remembers a reader's choice made with the menu button. Getting started
+mdBook remembers a reader's choice made with the menu button. The chapter list
+has the parts Getting started, Guides, Reference, Explanation, Conformance, Help
+and Project. Getting started holds installation and the quickstart, which
 focuses on a first authenticated Test. Guides give the steps for a task,
-Explanations say why, and Reference pages list every option, event and field. The glossary begins with a browser-find shortcut.
+Reference pages list every option, event and field, Explanation says why, and
+Help has troubleshooting. The glossary begins with a browser-find shortcut.
 On the first visit, a previously saved closed sidebar is reset to apply the new
 default, whether it came from initialization or a reader's choice. Menu choices
 made afterwards are remembered.
-Conformance and Decisions start collapsed; the current page's branch opens
-automatically, and their buttons let readers expand or collapse them.
+Pages with pages beneath them, such as Conformance, start collapsed; the current
+page's branch opens automatically, and their buttons let readers expand or
+collapse them.
 The chapter list keeps its reserved space while mdBook adds the current page's
 section links, then becomes visible at DOM readiness. Without JavaScript it is
 visible immediately. This prevents its entries from jumping during startup.
@@ -138,7 +142,7 @@ This serves local files and does not deploy them. Start the preview after the bu
 
 `cargo xtask site prepare` also fails if the landing page's template names a number it doesn't fill, or if the conformance data gains a state the landing page's table has no column for.
 
-Lighthouse and axe are separate browser checks, using the local preview above. Keep Chrome and Lighthouse versions and throttling settings fixed when comparing changes. Record three runs per page, theme and device profile, compare the median Performance and its metrics, and retain the raw reports. A representative set covers the landing page, Getting started, command line, configuration, conformance, glossary and an ADR. Lighthouse 13.5.0 can be run with:
+Lighthouse and axe are separate browser checks, using the local preview above. Keep Chrome and Lighthouse versions and throttling settings fixed when comparing changes. Record three runs per page, theme and device profile, compare the median Performance and its metrics, and retain the raw reports. A representative set covers the landing page, the quickstart, command line, configuration, conformance and glossary. Lighthouse 13.5.0 can be run with:
 
 ```sh
 npx --yes lighthouse@13.5.0 http://127.0.0.1:8000/ --only-categories=performance,accessibility,best-practices,seo --output=json --output-path=/tmp/udpstp-lighthouse.json

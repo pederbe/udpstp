@@ -1,8 +1,8 @@
 # JSON results
 
-`udpstp client --format json` prints the Test's results as JSON compatible with OB-UDPST v9.1.0's client output: the same keys, in the same order, with numbers and times printed the way OB-UDPST prints them, so tools written for OB-UDPST's formatted JSON (`-f jsonf`) keep working. Progress goes to stderr, so stdout holds only the JSON.
+`udpstp client --format json` prints the Test's results as JSON compatible with OB-UDPST v9.1.0's client output. It has the same keys, in the same order, with numbers and times printed the way OB-UDPST prints them, so tools written for OB-UDPST's formatted JSON (`-f jsonf`) keep working. Progress goes to stderr, so stdout holds only the JSON.
 
-From 0.1.0 the key names, types and enumerated values are a [stable interface](interfaces.md), the extension's included; the free text in `ErrorMessage`, `ErrorMessage2` and a warning's `Message` is not.
+From 0.1.0 the key names, types and enumerated values are a [stable interface](interfaces.md), the extension's included. The free text in `ErrorMessage`, `ErrorMessage2` and a warning's `Message` is not.
 
 ## What is the same
 

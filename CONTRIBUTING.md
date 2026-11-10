@@ -16,7 +16,7 @@ cargo test --locked --workspace
 cargo xtask req
 ```
 
-Read the [glossary](GLOSSARY.md), [architecture](docs/architecture.md), [testing guide](docs/testing.md) and the [ADRs](docs/adr/) relevant to your change. The [specification](docs/spec.md) records the user stories.
+Read the [glossary](GLOSSARY.md), [architecture](docs/architecture.md), [testing guide](docs/testing.md) and the [ADRs](docs/adr/) relevant to your change. [ARCHITECTURE.md](ARCHITECTURE.md) is the short map. The [specification](docs/spec.md) records the user stories, and the [changelog](CHANGELOG.md) lists what changed in each release.
 
 The project started on the latest stable Rust and supports the last three stable releases from then on. The workspace's `rust-version` is the oldest supported version, which CI builds and tests. Raise it only when a newer release is needed and the oldest one leaves the last three, and describe the compatibility change.
 
