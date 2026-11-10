@@ -140,13 +140,13 @@ fn die_of(signal: nix::sys::signal::Signal) {
     let _ = nix::sys::signal::raise(signal);
 }
 
-/// Whether the process started with `signal` ignored, which it then keeps.
+/// Whether `signal` was ignored in the inherited mask.
+/// Capture the mask once before installing the Client or Server's handlers.
 /// `sigaction` would tell, but only through `unsafe`, which the workspace
 /// forbids; Linux reports the ignored signals in `/proc`, and other Unix
 /// systems through `ps`. Unknown, it is taken as not ignored.
 #[cfg(unix)]
-fn ignored(signal: nix::sys::signal::Signal) -> bool {
-    let mask = ignored_mask().unwrap_or(0);
+fn ignored(mask: u64, signal: nix::sys::signal::Signal) -> bool {
     let bit = signal as i32 - 1;
     (0..64).contains(&bit) && mask & (1 << bit) != 0
 }
@@ -204,8 +204,9 @@ pub fn listen() -> Interrupts {
     {
         use nix::sys::signal::SigSet;
         let mut set = SigSet::empty();
+        let ignored_signals = ignored_mask().unwrap_or(0);
         for (signal, _) in SIGNALS {
-            if !ignored(signal) {
+            if !ignored(ignored_signals, signal) {
                 set.add(signal);
             }
         }
@@ -377,9 +378,10 @@ impl ServerStop {
         #[cfg(unix)]
         {
             use tokio::signal::unix::{SignalKind, signal};
+            let ignored_signals = ignored_mask().unwrap_or(0);
             let signals = SIGNALS
                 .into_iter()
-                .filter(|&(sig, _)| !ignored(sig))
+                .filter(|&(sig, _)| !ignored(ignored_signals, sig))
                 .filter_map(|(sig, name)| {
                     let stream = signal(SignalKind::from_raw(sig as i32)).ok()?;
                     Some((stream, name))
