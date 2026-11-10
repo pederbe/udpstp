@@ -24,7 +24,7 @@ The [Release workflow](../.github/workflows/release.yml) builds the archives, na
 
 ## Release process
 
-Every Monday at 07:37 UTC, [release-plz](https://release-plz.dev) opens or updates one release pull request when there are unreleased changes. It updates Cargo versions and writes a dated section in the root changelog from merged pull request titles. Internal changes do not trigger releases. The pull request merges automatically after the required CI checks pass. New commits on `main` refresh an open release pull request so its checks cover the current source.
+Every Friday at 07:37 UTC, [release-plz](https://release-plz.dev) opens or updates one release pull request when there are unreleased changes. It updates Cargo versions and writes a dated section in the root changelog from merged pull request titles. Internal changes do not trigger releases. The pull request merges automatically after the required CI checks pass. New commits on `main` refresh an open release pull request so its checks cover the current source.
 
 After preparing each release pull request, the workflow refreshes `fuzz/Cargo.lock` on its branch to match the local crate versions. It commits the lockfile only when it changes, before enabling auto-merge. Existing registry dependency versions stay locked.
 
