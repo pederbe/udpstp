@@ -27,7 +27,7 @@ pub struct Page {
 
 /// A repository page on the site: (repository path, book path, part, label,
 /// or the file's heading when empty). `run` sets the order.
-const SOURCES: &[(&str, &str, &str, &str)] = &[
+pub(super) const SOURCES: &[(&str, &str, &str, &str)] = &[
     // The book's front page, before the first part.
     ("website/pages/index.md", "index.md", "", ""),
     (

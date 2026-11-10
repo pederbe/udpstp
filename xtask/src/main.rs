@@ -6,6 +6,7 @@ mod glossary;
 mod kat;
 mod links;
 mod records;
+mod release_numbers;
 mod release_smoke;
 mod req;
 mod site;
@@ -30,7 +31,8 @@ commands:
          (needs `openssl` 3.x on PATH)
   glossary
          check the docs, user-visible strings, --help and requirement notes
-         for terms GLOSSARY.md avoids or writes in another case
+         for terms GLOSSARY.md avoids or writes in another case, and the
+         user documentation for release numbers
   links  check that relative links in the Markdown files resolve
   req    check requirement traceability and the conformance records, print
          coverage per section and each record's proving tests, and update
@@ -47,7 +49,10 @@ fn main() -> ExitCode {
     let command = std::env::args().nth(1);
     let result = match command.as_deref() {
         Some("capture") => capture::run(),
-        Some("glossary") => glossary::run(),
+        Some("glossary") => match (glossary::run(), release_numbers::run()) {
+            (Err(terms), Err(numbers)) => Err(format!("{terms}\n{numbers}")),
+            (terms, numbers) => terms.and(numbers),
+        },
         Some("kat") => kat::run(),
         Some("links") => links::run(),
         Some("req") => match std::env::args().nth(2).as_deref() {

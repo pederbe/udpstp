@@ -434,6 +434,8 @@ cargo xtask glossary
 
 Quotations are exempt, blockquotes and text in double quotes, and so is an avoided term inside a term ("rate table" in "Sending Rate Table"). Fix what it reports with the glossary's term. Only a true exception, such as a crate's or a flag's name, goes in [`xtask/glossary-allow.toml`](../xtask/glossary-allow.toml), with its reason: an `[[allow]]` entry exempts a pattern in the files a glob matches, and an `[[unchecked]]` entry an ordinary word, such as "path", whose avoided sense only a reader can tell. An entry that exempts nothing fails the check.
 
+The same command checks that the user documentation names no release, so no page goes stale when the project releases (source: `xtask/src/release_numbers.rs`). It reads `README.md`, the crates' READMEs, the install scripts and the book's user pages, which are every part of the book except Project, and reports each number with three parts, with or without a leading "v". Release lines with two parts pass, as do IP addresses and RFC section numbers after "§". Remove a reported number. Another product's version that the reader needs, or sample data, goes in the `ALLOWED` list in that file as an exact phrase.
+
 ### Contribution checks
 
 `cargo xtask release-smoke BIN VERSION DIRECTORY` exercises an installed release
