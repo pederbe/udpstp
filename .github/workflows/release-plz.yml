@@ -52,6 +52,26 @@ jobs:
           command: release-pr
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_PLZ_TOKEN }}
+      - name: Refresh the release pull request's fuzz lockfile
+        id: fuzz-lock
+        if: steps.release-plz.outputs.prs_created == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_PLZ_TOKEN }}
+          PR: ${{ steps.release-plz.outputs.pr }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch=$(jq -er .head_branch <<< "$PR")
+          gh auth setup-git --hostname github.com
+          git fetch origin "refs/heads/$branch"
+          git switch --detach FETCH_HEAD
+          cargo update --manifest-path fuzz/Cargo.toml --workspace
+          if ! git diff --quiet -- fuzz/Cargo.lock; then
+            git add fuzz/Cargo.lock
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+              commit -m 'chore: refresh fuzz lockfile for release'
+            git push origin "HEAD:refs/heads/$branch"
+          fi
       - name: Merge the release pull request once CI passes
         if: steps.release-plz.outputs.prs_created == 'true'
         env:
