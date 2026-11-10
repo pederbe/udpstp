@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 
 use serde_json::{Value, json};
 
-use super::{Paths, SITE, copy, files_under, html_escape, read, relative, write};
+use super::{DOCS, Paths, SITE, copy, docs_url, files_under, html_escape, read, relative, write};
 
 /// The author, as every page's JSON-LD names him.
 fn author() -> Value {
@@ -17,10 +17,12 @@ fn author() -> Value {
 
 pub fn run(paths: &Paths) -> Result<(), String> {
     let public = paths.public();
-    if !public.join("getting-started.html").is_file() {
+    let docs = paths.docs();
+    if !docs.join("getting-started.html").is_file() {
         return Err(format!(
-            "{} isn't a built book; run `mdbook build target/site/book` first",
-            public.display()
+            "{} isn't a built book; run `mdbook build target/site/book --dest-dir {}` first",
+            docs.display(),
+            docs.display()
         ));
     }
     let extra = paths.extra();
@@ -29,8 +31,7 @@ pub fn run(paths: &Paths) -> Result<(), String> {
     }
     // The landing page's monospace face: mdBook's Source Code Pro, under a
     // name that doesn't change with mdBook's fingerprint.
-    let fonts = public.join("fonts");
-    let mono = files_under(&fonts)?
+    let mono = files_under(&docs.join("fonts"))?
         .into_iter()
         .find(|f| {
             f.file_name().is_some_and(|n| {
@@ -39,7 +40,7 @@ pub fn run(paths: &Paths) -> Result<(), String> {
             })
         })
         .ok_or("mdBook's output has no Source Code Pro 500")?;
-    copy(&mono, &fonts.join("source-code-pro-500.woff2"))?;
+    copy(&mono, &public.join("fonts/source-code-pro-500.woff2"))?;
     let list = read(&paths.pages_list())?;
     let mut pages = Vec::new();
     for line in list.lines() {
@@ -50,34 +51,29 @@ pub fn run(paths: &Paths) -> Result<(), String> {
         pages.push((book, title, description, part));
     }
     // Each part's crumb leads to its first page, as the chapter list does.
-    let mut part_pages: BTreeMap<&str, String> = BTreeMap::new();
+    let mut part_pages: BTreeMap<&str, &str> = BTreeMap::new();
     for (book, _, _, part) in &pages {
-        part_pages
-            .entry(part)
-            .or_insert_with(|| book.trim_end_matches(".md").to_string() + ".html");
+        part_pages.entry(part).or_insert(book);
     }
     for (book, title, description, part) in pages {
         let html_name = book.trim_end_matches(".md").to_string() + ".html";
-        let path = public.join(&html_name);
+        let path = docs.join(&html_name);
         let page = read(&path)?;
         // Only real index pages are breadcrumb parents. The Reference and
         // Project sidebar groups have no landing page of their own.
         let crumb = part_pages
             .get(part)
-            .filter(|first| matches!(part, "Guides" | "Conformance") && **first != html_name)
-            .map(|first| (part, first.as_str()));
-        write(
-            &path,
-            head(&page, book, &html_name, title, description, crumb)?,
-        )?;
+            .filter(|first| matches!(part, "Guides" | "Conformance") && **first != book)
+            .map(|first| (part, *first));
+        write(&path, head(&page, book, title, description, crumb)?)?;
     }
     // Accessibility fixes to mdBook's own markup, on every docs page.
     let mut applied: BTreeMap<&str, usize> = BTreeMap::new();
-    let files = files_under(&public)?;
+    let files = files_under(&docs)?;
     let search_scripts: Vec<_> = files
         .iter()
         .filter(|file| {
-            let name = relative(file, &public);
+            let name = relative(file, &docs);
             name.starts_with("searcher-") && name.ends_with(".js")
         })
         .collect();
@@ -88,7 +84,7 @@ pub fn run(paths: &Paths) -> Result<(), String> {
         ));
     }
     for file in files {
-        let name = relative(&file, &public);
+        let name = relative(&file, &docs);
         let toc_script = name.starts_with("toc-") && name.ends_with(".js");
         let book_script = name.starts_with("book-") && name.ends_with(".js");
         if name.starts_with("searcher-") && name.ends_with(".js") {
@@ -125,7 +121,7 @@ pub fn run(paths: &Paths) -> Result<(), String> {
             )?;
             continue;
         }
-        if !(name.ends_with(".html") || toc_script) || name == "index.html" {
+        if !(name.ends_with(".html") || toc_script) {
             continue;
         }
         let page = read(&file)?;
@@ -167,7 +163,7 @@ pub fn run(paths: &Paths) -> Result<(), String> {
     // mdBook's single-page print view and its chapter list duplicate the
     // pages; keep them out of search results.
     for name in ["print.html", "toc.html", "404.html"] {
-        let path = public.join(name);
+        let path = docs.join(name);
         if path.is_file() {
             let page = read(&path)?;
             let page = if name == "toc.html" {
@@ -178,6 +174,9 @@ pub fn run(paths: &Paths) -> Result<(), String> {
             write(&path, ensure_noindex(&page)?)?;
         }
     }
+    // The page for a missing address outside the book. mdBook's 404 page
+    // names the book as its base, so its links work from anywhere.
+    copy(&docs.join("404.html"), &public.join("404.html"))?;
     check(paths)?;
     println!("site finished: {}", public.display());
     Ok(())
@@ -221,7 +220,7 @@ const ACCESSIBILITY_FIXES: &[(&str, &str, Expect)] = &[
         "</main><footer class=\"udpstp-footer\">\
          <p>udpstp is free software under MIT OR Apache-2.0 · \
          <a href=\"https://github.com/pederbe/udpstp\">Source</a> · \
-         <a href=\"__UDPSTP_ROOT__about.html\">About</a> · <a href=\"__UDPSTP_ROOT__index.html\">udpstp.com</a></p>\
+         <a href=\"__UDPSTP_ROOT__about.html\">About</a> · <a href=\"__UDPSTP_ROOT__../\">udpstp.com</a></p>\
          <p>Created by <a href=\"https://pederbe.dev\" rel=\"author me\">Peder Bergan</a> \
          <span class=\"udpstp-profiles\">\
          <a href=\"https://github.com/pederbe\" rel=\"me\">GitHub</a> · \
@@ -290,14 +289,14 @@ const ACCESSIBILITY_FIXES: &[(&str, &str, Expect)] = &[
         "<iframe title=\"Table of contents\" class=\"sidebar-iframe-outer\"",
         Expect::EveryPage,
     ),
-    // The masthead leads home and to the start of the docs, as on the
+    // The masthead leads home and to the docs' front page, as on the
     // landing page. The mark's colours follow the reader's theme.
     (
         "<h1 class=\"menu-title\">udpstp</h1>",
-        "<div class=\"menu-title\"><a class=\"docs-brand\" href=\"__UDPSTP_ROOT__index.html\">\
+        "<div class=\"menu-title\"><a class=\"docs-brand\" href=\"__UDPSTP_ROOT__../\">\
          <svg class=\"brand-mark\" viewBox=\"0 0 32 32\" width=\"22\" height=\"22\" aria-hidden=\"true\" focusable=\"false\">\
          <path class=\"brand-trace\" d=\"M5 27H10V21H15V15H20V11H27\"/><path class=\"brand-limit\" d=\"M5 5.5H27\"/></svg>udpstp</a>\
-         <a class=\"docs-home\" href=\"__UDPSTP_ROOT__getting-started.html\">Docs</a></div>",
+         <a class=\"docs-home\" href=\"__UDPSTP_ROOT__./\">Docs</a></div>",
         Expect::EveryPage,
     ),
     (
@@ -360,15 +359,16 @@ fn contents_landmark(page: &str) -> Result<String, String> {
 }
 
 /// A docs page's `<head>` with its own description, canonical URL, Open
-/// Graph URL and text, Markdown alternate and JSON-LD.
+/// Graph URL and text, Markdown alternate and JSON-LD. `part` names the
+/// page's part and that part's first page in the book.
 fn head(
     page: &str,
     book: &str,
-    html_name: &str,
     title: &str,
     description: &str,
     part: Option<(&str, &str)>,
 ) -> Result<String, String> {
+    let html_name = book.trim_end_matches(".md").to_string() + ".html";
     const META: &str = "<meta name=\"description\" content=\"";
     let start = page
         .find(META)
@@ -396,14 +396,18 @@ fn head(
             .find("</title>")
             .ok_or("unclosed page title")?;
     out.replace_range(title_start..title_end, &html_escape(&branded_title));
-    let url = format!("{SITE}/{html_name}");
+    let url = docs_url(book);
     let markdown_name = Path::new(book)
         .file_name()
         .map(|n| n.to_string_lossy().to_string())
         .unwrap_or_default();
     let mut crumbs = vec![("udpstp".to_string(), format!("{SITE}/"))];
+    let front = docs_url("index.md");
+    if url != front {
+        crumbs.push(("Docs".to_string(), front));
+    }
     if let Some((name, first)) = part {
-        crumbs.push((name.to_string(), format!("{SITE}/{first}")));
+        crumbs.push((name.to_string(), docs_url(first)));
     }
     crumbs.push((title.to_string(), url.clone()));
     let items: Vec<Value> = crumbs
@@ -463,6 +467,7 @@ fn page_kind(book: &str) -> &'static str {
         | "conformance/interpretations.md"
         | "conformance/obudpst-differences.md" => "CollectionPage",
         "citation.md" | "security-policy.md" | "contributing.md" => "WebPage",
+        "index.md" => "CollectionPage",
         _ if book.ends_with("/index.md") => "CollectionPage",
         _ => "TechArticle",
     }
@@ -511,6 +516,11 @@ pub fn check(paths: &Paths) -> Result<(), String> {
                 problems.push(format!("{name}: loads a third-party resource ({tag}…)"));
             }
         }
+        // mdBook's 404 page resolves its links against the book, wherever
+        // the page is served from.
+        let base = page
+            .contains(&format!("<base href=\"/{DOCS}/\">"))
+            .then(|| public.join(DOCS));
         for link in attribute_values(&page, "href")
             .into_iter()
             .chain(attribute_values(&page, "src"))
@@ -534,6 +544,8 @@ pub fn check(paths: &Paths) -> Result<(), String> {
                 (*file).clone()
             } else if let Some(absolute) = path.strip_prefix('/') {
                 public.join(absolute)
+            } else if let Some(base) = &base {
+                base.join(path)
             } else {
                 file.parent().unwrap_or(&public).join(path)
             };
@@ -578,16 +590,13 @@ fn metadata_problems(paths: &Paths) -> Result<Vec<String>, String> {
     for line in read(&paths.pages_list())?.lines() {
         let book = line.split('\t').next().ok_or("empty pages.tsv line")?;
         intended.insert(
-            book.trim_end_matches(".md").to_string() + ".html",
+            format!("{DOCS}/{}.html", book.trim_end_matches(".md")),
             page_kind(book),
         );
     }
-    let canonical = |name: &str| {
-        if name == "index.html" {
-            format!("{SITE}/")
-        } else {
-            format!("{SITE}/{name}")
-        }
+    let canonical = |name: &str| match name.strip_prefix(&format!("{DOCS}/")) {
+        Some(page) => docs_url(page.trim_end_matches(".html")),
+        None => format!("{SITE}/"),
     };
     let expected_urls: BTreeSet<String> = intended.keys().map(|name| canonical(name)).collect();
     let sitemap = read(&public.join("sitemap.xml"))?;
@@ -641,7 +650,12 @@ fn metadata_problems(paths: &Paths) -> Result<Vec<String>, String> {
             }
         }
     }
-    for name in ["print.html", "toc.html", "404.html"] {
+    for name in [
+        "docs/print.html",
+        "docs/toc.html",
+        "docs/404.html",
+        "404.html",
+    ] {
         let page = read(&public.join(name))?;
         if one_tag_value(&page, "meta", "name", "robots", "content").as_deref() != Ok("noindex") {
             problems.push(format!("{name}: duplicate or error page needs noindex"));
@@ -776,15 +790,19 @@ fn check_hosting_routes(config: &str, redirects: &str) -> Result<(), String> {
         .map(str::trim)
         .filter(|line| !line.is_empty() && !line.starts_with('#'))
         .collect();
-    const FIRST: [&str; 4] = [
+    const FIRST: [&str; 7] = [
         "/index.html / 301",
         "/ /index.html 200",
+        "/docs /docs/ 301",
+        "/docs/index.html /docs/ 301",
+        "/docs/ /docs/index.html 200",
         "/changelog.html https://github.com/pederbe/udpstp/releases 301",
         "/changelog.md https://github.com/pederbe/udpstp/releases 301",
     ];
     if rules.len() < FIRST.len() || rules[..FIRST.len()] != FIRST {
         return Err(
-            "_redirects: home routes or GitHub Releases redirects are missing or reordered".into(),
+            "_redirects: home and docs routes or GitHub Releases redirects are missing or reordered"
+                .into(),
         );
     }
     // The decision records left the site for the repository. Each address
@@ -1110,10 +1128,9 @@ mod tests {
         let out = head(
             page,
             "guides/a.md",
-            "guides/a.html",
             "A \"guide\"",
             "About A.",
-            Some(("Guides", "guides/index.html")),
+            Some(("Guides", "guides/index.md")),
         )
         .unwrap();
         let graph: Value = serde_json::from_str(
@@ -1125,16 +1142,22 @@ mod tests {
                 .0,
         )
         .unwrap();
-        assert_eq!(graph["@graph"][1]["itemListElement"][1]["name"], "Guides");
         assert_eq!(
             graph["@graph"][1]["itemListElement"][1]["item"],
-            "https://udpstp.com/guides/index.html"
+            "https://udpstp.com/docs/"
+        );
+        assert_eq!(graph["@graph"][1]["itemListElement"][2]["name"], "Guides");
+        assert_eq!(
+            graph["@graph"][1]["itemListElement"][2]["item"],
+            "https://udpstp.com/docs/guides/index.html"
         );
         assert!(out.contains("<meta name=\"description\" content=\"About A.\">"));
-        assert!(out.contains("<link rel=\"canonical\" href=\"https://udpstp.com/guides/a.html\">"));
+        assert!(
+            out.contains("<link rel=\"canonical\" href=\"https://udpstp.com/docs/guides/a.html\">")
+        );
         assert!(out.contains("<link rel=\"alternate\" type=\"text/markdown\" href=\"a.md\">"));
         assert_eq!(graph["@graph"][0]["headline"], "A \"guide\"");
-        assert_eq!(graph["@graph"][1]["itemListElement"][2]["position"], 3);
+        assert_eq!(graph["@graph"][1]["itemListElement"][3]["position"], 4);
         assert!(out.contains("<title>A &quot;guide&quot; - udpstp</title>"));
         assert!(
             out.contains("<meta name=\"twitter:title\" content=\"A &quot;guide&quot; - udpstp\">")
@@ -1155,14 +1178,17 @@ mod tests {
         let page = head(
             template,
             "guides/index.md",
-            "guides/index.html",
             "Guides",
             "UDPSTP task guides for Client users and Server administrators.",
             None,
         )
         .unwrap();
-        let url = "https://udpstp.com/guides/index.html";
-        let urls = BTreeSet::from(["https://udpstp.com/".to_string(), url.to_string()]);
+        let url = "https://udpstp.com/docs/guides/index.html";
+        let urls = BTreeSet::from([
+            "https://udpstp.com/".to_string(),
+            "https://udpstp.com/docs/".to_string(),
+            url.to_string(),
+        ]);
         assert_eq!(
             check_page_metadata(&page, url, "CollectionPage", &urls),
             Ok(())
@@ -1177,8 +1203,8 @@ mod tests {
                 .contains("exactly one")
         );
         let wrong_url = page.replace(
-            "<meta property=\"og:url\" content=\"https://udpstp.com/guides/index.html\">",
-            "<meta property=\"og:url\" content=\"https://udpstp.com/guides/\">",
+            "<meta property=\"og:url\" content=\"https://udpstp.com/docs/guides/index.html\">",
+            "<meta property=\"og:url\" content=\"https://udpstp.com/docs/guides/\">",
         );
         assert!(
             check_page_metadata(&wrong_url, url, "CollectionPage", &urls)
@@ -1248,6 +1274,8 @@ mod tests {
         assert_eq!(check_hosting_routes(config, redirects), Ok(()));
         assert!(check_hosting_routes("// \"html_handling\": \"none\",", redirects).is_err());
         let home = "/index.html / 301\n/ /index.html 200\n\
+                    /docs /docs/ 301\n/docs/index.html /docs/ 301\n\
+                    /docs/ /docs/index.html 200\n\
                     /changelog.html https://github.com/pederbe/udpstp/releases 301\n\
                     /changelog.md https://github.com/pederbe/udpstp/releases 301\n";
         assert!(check_hosting_routes(config, home).is_err());

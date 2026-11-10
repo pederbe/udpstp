@@ -72,7 +72,7 @@ brew install pederbe/tap/udpstp
 irm https://udpstp.com/install.ps1 | iex
 ```
 
-The [installation guide](https://udpstp.com/guides/installing-udpstp.html) covers signed Linux packages, portable downloads, Cargo and updates.
+The [installation guide](https://udpstp.com/docs/guides/installing-udpstp.html) covers signed Linux packages, portable downloads, Cargo and updates.
 
 ## Everyday use
 
@@ -91,7 +91,7 @@ key_id = 1
 key_hex = "replace-with-64-hexadecimal-digits"
 ```
 
-Allow inbound UDP ports 24601 and 49152 to 65535 at the Server. The [quickstart](https://udpstp.com/getting-started.html) covers Windows and other firewall setups.
+Allow inbound UDP ports 24601 and 49152 to 65535 at the Server. The [quickstart](https://udpstp.com/docs/getting-started.html) covers Windows and other firewall setups.
 
 Start a Server at the far end of the path.
 
@@ -158,16 +158,16 @@ udpstp runs complete Tests and reports their results.
 | Hosted documentation | Done |
 | Release binaries, signed Linux packages and installers | Done |
 
-[Platform differences](https://udpstp.com/reference/platforms.html) describes options that depend on the operating system. JSON results, exit statuses, key files and address pseudonyms are stable from 0.1.0. The command line, configuration and Server JSON logs can change in minor 0.x releases, with changes listed in the [changelog](https://udpstp.com/changelog.html).
+[Platform differences](https://udpstp.com/docs/reference/platforms.html) describes options that depend on the operating system. JSON results, exit statuses, key files and address pseudonyms are stable. The command line, configuration and Server JSON logs can change in minor 0.x releases, with changes listed in the [changelog](https://udpstp.com/changelog.html).
 
 ## Learn more
 
-- [Quickstart](https://udpstp.com/getting-started.html) for your first Test between two hosts
-- [Installation](https://udpstp.com/guides/installing-udpstp.html) for packages, portable downloads and Cargo
-- [Guides](https://udpstp.com/guides/index.html) for running Tests, [hosting a Server](https://udpstp.com/guides/hosting-a-server.html), Windows and Operator features
-- [Understanding the results](https://udpstp.com/understanding-results.html)
-- [Command line reference](https://udpstp.com/reference/cli.html)
-- [Troubleshooting](https://udpstp.com/troubleshooting.html)
-- [Architecture](https://udpstp.com/architecture.html), [contributing](https://github.com/pederbe/udpstp/blob/main/CONTRIBUTING.md) and [security reports](https://github.com/pederbe/udpstp/blob/main/SECURITY.md)
+- [Quickstart](https://udpstp.com/docs/getting-started.html) for your first Test between two hosts
+- [Installation](https://udpstp.com/docs/guides/installing-udpstp.html) for packages, portable downloads and Cargo
+- [Guides](https://udpstp.com/docs/guides/index.html) for running Tests, [hosting a Server](https://udpstp.com/docs/guides/hosting-a-server.html), Windows and Operator features
+- [Understanding the results](https://udpstp.com/docs/understanding-results.html)
+- [Command line reference](https://udpstp.com/docs/reference/cli.html)
+- [Troubleshooting](https://udpstp.com/docs/troubleshooting.html)
+- [Architecture](https://udpstp.com/docs/architecture.html), [contributing](https://github.com/pederbe/udpstp/blob/main/CONTRIBUTING.md) and [security reports](https://github.com/pederbe/udpstp/blob/main/SECURITY.md)
 
 Dual-licensed under [MIT](https://github.com/pederbe/udpstp/blob/main/LICENSE-MIT) or [Apache-2.0](https://github.com/pederbe/udpstp/blob/main/LICENSE-APACHE).

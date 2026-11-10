@@ -50,7 +50,7 @@ Examples:
   udpstp server --key-file keys.toml --max-hops 12
   udpstp client --key-file keys.toml --max-hops 12 server.example.net
 
-Documentation: https://udpstp.com/getting-started.html"
+Documentation: https://udpstp.com/docs/getting-started.html"
 )]
 struct Cli {
     /// Terminal styling: auto for capable terminals, always for redirected
@@ -69,7 +69,7 @@ Examples:
   udpstp client --key-file keys.toml server.example.net
   udpstp client --key-file keys.toml --direction upstream server.example.net
 
-Documentation: https://udpstp.com/guides/running-a-test.html")]
+Documentation: https://udpstp.com/docs/guides/running-a-test.html")]
     Client(Box<ClientArgs>),
     /// Serve Tests: answer Clients' Setup and Activation Requests and run
     /// their Test Connections.
@@ -79,7 +79,7 @@ Examples:
   udpstp server --key-file keys.toml --max-hops 12
   udpstp server --config /etc/udpstp/server.toml
 
-Documentation: https://udpstp.com/guides/hosting-a-server.html")]
+Documentation: https://udpstp.com/docs/guides/hosting-a-server.html")]
     Server(Box<ServerArgs>),
 }
 

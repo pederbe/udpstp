@@ -1,6 +1,6 @@
-# The docs half of udpstp.com, built by scripts/build-site.sh: `cargo xtask
-# site prepare` copies this file to target/site/book/ beside the generated
-# sources, and mdBook 0.5.4 builds it.
+# The docs half of udpstp.com, served under /docs/ and built by
+# scripts/build-site.sh: `cargo xtask site prepare` copies this file to
+# target/site/book/ beside the generated sources, and mdBook 0.5.4 builds it.
 [book]
 title = "udpstp"
 description = "udpstp is a Rust implementation of UDPSTP (RFC 9946), which measures the Maximum IP-Layer Capacity of a network path."
@@ -9,7 +9,7 @@ language = "en"
 src = "src"
 
 [output.html]
-site-url = "/"
+site-url = "/docs/"
 git-repository-url = "https://github.com/pederbe/udpstp"
 default-theme = "navy"
 preferred-dark-theme = "navy"

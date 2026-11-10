@@ -13,8 +13,9 @@
 //!    everything served beside the book to `target/site/extra/`: the
 //!    landing page, a Markdown copy of every page, llms.txt, the sitemap and
 //!    the response headers;
-//! 3. `mdbook build target/site/book` writes `target/site/public/`;
-//! 4. `cargo xtask site finish` copies `extra/` over it, gives every docs
+//! 3. `mdbook build target/site/book --dest-dir` writes
+//!    `target/site/public/docs/`;
+//! 4. `cargo xtask site finish` copies `extra/` over `target/site/public/`, gives every docs
 //!    page its canonical URL, description, Markdown alternate and JSON-LD,
 //!    and runs `check`: internal links and the palette's contrast.
 //!
@@ -32,6 +33,19 @@ use std::path::{Path, PathBuf};
 /// The site's canonical origin: the apex, no trailing slash.
 pub const SITE: &str = "https://udpstp.com";
 
+/// The book's directory on the site. The landing page is at the root, and
+/// every docs page is under `/docs/`.
+pub const DOCS: &str = "docs";
+
+/// A docs page's canonical URL, from its path in the book. The book's front
+/// page is the directory itself.
+pub fn docs_url(book: &str) -> String {
+    match book.trim_end_matches(".md") {
+        "index" => format!("{SITE}/{DOCS}/"),
+        page => format!("{SITE}/{DOCS}/{page}.html"),
+    }
+}
+
 /// The repository, where links to files outside the book go.
 pub const REPO: &str = "https://github.com/pederbe/udpstp";
 
@@ -40,7 +54,8 @@ pub const USAGE: &str = "usage: cargo xtask site <prepare|finish|check|contrast>
   prepare   write the book's sources and the landing page to target/site
             (needs UDPSTP_BIN, the built udpstp binary, and mermaid-cli in
             website/node_modules, or UDPSTP_MMDC)
-  finish    complete target/site/public after `mdbook build target/site/book`
+  finish    complete target/site/public after mdbook built target/site/book
+            into target/site/public/docs
   check     check target/site/public: links, contrast
   contrast  check the palette's token pairs (website/contrast.toml)
 
@@ -81,13 +96,17 @@ impl Paths {
     pub fn src(&self) -> PathBuf {
         self.book().join("src")
     }
-    /// Files served beside the book, copied over it by `finish`.
+    /// Files served beside the book, copied into the site by `finish`.
     pub fn extra(&self) -> PathBuf {
         self.out.join("extra")
     }
     /// The finished site.
     pub fn public(&self) -> PathBuf {
         self.out.join("public")
+    }
+    /// The book in the finished site, where mdBook writes it.
+    pub fn docs(&self) -> PathBuf {
+        self.public().join(DOCS)
     }
     /// What `website/render.mjs` rendered.
     pub fn rendered(&self) -> PathBuf {
@@ -197,7 +216,20 @@ pub fn version(root: &Path) -> Result<String, String> {
 
 #[cfg(test)]
 mod tests {
-    use super::{html_escape, slug};
+    use super::{docs_url, html_escape, slug};
+
+    #[test]
+    fn docs_pages_are_under_docs_and_the_front_page_is_the_directory() {
+        assert_eq!(docs_url("index.md"), "https://udpstp.com/docs/");
+        assert_eq!(
+            docs_url("guides/index.md"),
+            "https://udpstp.com/docs/guides/index.html"
+        );
+        assert_eq!(
+            docs_url("getting-started.md"),
+            "https://udpstp.com/docs/getting-started.html"
+        );
+    }
 
     #[test]
     fn slugs_follow_mdbook() {

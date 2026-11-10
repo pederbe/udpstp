@@ -203,10 +203,10 @@ Disable core dumps for the service.
 
 Release checksums detect a download that differs from the published hash. Build attestations add a separate, signed check of where it was built. The install scripts don't perform this check.
 
-Use the [GitHub CLI](https://cli.github.com/) 2.97.0 or later, signed in with `gh auth login`. Download the archive yourself, since the install scripts delete theirs. For Linux on x86_64:
+Use a current [GitHub CLI](https://cli.github.com/), signed in with `gh auth login`. Download the archive yourself, since the install scripts delete theirs. For Linux on x86_64:
 
 ```sh
-tag=v0.1.0
+tag=vX.Y.Z
 archive=udpstp-$tag-x86_64-unknown-linux-gnu.tar.gz
 gh release download "$tag" --repo pederbe/udpstp --pattern "$archive"
 gh attestation verify "$archive" --repo pederbe/udpstp \
@@ -217,10 +217,10 @@ gh attestation verify "$archive" --repo pederbe/udpstp \
 For Windows, in PowerShell:
 
 ```powershell
-$tag = 'v0.1.0'
+$tag = 'vX.Y.Z'
 $archive = "udpstp-$tag-x86_64-pc-windows-msvc.zip"
 gh release download $tag --repo pederbe/udpstp --pattern $archive
 gh attestation verify $archive --repo pederbe/udpstp --signer-workflow pederbe/udpstp/.github/workflows/release.yml --source-ref "refs/tags/$tag"
 ```
 
-Use your release's tag and archive name, and continue only if verification succeeds. This checks the signed provenance against the repository, the Release workflow and the source tag. It doesn't prove the code is safe or stop a tag from moving. [GitHub's attestation guide](https://docs.github.com/en/actions/concepts/security/artifact-attestations) explains the guarantees.
+Replace `vX.Y.Z` with your release's tag, use the archive name for your platform, and continue only if verification succeeds. This checks the signed provenance against the repository, the Release workflow and the source tag. It doesn't prove the code is safe or stop a tag from moving. [GitHub's attestation guide](https://docs.github.com/en/actions/concepts/security/artifact-attestations) explains the guarantees.
