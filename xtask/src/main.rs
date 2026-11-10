@@ -14,6 +14,8 @@ mod winget_submission;
 
 #[cfg(test)]
 mod check_selection_tests;
+#[cfg(test)]
+mod release_pr_tests;
 
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
