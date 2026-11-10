@@ -7,7 +7,7 @@ Test completed
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -331,7 +331,7 @@ Test completed
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -659,7 +659,7 @@ udpstp: warning: the Watchdog ended the Test: nothing received for 3 s
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -850,7 +850,7 @@ udpstp: the Test was interrupted
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -1037,7 +1037,7 @@ udpstp: warning: the Test ended without the Server's STOP: Stopped
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -1224,7 +1224,7 @@ udpstp: warning: the Test ended without the Server's STOP: Unconfirmed
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -1411,7 +1411,7 @@ udpstp: warning: the Test ended without the Server's STOP: StoppedByClient
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -1598,7 +1598,7 @@ udpstp: warning: the Test ended without the Server's STOP: OverRate
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -1785,7 +1785,7 @@ udpstp: the Data Phase failed: the Data Phase panicked
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -1972,7 +1972,7 @@ udpstp: the Server rejected the Activation Request
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -2000,7 +2000,7 @@ udpstp: the Server rejected the Activation Request; only an Operator Key may run
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -2028,7 +2028,7 @@ udpstp: the Test ended: UnknownActivationResponse
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -2056,7 +2056,7 @@ udpstp: 192.0.2.1:24601 set dscpEcn to 0 (asked for 184), which --refuse-coercio
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -2089,7 +2089,7 @@ udpstp: the Server set testIntTime to 1, which the Client can't run with; the Te
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -2122,7 +2122,7 @@ udpstp: 192.0.2.1:24601 refused the Test: the request's time was more than 5 s f
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -2150,7 +2150,7 @@ udpstp: 192.0.2.1:24601 answered the Setup Request with cmdResponse 99, which RF
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -2178,7 +2178,7 @@ udpstp: configuration error: no key to authenticate with; give one with --key-fi
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -2206,7 +2206,7 @@ udpstp: configuration error: no key in the key file may be sent with now (its se
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -2234,7 +2234,7 @@ udpstp: configuration error: several keys are valid now; choose one with --key-i
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -2262,7 +2262,7 @@ udpstp: configuration error: 224.0.0.1:24601 is a multicast or broadcast address
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -2290,7 +2290,7 @@ udpstp: the Test Connection's socket couldn't be opened
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -2318,7 +2318,7 @@ udpstp: 192.0.2.1:24601: Too many open files (os error 24)
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -2347,7 +2347,7 @@ udpstp: the Test was abandoned before it started
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -2375,7 +2375,7 @@ udpstp: no answer from 192.0.2.1:24601 within 3 s
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -2404,7 +2404,7 @@ udpstp: a response was more than 5 s from this host's clock; check both clocks
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -2433,7 +2433,7 @@ udpstp: a response failed verification; check the key
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -2462,7 +2462,7 @@ udpstp: a Setup Response came to a broadcast or multicast address and was ignore
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -2491,7 +2491,7 @@ udpstp: a response failed its header checksum (--checksum): it was corrupted on 
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -2519,7 +2519,7 @@ udpstp: 192.0.2.1:24601: the Activation exchange didn't complete within 3 s
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -2548,7 +2548,7 @@ udpstp: a response was more than 5 s from this host's clock; check both clocks
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -2577,7 +2577,7 @@ udpstp: a response failed verification; check the key
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
@@ -2606,7 +2606,7 @@ udpstp: a response failed its header checksum (--checksum): it was corrupted on 
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},

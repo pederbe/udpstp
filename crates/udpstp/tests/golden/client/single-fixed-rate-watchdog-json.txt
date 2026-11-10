@@ -6,7 +6,7 @@ udpstp: warning: the Watchdog ended the Test: nothing received for 3 s
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},

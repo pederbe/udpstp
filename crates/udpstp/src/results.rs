@@ -860,17 +860,20 @@ pub(crate) mod tests {
     }
 
     /// Compares with a golden file; `UDPSTP_BLESS=1` rewrites it.
+    /// Golden files use `udpstp {version}` for the current package version.
     pub(crate) fn golden(name: &str, text: &str) {
+        let version = concat!("udpstp ", env!("CARGO_PKG_VERSION"));
         let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("tests/golden")
             .join(name);
         if std::env::var("UDPSTP_BLESS").as_deref() == Ok("1") {
             std::fs::create_dir_all(path.parent().unwrap()).unwrap();
-            std::fs::write(&path, text).unwrap();
+            std::fs::write(&path, text.replace(version, "udpstp {version}")).unwrap();
         }
         let want = std::fs::read_to_string(&path)
             .unwrap_or_else(|e| panic!("{}: {e}; run with UDPSTP_BLESS=1", path.display()))
-            .replace("\r\n", "\n");
+            .replace("\r\n", "\n")
+            .replace("udpstp {version}", version);
         assert_eq!(
             text,
             want,
