@@ -85,8 +85,10 @@ jobs:
           head=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)
           test "$head" = "$SOURCE"
           test -f target/site/public/index.html
+          test -f target/site/public/docs/index.html
           test -f target/site/public/sitemap.xml
           test -f target/site/public/og.png
           npx --yes wrangler@4.147.0 deploy --config website/wrangler.jsonc
           curl --fail --retry 5 --retry-delay 3 https://udpstp.com/ > /dev/null
-          curl --fail --retry 5 --retry-delay 3 https://udpstp.com/getting-started.html > /dev/null
+          curl --fail --retry 5 --retry-delay 3 https://udpstp.com/docs/ > /dev/null
+          curl --fail --retry 5 --retry-delay 3 https://udpstp.com/docs/getting-started.html > /dev/null

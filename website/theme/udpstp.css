@@ -8,7 +8,7 @@
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("../fonts/udpstp-display-bold.woff2") format("woff2");
+  src: url("../../fonts/udpstp-display-bold.woff2") format("woff2");
 }
 
 /* Without JavaScript mdBook would follow the system palette under the navy

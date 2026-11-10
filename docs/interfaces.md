@@ -1,6 +1,6 @@
 # Stable interfaces
 
-Scripts and tools can rely on udpstp's exit statuses, JSON results, key files, use of stdout and stderr, and address pseudonyms from 0.1.0. The command line, the Server's settings and its JSON log settle during 0.x and become stable at 1.0. [ADR 0013](adr/0013-stable-interfaces-from-0-1-0.md) records the decision and its reasons, and the [changelog](../CHANGELOG.md) lists every change.
+Scripts and tools can rely on udpstp's exit statuses, JSON results, key files, use of stdout and stderr, and address pseudonyms in every release. The command line, the Server's settings and its JSON log settle during 0.x and become stable at 1.0. [ADR 0013](adr/0013-stable-interfaces-from-0-1-0.md) records the decision and its reasons, and the [changelog](../CHANGELOG.md) lists every change.
 
 ## What is stable
 
@@ -77,10 +77,10 @@ and table alignment, with wrapping adapted to the displayed symbol width.
 
 ## How a stable interface changes
 
-These rules cover the interfaces stable from 0.1.0, and from 1.0 the command line, settings and JSON log too.
+These rules cover the interfaces that are stable today, and from 1.0 the command line, settings and JSON log too.
 
 - **Additions** come in a minor release: new options, settings, JSON keys, log events and fields, enumerated values, exit statuses and Key Table columns. Your tools should ignore what they don't know: an unknown key, field, event or value, and treat an unknown non-zero exit status as a failure.
-- **A renamed or removed input** (an option, a setting, a value, a Key Table column) is still accepted for one minor release, with a warning on stderr naming its replacement. A name deprecated in 0.3.0 works through 0.3.x and may go in 0.4.0.
+- **A renamed or removed input** (an option, a setting, a value, a Key Table column) is still accepted for one minor release, with a warning on stderr naming its replacement. A name deprecated in one minor release works through that release's patch releases and may go in the next minor release.
 - **A renamed or removed output** (a log event, field or value, a JSON key or value) is written under both names for one minor release, then only under the new one.
 - **A default** changes in a minor release, announced in the changelog of the minor release before. A security fix may change one at once; the changelog says so.
 
@@ -143,4 +143,4 @@ With `address_privacy = "pseudonymize"` (the Server) or `--address-privacy pseud
 
 ## Container images
 
-Each published release provides `ghcr.io/pederbe/udpstp:<version>`, such as `:0.1.0`, which never changes. `:latest` follows releases that are not marked as pre-releases, including one that ends a deprecation period. Pin `:<version>` and upgrade on purpose.
+Each published release provides `ghcr.io/pederbe/udpstp:<version>`, tagged with the release's version number without the leading `v`, which never changes. `:latest` follows releases that are not marked as pre-releases, including one that ends a deprecation period. Pin `:<version>` and upgrade on purpose.

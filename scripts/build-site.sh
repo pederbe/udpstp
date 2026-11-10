@@ -1,6 +1,6 @@
 #!/bin/sh
-# Build udpstp.com locally into target/site/public: the landing page and the
-# mdBook docs, with diagrams, icons and the link-preview image rendered at
+# Build udpstp.com locally into target/site/public: the landing page and,
+# under docs/, the mdBook docs, with diagrams, icons and the link-preview image rendered at
 # build time. See docs/website.md for sources, previewing and build checks.
 #
 # usage: scripts/build-site.sh [--dev] [--audit]   (Linux or WSL)
@@ -71,7 +71,7 @@ cargo run --quiet --locked -p xtask -- site prepare
 
 echo "== mdBook"
 rm -rf "$out/public"
-mdbook build "$out/book" --dest-dir "$root/$out/public"
+mdbook build "$out/book" --dest-dir "$root/$out/public/docs"
 
 echo "== finish and check"
 cargo run --quiet --locked -p xtask -- site finish

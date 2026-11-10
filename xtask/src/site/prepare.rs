@@ -9,7 +9,7 @@ use std::process::Command;
 
 use super::conformance::{self, Facts};
 use super::markdown::{self, Diagrams, LinkMap};
-use super::{Paths, SITE, copy, html_escape, read, slug, write};
+use super::{DOCS, Paths, SITE, copy, docs_url, html_escape, read, slug, write};
 use crate::req::Status;
 
 /// One page of the book.
@@ -28,6 +28,8 @@ pub struct Page {
 /// A repository page on the site: (repository path, book path, part, label,
 /// or the file's heading when empty). `run` sets the order.
 const SOURCES: &[(&str, &str, &str, &str)] = &[
+    // The book's front page, before the first part.
+    ("website/pages/index.md", "index.md", "", ""),
     (
         "docs/guides/installing-udpstp.md",
         "guides/installing-udpstp.md",
@@ -135,7 +137,9 @@ const SOURCES: &[(&str, &str, &str, &str)] = &[
 
 /// Repository paths that aren't pages themselves but have one.
 const ALIASES: &[(&str, &str)] = &[
-    // The settings' own documentation, which the page is generated from.
+    // The options' and the settings' own documentation, which the pages
+    // are generated from.
+    ("crates/udpstp/src/main.rs", "reference/cli.md"),
     ("crates/udpstp/src/config.rs", "reference/configuration.md"),
     ("docs/conformance/summary.md", "conformance/index.md"),
     ("docs/conformance", "conformance/index.md"),
@@ -253,6 +257,7 @@ pub fn run(paths: &Paths) -> Result<(), String> {
         Ok(generated(path, "Reference", false, markdown.clone()))
     };
     // In the chapter list's order.
+    pages.push(repo("website/pages/index.md", false)?);
     pages.push(repo("docs/guides/installing-udpstp.md", false)?);
     pages.push(repo("docs/guides/building-udpstp.md", true)?);
     pages.push(repo("docs/getting-started.md", false)?);
@@ -335,7 +340,7 @@ pub fn run(paths: &Paths) -> Result<(), String> {
         })?;
         write(&src.join(&page.book), book_markdown)?;
         // The Markdown copy, whose links go to the other copies.
-        write(&paths.extra().join(&page.book), &page.markdown)?;
+        write(&paths.extra().join(DOCS).join(&page.book), &page.markdown)?;
         let title = markdown::title(&page.markdown).unwrap_or_else(|| page.label.clone());
         let _ = writeln!(
             descriptions,
@@ -660,6 +665,7 @@ fn insert_description(readme: &str) -> String {
 const NOT_FOUND: &str = "# Page not found\n\n\
 The page you asked for isn't here. It may have moved when the docs were reorganised.\n\n\
 - [udpstp.com](https://udpstp.com/), the home page\n\
+- [Documentation](index.md)\n\
 - [Quickstart](getting-started.md)\n\
 - [Guides](guides/index.md)\n\
 - [Troubleshooting](troubleshooting.md)\n\
@@ -695,9 +701,10 @@ fn security_txt() -> String {
          Contact: {repo}/security/advisories/new\n\
          Expires: {y:04}-{m:02}-{d:02}T00:00:00Z\n\
          Preferred-Languages: en\n\
-         Policy: {SITE}/security-policy.html\n\
+         Policy: {policy}\n\
          Canonical: {SITE}/.well-known/security.txt\n",
-        repo = super::REPO
+        repo = super::REPO,
+        policy = docs_url("security-policy.md")
     )
 }
 
@@ -724,6 +731,9 @@ fn html_path(book: &str) -> String {
 /// articles take their summary from their own prose.
 fn page_description(page: &Page) -> String {
     let summary = match page.book.as_str() {
+        "index.md" => {
+            "Documentation for udpstp: install it, run a first Test, host a Server, read the results and look up every option, field and exit status."
+        }
         "getting-started.md" => {
             "Share a key, connect a Client to a Server, and measure Maximum IP-Layer Capacity with authenticated UDPSTP Tests."
         }
@@ -758,7 +768,7 @@ fn page_description(page: &Page) -> String {
             "Build udpstp from source with Rust, run the binary, and prepare a development checkout for contributions."
         }
         "reference/interfaces.md" => {
-            "The compatibility policy for udpstp's command line, configuration, JSON results and Server logs, including the interfaces stable from version 0.1.0."
+            "The compatibility policy for udpstp's command line, configuration, JSON results and Server logs, and how a stable interface changes."
         }
         "reference/cli.md" => {
             "Commands, options and defaults for udpstp client and udpstp server, generated from the binary's built-in help."
@@ -810,8 +820,8 @@ fn sitemap(pages: &[Page]) -> String {
     for page in pages {
         let _ = writeln!(
             out,
-            "  <url><loc>{SITE}/{}</loc></url>",
-            html_escape(&html_path(&page.book))
+            "  <url><loc>{}</loc></url>",
+            html_escape(&docs_url(&page.book))
         );
     }
     out.push_str("</urlset>\n");
@@ -828,8 +838,9 @@ fn llms_txt(pages: &[Page], version: &str, released: bool, facts: &Facts) -> Str
     } else {
         format!(
             "Source revision for version {version}. Install the latest published release \
-             from https://udpstp.com/getting-started.html or build this revision from \
-             source (https://github.com/pederbe/udpstp)."
+             from {} or build this revision from \
+             source (https://github.com/pederbe/udpstp).",
+            docs_url("guides/installing-udpstp.md")
         )
     };
     let mut out = format!(
@@ -860,7 +871,7 @@ fn llms_txt(pages: &[Page], version: &str, released: bool, facts: &Facts) -> Str
         let description = markdown::description(&page.markdown);
         let _ = writeln!(
             out,
-            "- [{}]({SITE}/{}): {description}",
+            "- [{}]({SITE}/{DOCS}/{}): {description}",
             page.label, page.book
         );
     }
@@ -875,8 +886,8 @@ fn llms_full(pages: &[Page]) -> String {
     for page in pages {
         let _ = write!(
             out,
-            "\n---\n\nURL: {SITE}/{}\n\n{}\n",
-            html_path(&page.book),
+            "\n---\n\nURL: {}\n\n{}\n",
+            docs_url(&page.book),
             page.markdown.trim_end()
         );
     }
@@ -939,7 +950,7 @@ fn landing(
         };
         let _ = writeln!(
             table,
-            "<tr><th scope=\"row\"><a href=\"{}\">{}</a> <span class=\"topic\">{}</span></th>\
+            "<tr><th scope=\"row\"><a href=\"{DOCS}/{}\">{}</a> <span class=\"topic\">{}</span></th>\
              <td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td></tr>",
             html_path(&section.page()),
             html_escape(&section.label),
@@ -1072,9 +1083,11 @@ mod tests {
         assert!(!text.contains("pre-release"));
         assert!(text.contains("9 of its 10 RFC Requirements"));
         assert!(text.contains(
-            "## Docs\n\n- [Quickstart](https://udpstp.com/getting-started.md): About Quickstart."
+            "## Docs\n\n- [Quickstart](https://udpstp.com/docs/getting-started.md): About Quickstart."
         ));
-        assert!(text.contains("## Guides\n\n- [Overview](https://udpstp.com/guides/index.md)"));
+        assert!(
+            text.contains("## Guides\n\n- [Overview](https://udpstp.com/docs/guides/index.md)")
+        );
         assert!(text.contains("## Project\n\n- [Glossary]"));
         let released = llms_txt(&pages, "0.1.0", true, &facts());
         assert!(!released.contains("pre-release"));

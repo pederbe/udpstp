@@ -48,7 +48,7 @@
    "description": "A Rust implementation of UDPSTP, the UDP Speed Test Protocol (RFC 9946), which measures the Maximum IP-Layer Capacity of a network path (RFC 9097).",
    "applicationCategory": "NetworkingApplication",
    "operatingSystem": "Linux, macOS, Windows",
-   "installUrl": "https://udpstp.com/guides/installing-udpstp.html",
+   "installUrl": "https://udpstp.com/docs/guides/installing-udpstp.html",
    "license": [
     "https://spdx.org/licenses/MIT.html",
     "https://spdx.org/licenses/Apache-2.0.html"
@@ -92,8 +92,8 @@
 <header class="nav">
   <a class="brand" href="./" aria-label="udpstp home"><picture><source srcset="logo-light.svg" media="(prefers-color-scheme: light)"><img class="brand-mark" src="logo-dark.svg" alt="" width="24" height="24"></picture>udpstp</a>
   <nav aria-label="Main">
-    <a href="getting-started.html">Docs</a>
-    <a href="conformance/index.html">Conformance</a>
+    <a href="docs/">Docs</a>
+    <a href="docs/conformance/index.html">Conformance</a>
     <a href="https://github.com/pederbe/udpstp">GitHub</a>
   </nav>
 </header>
@@ -113,7 +113,7 @@
       <p class="lede">Check a circuit, compare network paths or investigate a change in performance. Measure <strong>Maximum IP-Layer Capacity</strong>, loss and delay together, then read the results in your terminal or collect JSON.</p>
       <p class="hero-context">Run udpstp at both ends of a path and measure in either direction. It implements the UDP Speed Test Protocol in <a href="https://www.rfc-editor.org/rfc/rfc9946">RFC&nbsp;9946</a> and the IP-layer capacity method in <a href="https://www.rfc-editor.org/rfc/rfc9097">RFC&nbsp;9097</a>.</p>
       <div class="actions">
-        <a class="button primary" href="getting-started.html">Try udpstp</a>
+        <a class="button primary" href="docs/getting-started.html">Try udpstp</a>
         <a class="button accent-edge" href="#how-title">How a Test works</a>
       </div>
       <ul class="hero-facts" aria-label="At a glance">
@@ -184,7 +184,7 @@
           </div>
           <p class="install-note">Builds from source with Rust 1.98 or later. With cargo-binstall, <code>cargo binstall udpstp</code> fetches the release binary.</p>
         </div>
-        <p class="install-alt"><a href="getting-started.html">Your first Test <span aria-hidden="true">→</span></a><br><a class="source-build" href="guides/installing-udpstp.html">All installation options</a><br><a class="source-build" href="guides/hosting-a-server.html">Run a Server with systemd or a container</a></p>
+        <p class="install-alt"><a href="docs/getting-started.html">Your first Test <span aria-hidden="true">→</span></a><br><a class="source-build" href="docs/guides/installing-udpstp.html">All installation options</a><br><a class="source-build" href="docs/guides/hosting-a-server.html">Run a Server with systemd or a container</a></p>
     </aside>
   </section>
 
@@ -194,7 +194,7 @@
       <h2 id="run-title">Read the result</h2>
       <p>See how the path behaves throughout the measurement. Check the IP-Layer Capacity and Loss Ratio of every Sub-Interval, then see the maximum that meets your Performance Criterion.</p>
       <p>Read the result in your terminal or use <code>--format json</code> to feed your own dashboards and measurement tools. The JSON is compatible with OB-UDPST's format. This example is a Downstream Test.</p>
-      <p class="more"><a href="reference/json-output.html">Explore the result format <span aria-hidden="true">→</span></a></p>
+      <p class="more"><a href="docs/reference/json-output.html">Explore the result format <span aria-hidden="true">→</span></a></p>
     </div>
     <figure class="terminal" data-reveal>
       <div class="terminal-bar"><span>udpstp client</span><span class="terminal-origin">Sample output</span></div>
@@ -258,14 +258,14 @@
       <figcaption>A Downstream Test illustration. The Server controls the sending rate in both directions. In an Upstream Test the Client sends Load PDUs, and the Server returns Status PDUs with the next sending parameters. After the Test Interval, the STOP exchange ends the Test Connection.</figcaption>
     </figure>
     <details class="exchange-details"><summary>See the full PDU exchange</summary><figure class="diagram"><div class="diagram-scroll" tabindex="0" role="region" aria-label="Full Downstream Test PDU exchange, scroll horizontally on narrow screens"><!-- sequence --></div><figcaption>The Client sends a Setup Request to the Standard Port, 24601. The Server answers with a Setup Response and sends a Null Request from the Test Connection's Ephemeral Port. Activation Requests and Activation Responses carry the Test parameters. Load PDUs and Status PDUs then carry the measurement load and reception statistics, ending with the STOP exchange.</figcaption></figure></details>
-    <p class="more"><a href="glossary.html">Every term, defined</a></p>
+    <p class="more"><a href="docs/glossary.html">Every term, defined</a></p>
   </section>
 
   <section class="proof" aria-labelledby="proof-title">
     <div class="section-head" data-reveal>
       <p class="eyebrow">RFC 9946 and RFC 9097</p>
       <h2 id="proof-title">Follow the measurement method</h2>
-      <p>udpstp uses the published IP-layer capacity method. The <a href="understanding-results.html">results guide</a> explains the numbers, and the <a href="conformance/index.html">protocol documentation</a> connects the implementation to the RFCs.</p>
+      <p>udpstp uses the published IP-layer capacity method. The <a href="docs/understanding-results.html">results guide</a> explains the numbers, and the <a href="docs/conformance/index.html">protocol documentation</a> connects the implementation to the RFCs.</p>
     </div>
     <details class="exchange-details"><summary>RFC conformance details</summary><div class="proof-frame">
       <dl class="figures">
@@ -285,13 +285,13 @@
       </div>
       <div class="record-heading"><h3>Read the reasons</h3><p>@RECORDS@ Conformance Records, grouped by what they explain.</p></div>
       <dl class="record-grid">
-        <div><dt><a href="conformance/deviations.html">Deviations</a></dt><dd><strong class="figure">@DEVIATIONS@</strong> recorded departures from Requirements, each with its reason.</dd></div>
-        <div><dt><a href="conformance/interpretations.html">Interpretations</a></dt><dd><strong class="figure">@INTERPRETATIONS@</strong> readings of ambiguous Requirements or choices the RFC leaves open.</dd></div>
-        <div><dt><a href="conformance/obudpst-differences.html">OB-UDPST Differences</a></dt><dd><strong class="figure">@OBUDPST_DIFFERENCES@</strong> differences from OB-UDPST where udpstp conforms to the RFC.</dd></div>
+        <div><dt><a href="docs/conformance/deviations.html">Deviations</a></dt><dd><strong class="figure">@DEVIATIONS@</strong> recorded departures from Requirements, each with its reason.</dd></div>
+        <div><dt><a href="docs/conformance/interpretations.html">Interpretations</a></dt><dd><strong class="figure">@INTERPRETATIONS@</strong> readings of ambiguous Requirements or choices the RFC leaves open.</dd></div>
+        <div><dt><a href="docs/conformance/obudpst-differences.html">OB-UDPST Differences</a></dt><dd><strong class="figure">@OBUDPST_DIFFERENCES@</strong> differences from OB-UDPST where udpstp conforms to the RFC.</dd></div>
       </dl>
     </div>
     </details>
-    <p class="more"><a href="conformance/index.html">Explore the protocol documentation</a></p>
+    <p class="more"><a href="docs/conformance/index.html">Explore the protocol documentation</a></p>
   </section>
 
   <section class="better" aria-labelledby="better-title">
@@ -319,7 +319,7 @@
       <h2 id="adoption-title">Put your network<br>to the test.</h2>
       <p>Install udpstp on two hosts, share a key and run your first measurement. Switch direction to check the return path, or collect JSON for your own tools.</p>
       <div class="actions">
-        <a class="button primary" href="getting-started.html">Run your first Test</a>
+        <a class="button primary" href="docs/getting-started.html">Run your first Test</a>
         <a class="button accent-edge" href="https://github.com/pederbe/udpstp/issues">Share feedback</a>
       </div>
       <p class="adoption-note">Found something to improve? Share a result, report a problem or suggest a feature.</p>
@@ -330,7 +330,7 @@
 
 <footer class="footer">
   <p>udpstp is free software under MIT OR Apache-2.0.</p>
-  <p><a href="getting-started.html">Docs</a> · <a href="https://github.com/pederbe/udpstp">Source</a> · <a href="https://github.com/pederbe/udpstp/releases">GitHub Releases</a> · <a href="security-policy.html">Security</a> · <a href="llms.txt">llms.txt</a> · <a href="sitemap.xml">Sitemap</a></p>
+  <p><a href="docs/">Docs</a> · <a href="https://github.com/pederbe/udpstp">Source</a> · <a href="https://github.com/pederbe/udpstp/releases">GitHub Releases</a> · <a href="docs/security-policy.html">Security</a> · <a href="llms.txt">llms.txt</a> · <a href="sitemap.xml">Sitemap</a></p>
   <p class="author">Created by <a href="https://pederbe.dev" rel="author me">Peder Bergan</a>
     <span class="profiles"><a href="https://github.com/pederbe" rel="me">GitHub</a> · <a href="https://www.linkedin.com/in/pederbergan/" rel="me">LinkedIn</a> · <a href="https://bsky.app/profile/pederbe.dev" rel="me">Bluesky</a></span></p>
   <p class="sibling">Also by Peder: <a href="https://fastmash.io/">Fastmash</a> · <a href="https://ripscope.com/">Ripscope</a> · <a href="https://esdieff.com/">Esdieff</a></p>

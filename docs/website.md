@@ -1,6 +1,6 @@
 # The website
 
-The website combines a static landing page with documentation built from this repository's Markdown using mdBook. This guide explains its sources, local build and checks.
+The website combines a static landing page with documentation built from this repository's Markdown using mdBook. The landing page is the site's home page at `/`, and every documentation page is under `/docs/`, which opens with a front page of its own. This guide explains its sources, local build and checks.
 
 ## What it is made of
 
@@ -8,14 +8,14 @@ The website combines a static landing page with documentation built from this re
 |---|---|---|
 | Landing page | `website/index.html`, `landing.css`, `landing.js` | Static HTML and CSS, one external script (copy buttons, install tabs and motion), no framework, no third-party requests, no cookies, no analytics. Strict CSP: no inline script or style. Its numbers and terminal output are filled in at build time. |
 | Docs theme | `website/book.toml`, `website/theme/` | mdBook 0.5.4's navy theme, retinted to palette D, plus a retinted light theme; `head.hbs` adds the author, Open Graph and the docs CSP, which allows mdBook's inline scripts. Without JavaScript the docs keep the navy palette, the default for every reader. |
-| Docs pages | The repository's Markdown | `docs/getting-started.md`, `docs/guides/`, `docs/troubleshooting.md`, `docs/interfaces.md`, `docs/json-output.md`, `docs/security.md`, `docs/architecture.md`, `docs/technology.md`, `docs/conformance/README.md`, `GLOSSARY.md`, `SECURITY.md`, `CONTRIBUTING.md`, and `website/pages/` for About. Links to other repository files become GitHub links pinned to the release tag; a link to a file Git doesn't track fails the build. |
+| Docs pages | The repository's Markdown | `docs/getting-started.md`, `docs/guides/`, `docs/troubleshooting.md`, `docs/interfaces.md`, `docs/json-output.md`, `docs/security.md`, `docs/architecture.md`, `docs/technology.md`, `docs/conformance/README.md`, `GLOSSARY.md`, `SECURITY.md`, `CONTRIBUTING.md`, and `website/pages/` for the docs' front page and About. Links to other repository files become GitHub links pinned to the release tag; a link to a file Git doesn't track fails the build. |
 | Generated pages | `xtask/src/site/` | The command line (from `udpstp --help`), Server configuration (from `--print-config` and `ServerSettings`' documentation), exit statuses (from `exit.rs`), the key files page's recorded choices (from `keyfile.rs`, after `docs/key-files.md`), the conformance pages (from `cargo xtask req`'s data: coverage, every Requirement with its state and proving tests, and the Conformance Records by kind), the glossary (from `GLOSSARY.md`, one anchor per term) and the citation. |
 | Diagrams | Mermaid blocks in the Markdown | Rendered to SVG at build time by mermaid-cli, in a dark and a light variant (`website/diagrams/`), with 18px labels. Large figures keep their native label size in a named, keyboard-accessible scroll region. Each Mermaid block must be followed by a `<!-- description: … -->` line, which becomes the figure's caption and text alternative outside the scroll region. The served pages load no mermaid.js. |
 | Images | `website/og.html`, `website/og.png`, `website/render.mjs` | The committed 1200x630 link-preview image and the PNG icons rendered from the logo (`docs/assets/logo/`). `website/fonts/fontconfig.conf` fixes Linux font rendering for reproducible social-image checks. |
 | Fonts | `website/fonts/` | A subset of IBM Plex Sans Condensed Bold, renamed "udpstp Display" as its licence requires, and bundled DejaVu fonts for the social image ([provenance.md](provenance.md#website-fonts)). Body text uses the system font; code uses mdBook's Source Code Pro. |
-| Hosting files | `website/_headers`, `website/_redirects`, `website/wrangler.jsonc` | Response headers (HSTS, CSP, and others) and the configuration for Cloudflare Workers static assets. Exact `.html` documentation URLs agree with the canonical URLs and sitemap; a root rewrite serves the landing page and `/index.html` redirects to `/`. The ADRs are not published: each address they had under `/decisions/`, HTML and Markdown, redirects to its file in `docs/adr/` on GitHub. The landing page may not be framed at all; the docs may be framed by the site itself, since mdBook's chapter list falls back to an `<iframe>` of `toc.html` without JavaScript. |
+| Hosting files | `website/_headers`, `website/_redirects`, `website/wrangler.jsonc` | Response headers (HSTS, CSP, and others) and the configuration for Cloudflare Workers static assets. Exact `.html` documentation URLs agree with the canonical URLs and sitemap; a root rewrite serves the landing page and `/index.html` redirects to `/`. The docs' front page is served the same way at `/docs/`, with `/docs` and `/docs/index.html` redirecting to it. The ADRs are not published: each address they had under `/decisions/`, HTML and Markdown, redirects to its file in `docs/adr/` on GitHub. The landing page may not be framed at all; the docs may be framed by the site itself, since mdBook's chapter list falls back to an `<iframe>` of `toc.html` without JavaScript. |
 
-Every build also copies the install scripts (`install/install.sh` and `install/install.ps1`, [Installing udpstp](guides/installing-udpstp.md)) to the site's root, and writes `sitemap.xml`, `robots.txt`, `llms.txt`, `llms-full.txt`, a Markdown copy of every docs page beside its HTML (linked as its `text/markdown` alternate), `site.webmanifest`, `.well-known/security.txt` and a 404 page. Each content page has its own description, canonical URL, matching Open Graph and Twitter metadata, and JSON-LD appropriate to the page's content, with BreadcrumbList destinations that resolve.
+Every build also copies the install scripts (`install/install.sh` and `install/install.ps1`, [Installing udpstp](guides/installing-udpstp.md)) to the site's root, and writes `sitemap.xml`, `robots.txt`, `llms.txt`, `llms-full.txt`, `site.webmanifest` and `.well-known/security.txt` there. Under `/docs/` it writes a Markdown copy of every docs page beside its HTML (linked as its `text/markdown` alternate). mdBook's 404 page is served for a missing address anywhere on the site: it is copied to the root, and its links resolve against `/docs/`. Each content page has its own description, canonical URL, matching Open Graph and Twitter metadata, and JSON-LD appropriate to the page's content, with BreadcrumbList destinations that resolve.
 
 The finish step makes guarded corrections to mdBook's generated controls and
 navigation: a focusable main target, named native buttons and Contents landmark,
@@ -26,7 +26,7 @@ cannot silently discard these corrections.
 
 The docs use a dark and light theme with blue and coral accents. The
 masthead carries the logo mark and name, which lead to the landing page, and a
-Docs label leading to the quickstart. In the chapter list, parts are labelled
+Docs label leading to the docs' front page. In the chapter list, parts are labelled
 like the landing page's eyebrows and the current chapter has a coral rail. Each
 page title sits over a coral rule that draws in once on load. Second-level
 headings carry the signal-blue rail and third-level headings are coral. Code
@@ -38,7 +38,7 @@ become cards.
 
 The Docs chapter list starts open on desktop and collapsed on smaller screens.
 mdBook remembers a reader's choice made with the menu button. The chapter list
-has the parts Getting started, Guides, Reference, Explanation, Conformance, Help
+opens with the front page, then has the parts Getting started, Guides, Reference, Explanation, Conformance, Help
 and Project. Getting started holds installation and the quickstart, which
 focuses on a first authenticated Test. Guides give the steps for a task,
 Reference pages list every option, event and field, Explanation says why, and
@@ -99,7 +99,7 @@ scripts/build-site.sh --dev
 
 `cargo xtask site prepare` refuses to run on Windows itself; use WSL.
 
-The script installs the pinned build tools (`npm ci --ignore-scripts` in `website/`, and `npx puppeteer browsers install chrome`, which downloads a headless Chrome into `~/.cache/puppeteer`), builds the `udpstp` binary for the reference pages, copies the committed social image, renders the icons, runs `cargo xtask site prepare`, `mdbook build`, and `cargo xtask site finish`. The site is in `target/site/public/`.
+The script installs the pinned build tools (`npm ci --ignore-scripts` in `website/`, and `npx puppeteer browsers install chrome`, which downloads a headless Chrome into `~/.cache/puppeteer`), builds the `udpstp` binary for the reference pages, copies the committed social image, renders the icons, runs `cargo xtask site prepare`, `mdbook build`, and `cargo xtask site finish`. The site is in `target/site/public/`, with the docs in `target/site/public/docs/`.
 
 After changing `website/og.html`, run `node website/render.mjs target/site/rendered --update-social` and commit `website/og.png` with its source. Website CI uses `--check-social` to compare the committed image with a fresh render. Normal builds copy the image without rendering its text again.
 
@@ -128,7 +128,7 @@ For browser audits, use the intended response headers and routing through a loca
 env WRANGLER_SEND_METRICS=false npx --yes wrangler@4.147.0 dev --config website/wrangler.jsonc --local --ip 127.0.0.1 --port 8000
 ```
 
-This serves local files and does not deploy them. Start the preview after the build completes, and restart it after rebuilding or changing `_redirects`: replacing the output directory can leave asset watching with stale routing rules or headers. Check `/`, `/index.html`, a nested `.html` page, `toc.html`, `robots.txt`, `sitemap.xml` and a missing page with their response headers.
+This serves local files and does not deploy them. Start the preview after the build completes, and restart it after rebuilding or changing `_redirects`: replacing the output directory can leave asset watching with stale routing rules or headers. Check `/`, `/index.html`, `/docs`, `/docs/`, `/docs/index.html`, a nested `.html` page, `docs/toc.html`, `robots.txt`, `sitemap.xml` and a missing page inside and outside `/docs/` with their response headers.
 
 ## What the build checks
 

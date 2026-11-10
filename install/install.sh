@@ -311,7 +311,7 @@ EOF
             command=$dir/udpstp
             ;;
     esac
-    say "Next: run '$command --help', and read https://udpstp.com/getting-started.html to run your first Test."
+    say "Next: run '$command --help', and read https://udpstp.com/docs/getting-started.html to run your first Test."
 }
 
 udpstp_install "$@"

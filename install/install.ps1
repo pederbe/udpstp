@@ -300,7 +300,7 @@ function Install-Udpstp {
             Write-Warning "$($found.Source) comes first on your PATH, so 'udpstp' runs that one, not $exe"
         }
     }
-    Write-Host "Next: run $command --help, and read https://udpstp.com/getting-started.html to run your first Test."
+    Write-Host "Next: run $command --help, and read https://udpstp.com/docs/getting-started.html to run your first Test."
 }
 
 function Invoke-UdpstpInstall {
