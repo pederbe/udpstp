@@ -87,7 +87,7 @@ impl Repository {
                         "gh() {{ test \"$*\" = 'auth setup-git --hostname github.com'; }};\n{body}"
                     ),
                 ])
-                .env("PR", r#"{"head_branch":"release-plz-fixture"}"#)
+                .env("RELEASE_BRANCH", "release-plz-fixture")
                 .env("CARGO_NET_OFFLINE", "true"),
         );
     }
