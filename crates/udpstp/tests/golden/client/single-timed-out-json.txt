@@ -7,7 +7,7 @@ udpstp: a response failed verification; check the key
 	"IPLayerMaxConnections":	24,
 	"IPLayerMaxIncrementalResult":	655350,
 	"IPLayerCapSupported":	{
-		"SoftwareVersion":	"udpstp 0.1.2",
+		"SoftwareVersion":	"udpstp {version}",
 		"ControlProtocolVersion":	20,
 		"Metrics":	"IPLR,Sampled_RTT,IPDV,IPRR,RIPR"
 	},
