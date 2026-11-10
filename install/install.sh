@@ -2,7 +2,7 @@
 # Installs udpstp from its GitHub release, on Linux and macOS.
 #
 #   curl -fsSL https://udpstp.com/install.sh | sh
-#   curl -fsSL https://udpstp.com/install.sh | sh -s -- --version v0.1.0 --to ~/bin
+#   curl -fsSL https://udpstp.com/install.sh | sh -s -- --to ~/bin
 #
 # What it does, in order (docs/guides/installing-udpstp.md, "Install script"):
 #
@@ -10,19 +10,17 @@
 #     is the glibc build when glibc 2.28 or later is present, and the static
 #     musl build otherwise.
 #  2. Downloads SHA256SUMS, then the archive it names for the target, over
-#     HTTPS from https://github.com/pederbe/udpstp/releases: from the latest
-#     release, or from the release --version names.
+#     HTTPS from https://github.com/pederbe/udpstp/releases, from the latest
+#     release.
 #  3. Checks the archive against SHA256SUMS with sha256sum or shasum.
 #  4. Copies the udpstp binary into ~/.local/bin, or the directory --to or
 #     $UDPSTP_INSTALL_DIR names, without sudo, and runs it to print its
 #     version. Nothing outside that directory changes: no PATH, no profile.
 #
 # Options:
-#   --version <tag>  install this release (v0.1.0, or 0.1.0) rather than the
-#                    latest; $UDPSTP_VERSION works too
-#   --to <dir>       install into <dir> rather than ~/.local/bin;
-#                    $UDPSTP_INSTALL_DIR works too
-#   -h, --help       print this help
+#   --to <dir>   install into <dir> rather than ~/.local/bin;
+#                $UDPSTP_INSTALL_DIR works too
+#   -h, --help   print this help
 #
 # For testing only: UDPSTP_INSTALL_BASE_URL replaces
 # https://github.com/pederbe/udpstp/releases, so that scripts/install-test.sh
@@ -51,17 +49,15 @@ udpstp_install() {
     }
     usage() {
         cat <<EOF
-Installs udpstp from its GitHub release, on Linux and macOS.
+Installs the latest release of udpstp from GitHub, on Linux and macOS.
 
-Usage: install.sh [--version <tag>] [--to <dir>]
+Usage: install.sh [--to <dir>]
        curl -fsSL https://udpstp.com/install.sh | sh -s -- [options]
 
 Options:
-  --version <tag>  install this release (v0.1.0, or 0.1.0) rather than the
-                   latest; \$UDPSTP_VERSION works too
-  --to <dir>       install into <dir> rather than ~/.local/bin;
-                   \$UDPSTP_INSTALL_DIR works too
-  -h, --help       print this help
+  --to <dir>   install into <dir> rather than ~/.local/bin;
+               \$UDPSTP_INSTALL_DIR works too
+  -h, --help   print this help
 
 The archive is checked against the release's SHA256SUMS.
 EOF
@@ -71,19 +67,9 @@ EOF
     }
 
     # The options.
-    version=${UDPSTP_VERSION:-}
     dir=${UDPSTP_INSTALL_DIR:-}
     while [ $# -gt 0 ]; do
         case $1 in
-            --version)
-                [ $# -ge 2 ] || die "--version needs a tag, such as v0.1.0"
-                version=$2
-                shift 2
-                ;;
-            --version=*)
-                version=${1#--version=}
-                shift
-                ;;
             --to)
                 [ $# -ge 2 ] || die "--to needs a directory"
                 dir=$2
@@ -102,12 +88,6 @@ EOF
                 ;;
         esac
     done
-    case $version in
-        '') ;;
-        *[!A-Za-z0-9._+-]*) die "--version $version isn't a release tag, such as v0.1.0" ;;
-        v*) ;;
-        *) version=v$version ;;
-    esac
     if [ -z "$dir" ]; then
         [ -n "${HOME:-}" ] || die "HOME isn't set; name a directory with --to"
         dir=$HOME/.local/bin
@@ -242,22 +222,16 @@ EOF
     trap 'exit 1' HUP INT TERM
 
     # SHA256SUMS names the archive, and with it the tag of the latest release.
-    if [ -n "$version" ]; then
-        sums_url=$base/download/$version/SHA256SUMS
-        which="release $version"
-    else
-        sums_url=$base/latest/download/SHA256SUMS
-        which="the latest release"
-    fi
-    say "Looking for $which of udpstp for $target"
+    sums_url=$base/latest/download/SHA256SUMS
+    say "Looking for the latest release of udpstp for $target"
     fetch "$sums_url" "$tmp/SHA256SUMS" ||
-        die "couldn't download $sums_url: there is no such release, or the network is down. The releases are listed at $releases"
+        die "couldn't download $sums_url: no release is published, or the network is down. The releases are listed at $releases"
     line=$(awk -v suffix="-$target.tar.gz" '
         { name = $2; sub(/^\*/, "", name) }
         index(name, "udpstp-v") == 1 && length(name) > length(suffix) &&
         substr(name, length(name) - length(suffix) + 1) == suffix { print $1, name; n++ }
         END { exit n != 1 }' "$tmp/SHA256SUMS") ||
-        die "$which has no archive for $target in its SHA256SUMS ($sums_url)"
+        die "the latest release has no archive for $target in its SHA256SUMS ($sums_url)"
     expected=${line%% *}
     file=${line#* }
     case $expected in
@@ -269,9 +243,6 @@ EOF
     esac
     tag=${file#udpstp-}
     tag=${tag%-"$target".tar.gz}
-    if [ -n "$version" ] && [ "$tag" != "$version" ]; then
-        die "the SHA256SUMS of release $version names an archive of $tag, $file"
-    fi
 
     url=$base/download/$tag/$file
     say "Downloading $url"

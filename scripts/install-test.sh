@@ -259,9 +259,9 @@ EOF
     contains "a directory off the PATH is warned about" "isn't on your PATH"
     contains "the next step is printed" "Next: run '$work/to/udpstp --help'"
 
-    expect "a release installs by --version, into UDPSTP_INSTALL_DIR" ok "Installed udpstp 0.0.0-test to $work/dir/udpstp" \
+    expect "the latest release installs into UDPSTP_INSTALL_DIR" ok "Installed udpstp 0.0.0-test to $work/dir/udpstp" \
         env UDPSTP_INSTALL_BASE_URL="$good" UDPSTP_INSTALL_DIR="$work/dir" PATH="$work/dir:$PATH" \
-        sh "$installer" --version "${tag#v}"
+        sh "$installer"
     installed "UDPSTP_INSTALL_DIR installs the stub" "$work/dir/udpstp"
     absent "a directory on the PATH isn't warned about" "isn't on your PATH"
 
@@ -290,8 +290,8 @@ EOF
         env UDPSTP_INSTALL_BASE_URL="$tampered" sh "$installer" --to "$work/to"
     if cmp -s "$work/to/udpstp" "$work/keep"; then pass "the installed udpstp is unchanged"; else fail "the installed udpstp is unchanged"; fi
 
-    expect "a missing release is refused" fails "there is no such release" \
-        env UDPSTP_INSTALL_BASE_URL="$good" sh "$installer" --version v9.9.9 --to "$work/missing"
+    expect "a missing release is refused" fails "no release is published" \
+        env UDPSTP_INSTALL_BASE_URL="$url/absent" sh "$installer" --to "$work/missing"
     nothing "nothing is installed for a missing release" "$work/missing"
 
     expect "a missing downloader is refused" fails "needs curl or wget" \

@@ -37,7 +37,7 @@ $registryRoot = 'HKEY_CURRENT_USER\Software\udpstp-install-test-' + [guid]::NewG
 $registryPath = "Registry::$registryRoot"
 $isolated = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $runner, '-RegistryRoot', $registryRoot, '-Script')
 # The variables a case may set, cleared around each one.
-$caseVariables = 'UDPSTP_INSTALL_BASE_URL', 'UDPSTP_VERSION', 'UDPSTP_INSTALL_DIR', 'UDPSTP_NO_MODIFY_PATH', 'PROCESSOR_ARCHITECTURE', 'PROCESSOR_ARCHITEW6432', 'USERPROFILE', 'LOCALAPPDATA', 'Path', 'UDPSTP_TEST_RELEASE', 'UDPSTP_TEST_GH_LOG'
+$caseVariables = 'UDPSTP_INSTALL_BASE_URL', 'UDPSTP_INSTALL_DIR', 'UDPSTP_NO_MODIFY_PATH', 'PROCESSOR_ARCHITECTURE', 'PROCESSOR_ARCHITEW6432', 'USERPROFILE', 'LOCALAPPDATA', 'Path', 'UDPSTP_TEST_RELEASE', 'UDPSTP_TEST_GH_LOG'
 
 # Read-only snapshot of the real account's whole Environment key, including
 # raw expandable values and their registry types. Never restore it by writing.
@@ -95,7 +95,7 @@ function Test-Case([string]$Description, [string]$Want, [string]$Text, [hashtabl
     try {
         $env:USERPROFILE = Join-Path $work 'profile'
         $env:LOCALAPPDATA = Join-Path $env:USERPROFILE 'AppData\Local'
-        Remove-Item Env:UDPSTP_VERSION, Env:UDPSTP_INSTALL_DIR, Env:UDPSTP_NO_MODIFY_PATH -ErrorAction SilentlyContinue
+        Remove-Item Env:UDPSTP_INSTALL_DIR, Env:UDPSTP_NO_MODIFY_PATH -ErrorAction SilentlyContinue
         foreach ($name in $Env.Keys) {
             if ($null -eq $Env[$name]) { Remove-Item -LiteralPath "Env:$name" -ErrorAction SilentlyContinue }
             else { [Environment]::SetEnvironmentVariable($name, $Env[$name]) }
@@ -281,7 +281,7 @@ exit $LASTEXITCODE
     Test-PathValue 'REG_SZ variables stay literal and the directory comes last' "%USERPROFILE%\literal;C:\before;$dir" String
 
     $dir = Join-Path $work 'dir'
-    Test-Case 'a release installs by UDPSTP_VERSION, into UDPSTP_INSTALL_DIR' ok "Installed udpstp 0.0.0-test to $dir\udpstp.exe" @{ UDPSTP_INSTALL_BASE_URL = $good; UDPSTP_VERSION = $tag.Substring(1); UDPSTP_INSTALL_DIR = $dir } {
+    Test-Case 'the latest release installs into UDPSTP_INSTALL_DIR' ok "Installed udpstp 0.0.0-test to $dir\udpstp.exe" @{ UDPSTP_INSTALL_BASE_URL = $good; UDPSTP_INSTALL_DIR = $dir } {
         $env:Path = "$dir;$env:Path"
         try { & $shell @isolated $installer }
         finally { $env:Path = $env:Path.Substring($dir.Length + 1) }
@@ -354,8 +354,8 @@ exit $LASTEXITCODE
     Test-Nothing 'nothing is installed from a tampered archive under irm | iex' $dir
 
     $dir = Join-Path $work 'missing'
-    Test-Case 'a missing release is refused' fails 'there is no such release' @{ UDPSTP_INSTALL_BASE_URL = $good } {
-        & $shell @isolated $installer -Version v9.9.9 -To $dir
+    Test-Case 'a missing release is refused' fails 'no release is published' @{ UDPSTP_INSTALL_BASE_URL = "$url/absent" } {
+        & $shell @isolated $installer -To $dir
     }
     Test-Nothing 'nothing is installed for a missing release' $dir
 
