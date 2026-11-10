@@ -5,7 +5,6 @@ param(
     [Parameter(Mandatory = $true)][string]$Script,
     [string]$Installer,
     [string]$To,
-    [string]$Version,
     [string]$Url,
     [string]$After,
     [switch]$NoModifyPath,

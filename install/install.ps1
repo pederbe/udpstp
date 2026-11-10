@@ -4,12 +4,12 @@
 #
 # Through irm | iex, options come from environment variables:
 #
-#   $env:UDPSTP_VERSION = 'v0.1.0'; $env:UDPSTP_INSTALL_DIR = "$env:LOCALAPPDATA\Programs\udpstp"
+#   $env:UDPSTP_INSTALL_DIR = "$env:LOCALAPPDATA\Programs\udpstp"
 #   irm https://udpstp.com/install.ps1 | iex
 #
 # Saved to a file, it takes them as parameters as well:
 #
-#   .\install.ps1 -Version v0.1.0 -To "$env:LOCALAPPDATA\Programs\udpstp"
+#   .\install.ps1 -To "$env:LOCALAPPDATA\Programs\udpstp"
 #   .\install.ps1 -NoModifyPath
 #   .\install.ps1 -Uninstall
 #
@@ -18,8 +18,8 @@
 #  1. Picks the release target: x86_64-pc-windows-msvc, which Windows 11 on
 #     Arm runs under emulation.
 #  2. Downloads SHA256SUMS, then the archive it names for the target, over
-#     HTTPS from https://github.com/pederbe/udpstp/releases: from the latest
-#     release, or from the release -Version names.
+#     HTTPS from https://github.com/pederbe/udpstp/releases, from the latest
+#     release.
 #  3. Checks the archive against SHA256SUMS with Get-FileHash.
 #  4. Copies udpstp.exe into %LOCALAPPDATA%\Programs\udpstp, or the directory -To or
 #     $env:UDPSTP_INSTALL_DIR names, without elevation, and runs it to print
@@ -43,8 +43,6 @@
 # as a file, the script then exits with status 1.
 
 param(
-    # The release to install (v0.1.0, or 0.1.0), rather than the latest.
-    [string]$Version = $env:UDPSTP_VERSION,
     # The directory to install udpstp.exe into, rather than LocalAppData\Programs\udpstp.
     [string]$To = $env:UDPSTP_INSTALL_DIR,
     # Leave both the account's and this process's PATH alone.
@@ -105,7 +103,6 @@ function Update-UdpstpPath([string]$Directory, [switch]$Remove) {
 function Install-Udpstp {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWriteHost', '', Justification = 'An interactive installer talks to the console, and its output must not reach the pipeline under iex.')]
     param(
-        [string]$Version,
         [string]$To,
         [switch]$NoModifyPath,
         [switch]$Uninstall
@@ -128,12 +125,6 @@ function Install-Udpstp {
     $fromSource = 'build from source instead: cargo install --locked udpstp'
 
     # The options.
-    if ($Version -and -not $Uninstall) {
-        if ($Version -notmatch '^[A-Za-z0-9._+-]+$') {
-            throw "-Version $Version isn't a release tag, such as v0.1.0"
-        }
-        if (-not $Version.StartsWith('v')) { $Version = "v$Version" }
-    }
     if (-not $To) {
         $baseDir = $env:LOCALAPPDATA
         if (-not $baseDir) {
@@ -202,21 +193,14 @@ function Install-Udpstp {
     try {
         # SHA256SUMS names the archive, and with it the tag of the latest
         # release.
-        if ($Version) {
-            $sumsUrl = "$base/download/$Version/SHA256SUMS"
-            $which = "release $Version"
-        }
-        else {
-            $sumsUrl = "$base/latest/download/SHA256SUMS"
-            $which = 'the latest release'
-        }
-        Write-Host "Looking for $which of udpstp for $target"
+        $sumsUrl = "$base/latest/download/SHA256SUMS"
+        Write-Host "Looking for the latest release of udpstp for $target"
         $sums = Join-Path $tmp 'SHA256SUMS'
         try {
             Save-Url $sumsUrl $sums
         }
         catch {
-            throw "couldn't download $sumsUrl`: there is no such release, or the network is down ($($_.Exception.Message)). The releases are listed at $releases"
+            throw "couldn't download $sumsUrl`: no release is published, or the network is down ($($_.Exception.Message)). The releases are listed at $releases"
         }
         $suffix = "-$target.zip"
         $entries = @(
@@ -227,14 +211,11 @@ function Install-Udpstp {
             }
         )
         if ($entries.Count -ne 1) {
-            throw "$which has no archive for $target in its SHA256SUMS ($sumsUrl)"
+            throw "the latest release has no archive for $target in its SHA256SUMS ($sumsUrl)"
         }
         $expected = $entries[0].Hash
         $file = $entries[0].File
         $tag = $file.Substring('udpstp-'.Length, $file.Length - 'udpstp-'.Length - $suffix.Length)
-        if ($Version -and $tag -ne $Version) {
-            throw "the SHA256SUMS of release $Version names an archive of $tag, $file"
-        }
 
         $url = "$base/download/$tag/$file"
         $archive = Join-Path $tmp $file
@@ -306,14 +287,13 @@ function Install-Udpstp {
 function Invoke-UdpstpInstall {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWriteHost', '', Justification = 'An interactive installer talks to the console.')]
     param(
-        [string]$Version,
         [string]$To,
         [switch]$NoModifyPath,
         [switch]$Uninstall,
         [bool]$AsFile
     )
     try {
-        Install-Udpstp -Version $Version -To $To -NoModifyPath:$NoModifyPath -Uninstall:$Uninstall
+        Install-Udpstp -To $To -NoModifyPath:$NoModifyPath -Uninstall:$Uninstall
     }
     catch {
         Write-Host "udpstp-install: error: $($_.Exception.Message)" -ForegroundColor Red
@@ -323,4 +303,4 @@ function Invoke-UdpstpInstall {
     }
 }
 
-Invoke-UdpstpInstall -Version $Version -To $To -NoModifyPath:$NoModifyPath -Uninstall:$Uninstall -AsFile ([bool]$PSCommandPath)
+Invoke-UdpstpInstall -To $To -NoModifyPath:$NoModifyPath -Uninstall:$Uninstall -AsFile ([bool]$PSCommandPath)
