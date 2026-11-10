@@ -1,6 +1,6 @@
 # Understanding the results
 
-What udpstp measures, what each line of its results means, and why a Test can fall short of a path's real capacity. [Running a Test](guides/running-a-test.md) has the steps.
+A Test's headline is the Maximum IP-Layer Capacity, the most the path carried while losing no more than the Performance Criterion allows. The lines around it say how the Test got there, and its warnings say when the result may fall short of the path's real capacity. [Running a Test](guides/running-a-test.md) has the steps.
 
 ## What a Test measures
 
@@ -12,117 +12,99 @@ The **Highest IP-Layer Capacity** is the highest of all Sub-Intervals, whatever 
 
 ## The text results
 
-This Downstream Test ran over loopback, so the two hosts, not a network, set its rates:
+This Downstream Test ran over loopback, so the host, not a network, set its rates.
 
-```text
-Test outcome: completed
+```console
+$ udpstp client --key-file keys.toml --max-hops 12 127.0.0.1:24701
+Sending the Setup Request to 127.0.0.1:24701
+Setup accepted (Ephemeral Port 58730)
+Test activated (Downstream)
+The Server ended the Test
+--------------------------------------------------------------------------------
 Endpoints
   Test Connection 0: Client unknown; Server 127.0.0.1:24701
-Results
-  Downstream Search Test with 127.0.0.1:24701, started 2026-09-26T21:51:34Z (T0)
-  Test Interval (I) 10 s in 10 Sub-Intervals (dt) of 1000 ms; Trial Interval
-    (FT) and st 50 ms; 1 Test Connection (F); MaxHops 64; DSCP 0 agreed
-  Performance Criterion: loss at most 1% of the Load PDUs sent, or one; Tmax up
-    to 1000 ms (a late Load PDU counts within the Sub-Interval its gap was seen
-    in)
+Results Summary
+  Downstream Search Test with 127.0.0.1:24701, started 2026-11-10T17:41:45Z (T0)
+  Test Interval (I) 10 s · 10 Sub-Intervals (dt) 1000 ms · Trial Interval (FT)
+    and st 50 ms
+  1 Test Connection (F) · MaxHops 12 · DSCP 0 agreed
+  Performance Criterion: loss ≤ 1% or one Load PDU · Tmax ≤ 1000 ms
+  Late Load PDUs count in the Sub-Interval where their gap was seen.
 
   Sub-Interval results
-  SI = Sub-Interval; C = IP-Layer Capacity; DV = delay variation (min/avg/max);
-    RTTV = RTT variation (min-max, avg); - = no measurement.
-  B = IP-Layer Sender Bit Rate.
-  SI  C (Mbps)  Loss Ratio
-   1    103.97    0.000000
-   2    303.93    0.000000
-   3    504.06    0.000000
-   4    648.99    0.000000
-   5    801.02    0.000000
-   6   1450.50    0.000000
-   7   1689.22    0.002149
-   8   1809.98    0.000000
-   9   1867.22    0.014783
-  10   1860.05    0.015516
+  SI  C (Mbps)  Loss Ratio   Lost  Reordered  Duplicates
+   1    104.50    0.000000      0          0           0
+   2    304.98    0.000000      0          0           0
+   3    504.98    0.000000      0          0           0
+   4    705.05    0.000000      0          0           0
+   5    905.07    0.000000      0          0           0
+   6   2049.74    0.000000      0          0           0
+   7   4049.82    0.000000      0          0           0
+   8   6049.85    0.000000      0          0           0
+   9   9516.51    0.009479   7594          0           0
+  10   9933.89    0.014537  12212          0           0
 
-  SI  Lost  Reordered  Duplicates
-   1     0          0           0
-   2     0          0           0
-   3     0          0           0
-   4     0          0           0
-   5     0          0           0
-   6     0          0           0
-   7   307          0           0
-   8     0          0           0
-   9  2340          0           0
-  10  2443          0           0
+  SI  DV (ms)  RTTV (ms)  B (Mbps)*
+   1    0/0/0     0-0, 0      94.52
+   2    0/0/0     0-0, 0     294.97
+   3    0/0/0     0-0, 0     494.98
+   4    0/0/0     0-0, 0     695.05
+   5    0/0/0     0-0, 0     895.07
+   6    0/0/0     0-0, 0    1949.75
+   7    0/0/0     0-0, 0    3949.83
+   8    0/0/0     0-0, 0    5949.86
+   9    0/0/0     0-0, 0    9453.69
+  10    0/0/0     0-0, 0   10078.78
 
-  SI  DV (ms)  RTTV (ms)
-   1    0/1/3     0-1, 0
-   2    0/1/2     0-2, 1
-   3    0/1/2     0-2, 1
-   4    0/1/7     1-7, 2
-   5    0/1/8     1-3, 1
-   6   0/2/11     1-6, 2
-   7   0/4/11     1-8, 4
-   8    0/3/9     1-8, 3
-   9   0/4/14     1-8, 4
-  10   0/5/12     1-8, 5
+  SI: Sub-Interval · C: IP-Layer Capacity · B: IP-Layer Sender Bit Rate
+  DV: delay variation (min/avg/max) · RTTV: RTT variation (min-max, avg) · -: no
+    measurement
+  * Estimated from the Server's lpduSeqNo span on its st clock.
+  Lost Load PDUs use the size of surrounding Load PDUs.
 
-  SI  B (Mbps)*
-   1      93.75
-   2     293.58
-   3     493.68
-   4     646.35
-   5     789.84
-   6    1432.82
-   7    1665.09
-   8    1810.14
-   9    1893.99
-  10    1893.41
-
-  * The IP-Layer Sender Bit Rate estimated here, not measured by the Load
-    Sender: the Load PDUs the Server sent in each st of its own clock, from
-    their lpduSeqNo span, a lost one as big as those around it
-
-  Summary
-  F = Test Connections; SI = Sub-Interval; Max = Maximum IP-Layer Capacity; - =
-    no valid result.
-   Phase  F  SI  Max (Mbps)  Loss Ratio
-  Search  1   8     1809.98    0.000000
-  RTT minimum (ms)  RTT maximum (ms)
-                 0                 8
-  Maximum Sub-Interval result received at an unknown time
-  Maximum IP-Layer Capacity 1809.98 Mbps in Sub-Interval 8 (Loss Ratio 0.000000,
-    RTT variation 1-8 ms above a minimum of 0 ms, estimated IP-Layer Sender Bit
-    Rate 1810.14 Mbps); Highest IP-Layer Capacity 1867.22 Mbps in Sub-Interval 9
-    (Loss Ratio 0.014783)
+Final metrics
+  Maximum IP-Layer Capacity: 9516.51 Mbps (Sub-Interval 9)
+  Maximum Sub-Interval result received at 2026-11-10T17:41:54.515674360Z
+  Loss Ratio 0.009479, RTT minimum 0 ms, maximum 0 ms, estimated IP-Layer Sender
+    Bit Rate 9453.69 Mbps; Highest IP-Layer Capacity 9933.89 Mbps in
+    Sub-Interval 10 (Loss Ratio 0.014537)
   RTT minimum 0 ms
   Minimum one-way delay 0 ms (clockDeltaMin; valid only if the clocks are
     synchronized)
 
-  This host: DF clear, socket buffers receive 2097152 and send 2097152 bytes;
-    portable Data Phase Engine, no fast paths
-Test completed
+  Warnings
+    22396 datagrams discarded by this host before udpstp read them: its receive
+      buffer overflowed (Receive Buffer Overflows), and a Load Receiver counts
+      them as lost
+
+  This host: DF set, socket buffers receive 2097152 and send 2097152 bytes;
+    portable Data Phase Engine, receiving with recvmmsg and kernel timestamps,
+    waking on arrival with ppoll
+--------------------------------------------------------------------------------
+Test outcome: completed with warnings or qualified results
 ```
 
-Line by line:
+From the top:
 
-- **Test outcome**: `completed`, `completed with warnings or qualified results`, `partially completed`, `failed`, `aborted` or `interrupted`. A Multi-Connection Test also gives each Test Connection's own outcome.
+- **Progress**: one line for each step of the Control Phase, then how the Test ended.
 - **Endpoints**: each Test Connection's Server and, where the socket knows it, the Client's address. A socket bound to every address can't name the Client and says `unknown`. `--address-privacy` applies here too.
-- **Header**: the direction, whether the algorithm set the rate (a Search Test) or an Operator fixed it (a Fixed-Rate Test), the Server, and the start time T0 in UTC.
+- **Results Summary** opens with the direction, whether the algorithm set the rate (a Search Test) or an Operator fixed it (a Fixed-Rate Test), the Server, and the start time T0 in UTC.
 - **Parameters**, in RFC 9097's notation: the Test Interval I, its Sub-Intervals of length dt, the Trial Interval FT, st (the interval the IP-Layer Sender Bit Rate is taken over), and F, the number of Test Connections. MaxHops is this end's own setting. The DSCP is the one the Server agreed to.
 - **Performance Criterion**: the share of Load PDUs a Sub-Interval may lose and still count, set with `--max-loss-ratio`. One lost Load PDU always passes. A Sub-Interval in which nothing arrived never does. Tmax is how late a Load PDU may arrive and still count as received.
-- **The tables**, one row per Sub-Interval (SI). The terminal's width decides whether they fit in one table or several:
+- **The tables**, one row per Sub-Interval (SI), with their legend below them. The terminal's width decides whether they fit in one table or several:
   - **C**: the IP-Layer Capacity.
   - **Loss Ratio** and **Lost**: the Load PDUs lost, as a share of those sent and as a count. **Reordered** and **Duplicates** count the other Sequence Errors. Duplicates count as received.
   - **DV**: the one-way delay variation's minimum, average and maximum.
   - **RTTV**: the round-trip time variation, lowest to highest, and its average, above the RTT minimum.
   - **B**: the IP-Layer Sender Bit Rate, what the Load Sender actually sent. In a Downstream Test the Client can only estimate the Server's rate, and the footnote says so. In an Upstream Test it is measured on this end.
-- **Maximum IP-Layer Capacity**: the headline result, with its Sub-Interval's Loss Ratio, RTT variation and Sender Bit Rate. Sub-Intervals 9 and 10 above were faster but lost more than 1%, so they don't count, and the line ends with the Highest IP-Layer Capacity. With `--first-mode-sub-intervals` there is one such line per Capacity Mode.
-- **Maximum Sub-Interval result received**: when this Client learned the Maximum's own Sub-Interval result, or `unknown`.
+- **Maximum IP-Layer Capacity**, under **Final metrics**: the headline result and its Sub-Interval. Two lines down come that Sub-Interval's Loss Ratio, RTT and Sender Bit Rate. Sub-Interval 10 above was faster but lost more than 1%, so it doesn't count, and that line ends with the Highest IP-Layer Capacity. With `--first-mode-sub-intervals` there is one such group per Capacity Mode.
+- **Maximum Sub-Interval result received**: when this Client learned the Maximum's own Sub-Interval result, or `an unknown time`.
 - **RTT minimum** and **Minimum one-way delay**. The one-way figure compares the two ends' clocks, so it means something only when they are synchronised.
-- **Warnings**, when there are any ([below](#what-the-warnings-mean)).
-- **This host**: whether the Don't Fragment bit (DF) was set, the socket buffers the OS granted, and which Data Phase Engine ran with which fast paths. On Linux this names batched sending and receiving, UDP GSO and kernel timestamps. This example ran on Windows, which has none. [Platform differences](platforms.md) lists them.
+- **Warnings**, when there are any ([below](#what-the-warnings-mean)). Here the host's receive buffer overflowed.
+- **This host**: whether the Don't Fragment bit (DF) was set, the socket buffers the OS granted, and which Data Phase Engine ran with which fast paths. On Linux this names batched sending and receiving, UDP GSO and kernel timestamps. macOS and Windows have none. [Platform differences](platforms.md) lists them.
+- **Test outcome**: `completed`, `completed with warnings or qualified results`, `partially completed`, `failed`, `aborted` or `interrupted`. A Multi-Connection Test also gives each Test Connection's own outcome.
 
-In a terminal, headings are cyan, a clean result green, warnings and partial results yellow, and failures red. `--color never` keeps the output plain.
+In a terminal, headings are purple, a clean result green, warnings, qualified results and partial results amber, and failures red. `--color never` keeps the output plain. [Terminal color](interfaces.md#terminal-color) lists every style.
 
 ## Was the network or a host the limit?
 
@@ -151,6 +133,8 @@ A completed Test's warnings appear under **Warnings** in the text results and in
 An Upstream Test in which this host left more than 1% of its Load PDUs unsent warns of its Skipped or Withheld Bursts instead.
 
 **Skipped Bursts**: this host couldn't send on schedule, so the result is limited by the sender. **Withheld Bursts**: the OS couldn't take the datagrams fast enough.
+
+**Receive Buffer Overflows.** This host's OS discarded datagrams at the socket before udpstp read them (JSON `ReceiveBufferOverflows`). A Load Receiver counts them as lost, so that loss happened on this host and not on the path. They are counted on Linux.
 
 **The Server sent below its Fixed-Rate row.** In a Downstream Fixed-Rate Test, the Server sent less than its row, as this Client estimated it. It may have skipped or withheld Bursts, so the Server limited the result. A Search Test's Server doesn't tell the Client its sending rate, so it gets the next warning instead.
 

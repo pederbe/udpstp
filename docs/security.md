@@ -1,6 +1,6 @@
 # Security model
 
-This document describes what udpstp protects, from whom, and how. It is written for Server administrators and Operators deciding whether to deploy udpstp, and for security reviewers. [SECURITY.md](../SECURITY.md) says how to report a vulnerability.
+udpstp starts a Test only for a Client that proves it holds a Shared Key the Server knows, and the Server limits how many Tests and Test Connections it carries. Server administrators and Operators deciding whether to deploy udpstp, and security reviewers, will find what it protects, from whom, and how. [SECURITY.md](../SECURITY.md) says how to report a vulnerability.
 
 Each defence below names the file, and the function, that implements it. The [glossary](../GLOSSARY.md) defines terms such as Test Connection, Shared Key and Silent Rejection.
 

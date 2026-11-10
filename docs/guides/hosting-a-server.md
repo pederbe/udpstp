@@ -1,6 +1,6 @@
 # Hosting a Server
 
-For Server administrators: the steps to set up, open, limit and run `udpstp server`. [Server configuration](../../crates/udpstp/src/config.rs) lists every setting, [Server log](../server-log.md) every event, and the [security model](../security.md) explains the defaults. On Windows, follow [udpstp on Windows](windows.md) alongside this guide.
+`udpstp server` answers Clients' Tests from the far end of a path. Four steps get it running, and a few more make it safe to open to Clients outside your own network. [Server configuration](../../crates/udpstp/src/config.rs) lists every setting, [Server log](../server-log.md) every event, and the [security model](../security.md) explains the defaults. On Windows, follow [udpstp on Windows](windows.md) alongside this guide.
 
 The [required setup](#required-setup) gets a Server running. A Server that Clients outside your own network can reach should also take the [recommended steps](#recommended-for-a-public-server). Each [optional step](#optional-steps) says when you need it.
 
@@ -161,10 +161,10 @@ udpstp server --key-file keys.toml --max-hops 12 --address-privacy pseudonymize 
 
 Whatever runs the Server, give it:
 
-- a dedicated, unprivileged account that alone can read the key file;
-- core dumps disabled, for example with `ulimit -c 0`, since a dump can hold the Key Table;
-- a log system that rotates its standard output;
-- a clock synchronised with NTP, since clocks more than 5 s apart make every authenticated Test fail.
+- a dedicated, unprivileged account that alone can read the key file
+- core dumps disabled, for example with `ulimit -c 0`, since a dump can hold the Key Table
+- a log system that rotates its standard output
+- a clock synchronised with NTP, since clocks more than 5 s apart make every authenticated Test fail
 
 #### With systemd
 
@@ -216,7 +216,7 @@ Each step says when you need it. Skip the rest.
 
 **When:** you have more than a few settings, or want them kept in one file.
 
-Every setting has a command-line flag and a TOML key of the same name: `--max-hops` is `max_hops`. Flags replace the file's values, and the file replaces the defaults.
+Every setting has a command-line flag and a TOML key of the same name, so `--max-hops` is `max_hops`. Flags replace the file's values, and the file replaces the defaults.
 
 1. Print the effective configuration to start a file:
 
@@ -285,7 +285,7 @@ On Linux the Server runs one Engine Thread for each CPU it may use, each serving
 
 For high-rate Multi-Connection Tests, give the Server at least as many CPUs as such a Test has Test Connections.
 
-A Server that falls behind says so in its `TestSummary` log lines: `skipped_bursts` when it couldn't send on time, and `receive_buffer_overflows` for its Receive Buffer Overflows.
+A Server that falls behind says so in its `TestSummary` log lines, with `skipped_bursts` when it couldn't send on time and `receive_buffer_overflows` for its Receive Buffer Overflows.
 
 ### Debug a failing Client
 
@@ -309,7 +309,7 @@ Turn it off when you're done. While it is on, anyone can learn whether the Serve
 
 **When:** on a lab network where every host is trusted, for Clients without a key.
 
-Only on a network where every host is trusted, such as a lab, set `allow_unauthenticated` to accept Tests without a key, as default OB-UDPST installations do. It protects nothing: anyone who can reach the Server can start a Test. The Server still accepts authenticated Tests.
+Only on a network where every host is trusted, such as a lab, set `allow_unauthenticated` to accept Tests without a key, as default OB-UDPST installations do. It protects nothing, so anyone who can reach the Server can start a Test. The Server still accepts authenticated Tests.
 
 ### Read the log
 
@@ -318,8 +318,19 @@ Only on a network where every host is trusted, such as a lab, set `allow_unauthe
 The Server writes one line per event to standard output, human-readable by default. Set `log_format = "json"` for one JSON object per line:
 
 ```text
-2026-09-26T14:46:26.621011Z  INFO Test Connection admitted event="TestConnectionAdmitted" test_connection_id=1 client="127.0.0.1:51801" mc_ident=60798
-2026-09-26T14:46:37.129734Z  INFO Test ended: Completed event="TestSummary" client=127.0.0.1:51801 mc_ident=60798 test_connections=1 direction="Downstream" test_interval=10 … result="Completed"
+2026-11-10T17:45:22.533499Z INFO Test Connection admitted
+  | event="TestConnectionAdmitted" test_connection_id=1 client="127.0.0.1:45728"
+  | mc_ident=3934 key_id=1
+2026-11-10T17:45:33.074158Z INFO Test ended: Completed event="TestSummary"
+  | client=127.0.0.1:45728 mc_ident=3934 key_id=1 test_connections=1
+  | direction="Downstream" test_interval=10 sub_interval=1000 trial_interval=50
+  | low_thresh=30 upper_thresh=90 seq_err_thresh=10 slow_adj_thresh=3
+  | high_speed_delta=10 ignore_ooo_dup=true one_way_delay_variation=true
+  | random_payload=false rate_adj_algo="B" dscp=0 sr_index_conf=65535
+  | sr_index_is_start=false bytes_sent=4089512844 bytes_received=4125335714
+  | ip_layer_sender_bit_rate=3335136496 skipped_bursts=5 skipped_datagrams=102
+  | skipped_bytes=145644 withheld_bursts=0 withheld_datagrams=0 withheld_bytes=0
+  | receive_buffer_overflows=0 result="Completed"
 ```
 
 Filter on the `event` name and its fields, not on the message. Under a service manager, leave the log on standard output and let it rotate the log. Otherwise set `log_file` to write a new file each day, kept for 14 days, in a folder of its own. [Server log](../server-log.md) lists every event, field and reason.

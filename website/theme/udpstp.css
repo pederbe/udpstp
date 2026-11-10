@@ -372,10 +372,10 @@ pre:focus-within > .buttons { visibility: visible; opacity: 1; }
 .light .diagram-light, .rust .diagram-light { display: block !important; }
 .diagram figcaption { margin-top: 0.75em; font-size: 0.9em; line-height: 1.6; color: var(--muted, var(--sidebar-fg)); }
 
-/* Getting started is the front door: its opening paragraph leads, and its
+/* The quickstart is the front door: its opening paragraph leads, and its
    closing links become cards, keeping their Markdown. The guides overview
    opens the same way. */
-.content main > #getting-started:first-child + p,
+.content main > #quickstart:first-child + p,
 .content main > #guides:first-child + p { font-size: 1.15em; line-height: 1.65; }
 #keep-exploring + ul {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(13em, 1fr)); gap: 14px;

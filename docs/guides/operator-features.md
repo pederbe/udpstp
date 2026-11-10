@@ -1,10 +1,10 @@
 # Operator features
 
-For Operators measuring within their own networks, and for the Server administrators who give them Operator Keys.
+An Operator Key lets you measure within your own network with Tests that ordinary keys can't run, such as Fixed-Rate Tests and Test Intervals longer than 60 s. Server administrators decide which keys are Operator Keys.
 
 ## Operator Keys
 
-An Operator Key is a Shared Key that the Server's Key Table marks as belonging to an Operator. The Server decides: a Test gets an Operator's allowances only when its Setup Request verified with a row marked `operator = true`, whatever the Client claims.
+An Operator Key is a Shared Key that the Server's Key Table marks as belonging to an Operator. The Server decides. A Test gets an Operator's allowances only when its Setup Request verified with a row marked `operator = true`, whatever the Client claims.
 
 On the Server, in a TOML Key Table ([Key files](../key-files.md)):
 
@@ -17,9 +17,9 @@ operator = true
 max_test_interval = 3600
 ```
 
-`max_test_interval` is optional: without it, an Operator Key's Tests are limited to 60 s like everyone else's. An OB-UDPST `udpst.keys` file can't mark Operator Keys.
+`max_test_interval` is optional. Without it, an Operator Key's Tests are limited to 60 s like everyone else's. An OB-UDPST `udpst.keys` file can't mark Operator Keys.
 
-On the Client, the key file needs only the key; `operator` there changes nothing:
+On the Client, the key file needs only the key, and `operator` there changes nothing:
 
 ```toml
 [[key]]
@@ -35,7 +35,7 @@ Give Operator Keys their own keyIds, and never share them with Consumers.
 | Allowance | Without an Operator Key | With one |
 |---|---|---|
 | Fixed-Rate Tests (`--fixed-rate`) | Refused with BADPARAM | Allowed |
-| Test Interval (`--test-interval`) | At most 60 s; a longer request is coerced to 60 | Up to the key's `max_test_interval` |
+| Test Interval (`--test-interval`) | At most 60 s. A longer request is coerced to 60 | Up to the key's `max_test_interval` |
 | Starting row of a search (`--start-row`) | At most `max_start_row`, row 100 by default | Any row |
 | Share of the Admitted Rate Cap one Test may state | At most `max_test_share`, 50% by default | Up to the whole cap |
 | Quotas of Tests and load bytes | Counted | Exempt |
@@ -54,20 +54,22 @@ A Fixed-Rate Test holds one Sending Rate Table row for its whole Test Interval i
 udpstp client --key-file noc.toml --fixed-rate 100 server.example.net
 ```
 
-Rows 1 to 1000 offer that many Mbps at the IP layer; rows 1001 to 1152 offer the rates above 1 Gbps. Row 0 offers about 0.1 Mbps. The results' header names the Test type:
+Rows 1 to 1000 offer that many Mbps at the IP layer, and rows 1001 to 1152 offer the rates above 1 Gbps. Row 0 offers about 0.1 Mbps. The results' header names the Test type:
 
 ```text
-Results
-  Downstream Fixed-Rate Test with 127.0.0.1:24701, started 2026-09-26T14:50:11Z (T0)
+Results Summary
+  Downstream Fixed-Rate Test with 127.0.0.1:24601, started 2026-11-10T17:48:32Z
+    (T0)
 ```
 
 A Test with an ordinary key is refused:
 
 ```text
-udpstp: the Server rejected the Activation Request; only an Operator Key may run a Fixed-Rate Test (RFC 9946 §4.1), so check the key, or the Server's log
+udpstp: the Server rejected the Activation Request; only an Operator Key may run
+  a Fixed-Rate Test (RFC 9946 §4.1), so check the key, or the Server's log
 ```
 
-with exit status 152; the Server logs `reason="FixedRateNeedsOperatorKey"`. `--fixed-rate` and `--start-row` can't be combined.
+The Client exits with status 152, and the Server logs `reason="FixedRateNeedsOperatorKey"`. `--fixed-rate` and `--start-row` can't be combined.
 
 **Check the IP-Layer Sender Bit Rate.** A Fixed-Rate Test sends only as fast as the Load Sender can. Compare the B column, the Sender Bit Rate, with the row's rate. When it is below the row's rate, the host, not the path, set the result, and the Server's log shows `BurstsSkipped`.
 
@@ -79,7 +81,7 @@ An Operator Key with `max_test_interval` allows Tests longer than 60 s, up to th
 udpstp client --key-file noc.toml --test-interval 900 --delay-var rtt server.example.net
 ```
 
-Above 60 s the Server judges by round-trip delay variation instead of one-way delay variation, which clock drift would distort over a long Test. Ask for it with `--delay-var rtt`; otherwise the Server coerces it and the Client says so:
+Above 60 s the Server judges by round-trip delay variation instead of one-way delay variation, which clock drift would distort over a long Test. Ask for it with `--delay-var rtt`. Otherwise the Server coerces it and the Client says so:
 
 ```text
 The Server set useOwDelVar to 0 (asked for 1)
@@ -89,13 +91,13 @@ A Test Interval beyond the key's maximum is coerced to it. Add `--refuse-coercio
 
 ## MaxHops
 
-MaxHops, the TTL or IPv6 hop limit of test traffic, keeps a Test's load from straying beyond the path you mean to measure (RFC 9946 §10). Each end sets its own: the Server with `max_hops`, which RFC 9946 says the operator MUST set, and the Client with `--max-hops` (64 by default).
+MaxHops, the TTL or IPv6 hop limit of test traffic, keeps a Test's load from straying beyond the path you mean to measure (RFC 9946 §10). Each end sets its own. The Server uses `max_hops`, which RFC 9946 says the operator MUST set, and the Client uses `--max-hops` (64 by default).
 
 ```sh
 udpstp client --key-file noc.toml --max-hops 12 server.example.net
 ```
 
-Set it a little above the number of hops on the path. Too small, and the load dies on the way: the Client reports "ICMP time-exceeded errors: --max-hops is too small for the path" instead of a low capacity, and the Server logs it.
+Set it a little above the number of hops on the path. Too small, and the load dies on the way. The Client then reports "ICMP time-exceeded errors: --max-hops is too small for the path" instead of a low capacity, and the Server logs it.
 
 ## DSCP
 

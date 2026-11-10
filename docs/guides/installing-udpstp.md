@@ -1,20 +1,11 @@
 # Installing udpstp
 
-Install udpstp on both Test hosts. Choose your platform below, then follow [Getting started](../getting-started.md) to share a key and run a Test.
+One command installs the latest release of udpstp. Install it on both Test hosts, then follow the [quickstart](../getting-started.md) to share a key and run a Test.
 
 <a id="platforms-and-installation-options"></a>
+<a id="installation-methods"></a>
 
-## Installation methods
-
-| Platform | Method | Availability |
-| --- | --- | --- |
-| Linux | Archive installer, signed apt and dnf repositories | Available |
-| Linux and macOS | Homebrew | Available |
-| Windows | PowerShell installer and portable download | Available |
-| Windows | WinGet | Awaiting catalog approval |
-| All three | Cargo source build and cargo-binstall | Available |
-
-### Linux
+## Linux
 
 The installer selects a matching binary and places it in `~/.local/bin`.
 
@@ -24,17 +15,17 @@ curl -fsSL https://udpstp.com/install.sh | sh
 
 Run it again to update. It leaves your shell configuration unchanged. If `~/.local/bin` is outside your PATH, add it using your shell's configuration.
 
-### macOS
+## macOS
 
 ```sh
 brew install pederbe/tap/udpstp
 ```
 
-Use `brew upgrade udpstp` for updates and `brew uninstall udpstp` to remove it.
+Use `brew upgrade udpstp` for updates and `brew uninstall udpstp` to remove it. Homebrew installs udpstp on Linux too.
 
 <a id="install-script"></a>
 
-### Windows
+## Windows
 
 In PowerShell
 
@@ -45,6 +36,24 @@ irm https://udpstp.com/install.ps1 | iex
 The installer uses your account's `LocalAppData\Programs\udpstp` folder and adds it to PATH. You can use udpstp in the current PowerShell window immediately. Sign out and back in to refresh PATH for other applications. The [Windows guide](windows.md) covers key-file permissions, firewall rules and running the Server as a service.
 
 WinGet catalog approval is pending. The PowerShell installer and portable download are available now.
+
+## Check that it works
+
+```sh
+udpstp --version
+```
+
+It prints `udpstp` and the version. If the command isn't found, check that the install folder is in your PATH. Then go on to the [quickstart](../getting-started.md).
+
+## Other ways to install
+
+| Platform | Method | Availability |
+| --- | --- | --- |
+| Linux | Archive installer, signed apt and dnf repositories | Available |
+| Linux and macOS | Homebrew | Available |
+| Windows | PowerShell installer and portable download | Available |
+| Windows | WinGet | Awaiting catalog approval |
+| All three | Cargo source build and cargo-binstall | Available |
 
 ## Signed Linux packages
 

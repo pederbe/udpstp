@@ -4,17 +4,47 @@
 
 **Measure the capacity your network really delivers.**
 
-udpstp is a Rust implementation of the UDP Speed Test Protocol in [RFC 9946](https://www.rfc-editor.org/rfc/rfc9946). Run a Client and a Server at the two ends of a network path to measure Maximum IP-Layer Capacity with the method in [RFC 9097](https://www.rfc-editor.org/rfc/rfc9097).
+udpstp measures how much traffic a network path can carry, along with its loss, delay variation and round-trip time. It is for people who check access lines and circuits, compare network paths, or collect measurements for their own tools.
 
-Use it to check access lines and circuits, compare network paths, or collect measurements for your own tools.
+```console
+$ udpstp client --key-file keys.toml --max-hops 12 127.0.0.1
+Sending the Setup Request to 127.0.0.1:24601
+Setup accepted (Ephemeral Port 57607)
+Test activated (Downstream)
+The Server ended the Test
+...
+  Sub-Interval results
+  SI  C (Mbps)  Loss Ratio   Lost  Reordered  Duplicates
+   1    104.43    0.000000      0          0           0
+   2    304.94    0.000000      0          0           0
+   3    504.75    0.000000      0          0           0
+   4    705.01    0.000000      0          0           0
+   5    905.04    0.000000      0          0           0
+   6   2049.63    0.000000      0          0           0
+   7   4049.68    0.000000      0          0           0
+   8   6049.77    0.000000      0          0           0
+   9   9256.27    0.013230  10348          0           0
+  10   9713.89    0.008982   7337          0           0
+...
+Final metrics
+  Maximum IP-Layer Capacity: 9713.89 Mbps (Sub-Interval 10)
+```
 
-- **Measure in both directions.** Run authenticated Upstream and Downstream Tests.
-- **See how the path behaves.** Inspect capacity, loss, delay variation and RTT in your terminal or collect JSON for your own tools.
-- **Choose the load.** Combine Test Connections or use an Operator Key for Fixed-Rate Tests.
-- **Use your existing setup.** Read OB-UDPST key files and export compatible JSON.
-- **Build on the libraries.** Use the [wire codecs](https://docs.rs/udpstp-wire), [protocol core](https://docs.rs/udpstp-core) and [network runtime](https://docs.rs/udpstp-runtime) in Rust applications.
+This Test ran against a Server on the same machine, so the host set the rate. Between two hosts, the result is the capacity of the path between them.
 
-## Install
+udpstp is a Rust implementation of the UDP Speed Test Protocol in [RFC 9946](https://www.rfc-editor.org/rfc/rfc9946). A Client and a Server at the two ends of a network path measure its Maximum IP-Layer Capacity with the method in [RFC 9097](https://www.rfc-editor.org/rfc/rfc9097).
+
+## Highlights
+
+- Measures both directions with authenticated Upstream and Downstream Tests
+- Reports capacity, loss, delay variation and RTT in your terminal, or as JSON for your own tools
+- Combines Test Connections to fill a fast path, and holds a fixed rate with an Operator Key
+- Reads OB-UDPST key files and exports compatible JSON
+- Offers its [wire codecs](https://docs.rs/udpstp-wire), [protocol core](https://docs.rs/udpstp-core) and [network runtime](https://docs.rs/udpstp-runtime) as libraries for Rust applications
+
+udpstp measures between two hosts that share a key, so you need a Server at the far end of the path. It is not a one-click test against public servers.
+
+## Installation
 
 **Linux**
 
@@ -36,23 +66,67 @@ irm https://udpstp.com/install.ps1 | iex
 
 The [installation guide](https://udpstp.com/guides/installing-udpstp.html) covers signed Linux packages, portable downloads, Cargo and updates.
 
-## Run a Test
+## Everyday use
 
-Install on both hosts and give them the same private Key Table. [Getting started](https://udpstp.com/getting-started.html) shows how to create one and open the required UDP ports.
+Install udpstp on both hosts. Tests are authenticated by default, so generate a Shared Key.
 
-On the Server host
+```sh
+openssl rand -hex 32
+```
+
+Save the following as `keys.toml` on both hosts, replacing the placeholder with that key, and keep the file private with `chmod 600 keys.toml`.
+
+```toml
+[[key]]
+admin_key_name = "first-test"
+key_id = 1
+key_hex = "replace-with-64-hexadecimal-digits"
+```
+
+Allow inbound UDP ports 24601 and 49152 to 65535 at the Server. The [quickstart](https://udpstp.com/getting-started.html) covers Windows and other firewall setups.
+
+Start a Server at the far end of the path.
 
 ```sh
 udpstp server --key-file keys.toml --max-hops 12
 ```
 
-On the Client host
+Run a 10-second Downstream Test, in which the Server sends the load.
 
 ```sh
 udpstp client --key-file keys.toml --max-hops 12 server.example.net
 ```
 
-This runs a 10-second Downstream Test. Add `--direction upstream` for the other direction, or `--format json` to collect structured results. Choose MaxHops for your path.
+Measure the other direction.
+
+```sh
+udpstp client --key-file keys.toml --max-hops 12 --direction upstream server.example.net
+```
+
+Use several Test Connections when one does not fill a fast path.
+
+```sh
+udpstp client --key-file keys.toml --max-hops 12 --test-connections 4 server.example.net
+```
+
+Collect JSON for a script. The second command runs only when the Test completed, and fails when the Test found no Maximum IP-Layer Capacity.
+
+```sh
+udpstp client --key-file keys.toml --max-hops 12 --format json server.example.net > result.json &&
+  jq -e '.Output.AtMax.MaxIPLayerCapacity' result.json
+```
+
+| Option | What it does |
+| --- | --- |
+| `--key-file FILE` | Authenticate with the Shared Key in this private key file |
+| `--max-hops HOPS` | Set MaxHops, the TTL or hop limit of Test traffic. Choose it for your path |
+| `--direction upstream` | Run an Upstream Test, in which the Client sends the load |
+| `--test-interval SECONDS` | Run the Test for 5 to 60 seconds instead of 10 |
+| `--test-connections N` | Run a Multi-Connection Test with N Test Connections |
+| `--max-bandwidth MBPS` | State the most the Test is expected to carry, so the Server searches no higher |
+| `--format json` | Print JSON results instead of text |
+
+Run `udpstp client --help` and `udpstp server --help` for every option.
 
 ## How a Test works
 
@@ -97,6 +171,12 @@ udpstp runs complete Tests and reports their results.
 
 ## Learn more
 
-[Guides](docs/guides/README.md) · [Understanding results](docs/understanding-results.md) · [Hosting a Server](docs/guides/hosting-a-server.md) · [Architecture](docs/architecture.md) · [Contributing](CONTRIBUTING.md) · [Security reports](SECURITY.md)
+- [Quickstart](https://udpstp.com/getting-started.html) for your first Test between two hosts
+- [Installation](https://udpstp.com/guides/installing-udpstp.html) for packages, portable downloads and Cargo
+- [Guides](https://udpstp.com/guides/index.html) for running Tests, [hosting a Server](https://udpstp.com/guides/hosting-a-server.html), Windows and Operator features
+- [Understanding the results](https://udpstp.com/understanding-results.html)
+- [Command line reference](https://udpstp.com/reference/cli.html)
+- [Troubleshooting](https://udpstp.com/troubleshooting.html)
+- [Architecture](docs/architecture.md), [contributing](CONTRIBUTING.md) and [security reports](SECURITY.md)
 
 Dual-licensed under [MIT](LICENSE-MIT) or [Apache-2.0](LICENSE-APACHE).
