@@ -4,6 +4,12 @@ User-facing changes in udpstp, including capabilities, installation and compatib
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-11-10
+
+### Other changes
+
+- Trim completed test-fixture traffic and scope platform faults ([#17](https://github.com/pederbe/udpstp/pull/17))
+
 ## [0.1.2] - 2026-11-06
 
 ### Fixed
