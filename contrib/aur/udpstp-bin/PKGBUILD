@@ -1,27 +1,34 @@
-# The AUR's `udpstp-bin`, from the release's binary archives. The
-# maintainer publishes it to the AUR with each release: set pkgver, run
-# updpkgsums, makepkg --printsrcinfo > .SRCINFO (docs/releasing.md). The
-# checksums must match the release's SHA256SUMS.
+# Package the published binary without rebuilding or stripping it.
+# The release workflow refreshes versions and hashes with render-binary.sh.
+# See docs/releasing.md for preparation and checks.
 # Maintainer: Peder Bergan <https://pederbe.dev>
 
 pkgname=udpstp-bin
 _pkgname=udpstp
-pkgver=0.1.0
+pkgver=0.1.3
 pkgrel=1
-pkgdesc='udpstp: IP-Layer Capacity measurement with UDPSTP (RFC 9946) (release binary)'
+pkgdesc='IP-Layer Capacity measurement with UDPSTP (RFC 9946)'
 arch=('x86_64' 'aarch64')
 url='https://udpstp.com'
 license=('MIT OR Apache-2.0')
-depends=('gcc-libs' 'glibc')
-provides=('udpstp')
+depends=('gcc-libs' 'glibc>=2.28')
+provides=("udpstp=$pkgver")
 conflicts=('udpstp')
+options=('!strip' '!debug')
 _release="https://github.com/pederbe/udpstp/releases/download/v$pkgver"
 source=("udpstp-server-$pkgver.service::https://raw.githubusercontent.com/pederbe/udpstp/v$pkgver/contrib/systemd/udpstp-server.service")
 source_x86_64=("$_release/udpstp-v$pkgver-x86_64-unknown-linux-gnu.tar.gz")
 source_aarch64=("$_release/udpstp-v$pkgver-aarch64-unknown-linux-gnu.tar.gz")
-sha256sums=('SKIP')
-sha256sums_x86_64=('SKIP')
-sha256sums_aarch64=('SKIP')
+sha256sums=('105407c85f2a0059ae97139a56982be450b541145f32785f78fe3c19dc804ba2')
+sha256sums_x86_64=('496c709c9b99911c259c01739147214162af6cd68082858b7ebe8a987df85dd6')
+sha256sums_aarch64=('cab35238293593d218eda4b0813d3cac53e4cd0a669649b6eed44cf829d1bb0f')
+
+check() {
+    cd "udpstp-v$pkgver-$CARCH-unknown-linux-gnu"
+    test "$(./udpstp --version)" = "udpstp $pkgver"
+    ./udpstp client --help > /dev/null
+    ./udpstp server --help > /dev/null
+}
 
 package() {
     cd "udpstp-v$pkgver-$CARCH-unknown-linux-gnu"
@@ -30,6 +37,7 @@ package() {
     # and keys.toml first (docs/guides/hosting-a-server.md).
     sed 's|/usr/local/bin/udpstp|/usr/bin/udpstp|' "$srcdir/udpstp-server-$pkgver.service" |
         install -Dm644 /dev/stdin "$pkgdir/usr/lib/systemd/system/udpstp-server.service"
-    install -Dm644 LICENSE-MIT LICENSE-APACHE -t "$pkgdir/usr/share/licenses/$pkgname"
-    install -Dm644 README.md -t "$pkgdir/usr/share/doc/$_pkgname"
+    install -Dm644 LICENSE-MIT LICENSE-APACHE THIRD-PARTY-LICENSES.md \
+        -t "$pkgdir/usr/share/licenses/$pkgname"
+    install -Dm644 README.md CHANGELOG.md -t "$pkgdir/usr/share/doc/$_pkgname"
 }

@@ -129,11 +129,67 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  arch:
+    name: Arch Linux binary package
+    needs: build
+    runs-on: ubuntu-26.04
+    container: archlinux:base-devel
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Build and check the package
+        run: |
+          # Previews keep their archives without adding an Arch package.
+          if [[ "$GITHUB_REF_NAME" = *-* ]]; then exit 0; fi
+          version=${GITHUB_REF_NAME#v}
+          cd dist
+          sha256sum udpstp-v"$version"-*-unknown-linux-gnu.tar.gz > SHA256SUMS
+          sh ../contrib/aur/render-binary.sh "$version" SHA256SUMS \
+            ../contrib/systemd/udpstp-server.service > PKGBUILD
+          cp ../contrib/systemd/udpstp-server.service "udpstp-server-$version.service"
+          useradd --create-home builder
+          chown -R builder:builder .
+          runuser -u builder -- env PACKAGER='Peder Bergan <https://pederbe.dev>' \
+            makepkg --cleanbuild --clean --noconfirm
+          runuser -u builder -- makepkg --printsrcinfo > udpstp-bin.SRCINFO
+          mv PKGBUILD udpstp-bin.PKGBUILD
+          mv udpstp-bin-*.pkg.tar.zst udpstp-x86_64.pkg.tar.zst
+          # The container omits documentation. Check a normal system install.
+          sed -i '/^NoExtract[[:space:]]*=/d' /etc/pacman.conf
+          pacman -U --noconfirm udpstp-x86_64.pkg.tar.zst
+          test "$(udpstp --version)" = "udpstp $version"
+          tar -xOf "udpstp-v$version-x86_64-unknown-linux-gnu.tar.gz" \
+            "udpstp-v$version-x86_64-unknown-linux-gnu/udpstp" | cmp /usr/bin/udpstp -
+          pacman -Qkk udpstp-bin
+          test ! -e /etc/systemd/system/multi-user.target.wants/udpstp-server.service
+          pacman -R --noconfirm udpstp-bin
+          test ! -e /usr/bin/udpstp
+          test ! -e /usr/lib/systemd/system/udpstp-server.service
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !contains(github.ref_name, '-') }}
+        with:
+          name: arch-linux
+          path: |
+            dist/udpstp-x86_64.pkg.tar.zst
+            dist/udpstp-bin.PKGBUILD
+            dist/udpstp-bin.SRCINFO
+          if-no-files-found: error
+          retention-days: 7
+
   # Attach assets to the draft for downloaded-archive qualification.
   candidate:
     if: github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
     name: Attach release assets
-    needs: build
+    needs: [build, arch]
     runs-on: ubuntu-26.04
     timeout-minutes: 15
     permissions:
@@ -182,6 +238,7 @@ jobs:
             dist/udpstp-*.zip
             dist/udpstp-*.rpm
             dist/udpstp_*.deb
+            dist/udpstp-*.pkg.tar.zst
             dist/udpstp.exe
           sbom-path: dist/udpstp-${{ github.ref_name }}.cdx.json
       - name: Install the pinned GitHub CLI
