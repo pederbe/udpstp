@@ -130,14 +130,25 @@ while IFS= read -r -d '' file; do
     fi
 done < <(find "$repository" -type f -print0)
 
-# apt: Packages lists every version in the pool; InRelease and Release.gpg
-# sign the Release file that holds the Packages digests.
+# Advertise only the newest release. Older files remain for clients already
+# using a signed index and for the internal upgrade test's direct-file route.
+latest=$(find "$pool" -name 'udpstp_*_amd64.deb' -printf '%f\n' |
+    sed 's/^udpstp_\(.*\)-1_amd64\.deb$/\1/' | sort -V | tail -n 1)
+test -n "$latest" || { echo 'no release packages in the repository' >&2; exit 1; }
+for file in "$pool/udpstp_${latest}-1_amd64.deb" "$pool/udpstp_${latest}-1_arm64.deb" \
+    "$repository/rpm/udpstp-${latest}-1.x86_64.rpm" "$repository/rpm/udpstp-${latest}-1.aarch64.rpm"; do
+    test -f "$file" || { echo "missing latest release package: $file" >&2; exit 1; }
+done
+
+# apt: InRelease and Release.gpg sign the Release file holding the index digests.
 apt=$repository/apt
 dists=$apt/dists/stable
 for arch in amd64 arm64; do
     binary=$dists/main/binary-$arch
     mkdir -p "$binary"
-    (cd "$apt" && apt-ftparchive --arch "$arch" packages pool) > "$binary/Packages"
+    (cd "$apt" && apt-ftparchive --arch "$arch" packages pool) |
+        awk -v version="$latest-1" 'BEGIN { RS=""; FS="\n"; ORS="\n\n" }
+            { for (i=1; i<=NF; i++) if ($i == "Version: " version) { print; break } }' > "$binary/Packages"
     gzip -9nkf "$binary/Packages"
     # Old signed InRelease files must still find their exact indexes after an
     # update. Keep both strong hash forms that the supported apt clients can use.
@@ -174,7 +185,8 @@ sign --armor --detach-sign --output "$dists/Release.gpg" "$dists/Release"
 # index and its detached signature always come from the same generation.
 # Package paths go back to the shared rpm pool, without copying the packages.
 mkdir "$work/rpm"
-createrepo_c --quiet --location-prefix '../../' --outputdir "$work/rpm" "$repository/rpm"
+printf 'udpstp-%s-1.%s.rpm\n' "$latest" x86_64 "$latest" aarch64 > "$work/rpm-packages"
+createrepo_c --quiet --pkglist "$work/rpm-packages" --location-prefix '../../' --outputdir "$work/rpm" "$repository/rpm"
 sign --armor --detach-sign --output "$work/rpm/repodata/repomd.xml.asc" \
     "$work/rpm/repodata/repomd.xml"
 generation=$(sha256sum < "$work/rpm/repodata/repomd.xml" | cut -d' ' -f1)

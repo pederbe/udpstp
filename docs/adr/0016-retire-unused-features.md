@@ -1,5 +1,7 @@
 # Retire unused features
 
-**Status: Accepted** (2026-11-11). Supersedes ADR 0013's optional Key Table format marker.
+**Status: Accepted** (2026-11-11). Supersedes ADR 0013's optional Key Table format marker and ADR 0008's experimental wake-up grouping.
 
 The TOML Key Table's `format = 1` marker adds no meaning. Unknown fields already make the whole file fail to load, so a newer restriction cannot be silently ignored. Deprecate the marker and keep accepting it with a warning naming the safe replacement: delete the line. Under ADR 0013's input deprecation rule, it remains accepted throughout the minor release that first publishes the warning and that release's patches. Removal is eligible only in the following minor release, after the deprecation has shipped. Existing Key Table columns keep their meaning. Unknown fields and unsupported marker values remain errors. Rejecting valid marked files immediately would break the released input contract.
+
+Remove experimental wake-up grouping now. Its precision cost was never qualified, and the default already waits for the earliest deadline. Remove its environment setting, scheduling branch and `grouping_us` startup-log field. ADR 0013 permits experimental settings and the Server's 0.x JSON log to change without a deprecation period. Saved benchmark matrices, logs and reports remain readable with their historical windows. New benchmark Rounds refuse grouping requests before starting work, and maintained presets no longer request it.

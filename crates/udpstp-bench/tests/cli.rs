@@ -230,6 +230,51 @@ fn a_server_scale_matrix_checks_its_registered_options_before_contacting_hosts()
     std::fs::remove_dir_all(&dir).unwrap();
 }
 
+// ADR 0016: historical grouping plans can be read but cannot launch new Rounds.
+#[test]
+fn retired_grouping_is_refused_before_the_provider_is_created() {
+    let dir = scratch("retired-grouping");
+    let out = dir.join("out");
+    let source =
+        std::fs::read_to_string(root().join("scripts/bench/tests/scale-smoke.toml")).unwrap();
+    let built = RefCell::new(0);
+    let factory = |_: &RoundArgs, _: &Setup| -> Result<Built, String> {
+        *built.borrow_mut() += 1;
+        Err("the provider must not be created".into())
+    };
+    for (name, source) in [
+        (
+            "client",
+            source.replace(
+                "kind = \"server-scale\"",
+                "kind = \"server-scale\"\nclient_env = { UDPSTP_ENGINE_GROUPING_US = \"50\" }",
+            ),
+        ),
+        (
+            "server",
+            source.replace(
+                "name = \"S\"",
+                "name = \"S\"\nserver_env = { UDPSTP_ENGINE_GROUPING_US = \"50\" }",
+            ),
+        ),
+    ] {
+        let path = dir.join(format!("{name}.toml"));
+        std::fs::write(&path, source).unwrap();
+        let mut argv = plan_args(out.to_str().unwrap(), "static");
+        argv.extend(["--matrix", path.to_str().unwrap()]);
+        let ran = run(&argv, &dir, Some(&factory), false);
+        assert_eq!(ran.code, 2);
+        assert!(
+            ran.err[0].contains("wake-up grouping is no longer supported"),
+            "{:?}",
+            ran.err
+        );
+        assert_eq!(*built.borrow(), 0);
+        assert!(!out.exists());
+    }
+    std::fs::remove_dir_all(dir).unwrap();
+}
+
 /// Refusals of a static Round before its hosts are asked anything.
 #[test]
 fn a_static_round_is_refused_what_it_lacks() {

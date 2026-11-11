@@ -320,7 +320,12 @@ pub fn engine_startups(events: &[Json]) -> Result<Json, Error> {
         found.push(dict([
             ("executor", executor),
             ("engine_threads", e.get("engine_threads")?.clone()),
-            ("grouping_us", e.get("grouping_us")?.clone()),
+            // Current Servers omit the retired setting. Historical events
+            // still provide their actual window.
+            (
+                "grouping_us",
+                e.get_or("grouping_us", &Json::Int(0))?.clone(),
+            ),
         ]));
     }
     Ok(Json::List(found))

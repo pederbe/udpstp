@@ -1056,10 +1056,13 @@ pub fn startup_problems(meta: &Json, record: &Json) -> Result<Vec<String>, Error
                 display(meant.item("engine_threads")?)
             ));
         }
-        if !eq(startup.item("grouping_us")?, meant.item("grouping_us")?) {
+        // Current startup records omit the retired setting. Saved records
+        // still carry it, and a historical nonzero request must match.
+        let grouping = startup.get_or("grouping_us", &Json::Int(0))?;
+        if !eq(grouping, meant.item("grouping_us")?) {
             problems.push(format!(
                 "{said}a grouping window of {} µs, where its settings ask for {} µs",
-                display(startup.item("grouping_us")?),
+                display(grouping),
                 display(meant.item("grouping_us")?)
             ));
         }

@@ -923,12 +923,10 @@ fn steady_state_allocations() {
 // Diagnostic loopback proxy.
 // pre-registers, run by hand, which gates nothing: Downstream Tests from
 // one Server at once over loopback, on the pooled executor with 1 and 2
-// Engine Threads, with and without wake-up grouping, each pair of windows
-// back to back, the first of a pair taking turns. Its parameters come from
+// Engine Threads. Its parameters come from
 // the environment, each defaulting to the pre-registration's fixed value
 // or its first candidate; the feasibility run sets
-// `UDPSTP_PROXY_THREADS=1`, `UDPSTP_PROXY_GROUPING_US=0` and
-// `UDPSTP_PROXY_RUNS=3`:
+// `UDPSTP_PROXY_THREADS=1` and `UDPSTP_PROXY_RUNS=3`:
 //
 // - `UDPSTP_PROXY_TESTS`: the Tests at once (8);
 // - `UDPSTP_PROXY_ROW`: each one's row, at most 1000 (125);
@@ -936,15 +934,14 @@ fn steady_state_allocations() {
 // - `UDPSTP_PROXY_THREADS`: the pooled executor's Engine Threads, comma-
 //   separated (1,2); 0 runs each Server's end on a thread of its own, the
 //   per-Test-Connection executor, for comparison only;
-// - `UDPSTP_PROXY_GROUPING_US`: the grouping windows, comma-separated
-//   (0,50);
 // - `UDPSTP_PROXY_RUNS`: the rounds of all of them (5).
 //
 // Each run prints one line, `PROXY` and tab-separated `key=value` fields,
 // from which the pre-registration's reading takes one value a run:
 //
 // - `run`, `executor` (`pool` or `per-test-connection`), `engine_threads`,
-//   `grouping_us`, `pair_position` (1 or 2), `tests`, `row`, `seconds`;
+//   `grouping_us` (0), `pair_position` (1), `tests`, `row`, `seconds`;
+//   the two fixed fields keep the saved proxy report format readable;
 // - `completed`: `yes` where every Test completed at both ends; a run
 //   whose Tests didn't gives the reading no figures;
 // - `planned`: the Load PDUs the Tests were to send;
@@ -973,6 +970,10 @@ fn steady_state_allocations() {
 #[test]
 #[ignore = "a measurement run by hand, optimized and alone on the host: see its comment"]
 fn shared_engine_thread_precision() {
+    assert!(
+        std::env::var_os("UDPSTP_PROXY_GROUPING_US").is_none(),
+        "wake-up grouping was removed; unset UDPSTP_PROXY_GROUPING_US before starting a new proxy measurement"
+    );
     let number = |name: &str, default: &str| -> Vec<u64> {
         std::env::var(name)
             .unwrap_or_else(|_| default.into())
@@ -984,37 +985,27 @@ fn shared_engine_thread_precision() {
     let row = u16::try_from(number("UDPSTP_PROXY_ROW", "125")[0]).expect("a row");
     let seconds = u16::try_from(number("UDPSTP_PROXY_SECONDS", "10")[0]).expect("seconds");
     let threads = number("UDPSTP_PROXY_THREADS", "1,2");
-    let groupings = number("UDPSTP_PROXY_GROUPING_US", "0,50");
     let runs = number("UDPSTP_PROXY_RUNS", "5")[0];
     for run in 1..=runs {
         for &threads in &threads {
-            // Each pair back to back, the first of a pair taking turns.
-            let mut order = groupings.clone();
-            if run % 2 == 0 {
-                order.reverse();
-            }
-            for (position, &grouping) in order.iter().enumerate() {
-                if threads == 0 && grouping > 0 {
-                    continue;
-                }
-                let settings = EngineSettings {
-                    grouping: Duration::from_micros(grouping),
-                    ..EngineSettings::default()
-                };
-                let figures = proxy_run(tests, row, seconds, threads as usize, settings);
-                let executor = if threads == 0 {
-                    "per-test-connection"
-                } else {
-                    "pool"
-                };
-                println!(
-                    "PROXY\trun={run}\texecutor={executor}\tengine_threads={threads}\t\
-                     grouping_us={grouping}\tpair_position={}\ttests={tests}\trow={row}\t\
-                     seconds={seconds}\t{}",
-                    position + 1,
-                    figures.fields(threads > 0)
-                );
-            }
+            let figures = proxy_run(
+                tests,
+                row,
+                seconds,
+                threads as usize,
+                EngineSettings::default(),
+            );
+            let executor = if threads == 0 {
+                "per-test-connection"
+            } else {
+                "pool"
+            };
+            println!(
+                "PROXY\trun={run}\texecutor={executor}\tengine_threads={threads}\t\
+                 grouping_us=0\tpair_position=1\ttests={tests}\trow={row}\t\
+                 seconds={seconds}\t{}",
+                figures.fields(threads > 0)
+            );
         }
     }
 }

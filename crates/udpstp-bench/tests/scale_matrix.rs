@@ -38,21 +38,33 @@ fn committed_matrices_and_refusals_match_the_python() {
         };
         assert_eq!(actual, expected, "case {index}: {}", case["name"]);
         if let Some(path) = case["path"].as_str() {
+            let saved = matrix::parse(case["text"].as_str().unwrap()).unwrap();
+            assert_eq!(
+                common::scale::snapshot(&saved),
+                expected,
+                "saved TOML case {index}"
+            );
             let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
                 .join("../..")
                 .join(path);
             let text = std::fs::read_to_string(path).unwrap().replace("\r\n", "\n");
-            assert_eq!(
-                text,
-                case["text"].as_str().unwrap(),
-                "regenerate the Python golden"
-            );
             let parsed = matrix::parse(&text).unwrap();
-            assert_eq!(
-                common::scale::snapshot(&parsed),
-                expected,
-                "TOML case {index}"
-            );
+            if matrix::check_execution(&saved).is_err() {
+                // ADR 0016: saved grouping plans stay readable, while
+                // their maintained replacements no longer request it.
+                matrix::check_execution(&parsed).unwrap();
+            } else {
+                assert_eq!(
+                    text,
+                    case["text"].as_str().unwrap(),
+                    "regenerate the Python golden"
+                );
+                assert_eq!(
+                    common::scale::snapshot(&parsed),
+                    expected,
+                    "TOML case {index}"
+                );
+            }
         }
     }
 }

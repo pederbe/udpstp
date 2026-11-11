@@ -176,8 +176,6 @@ const CATCH_UP: &str = "UDPSTP_ENGINE_CATCH_UP_US";
 const HOLD_OFF: &str = "UDPSTP_ENGINE_HOLD_OFF_US";
 /// The most Engine Threads the pooled executor starts.
 const THREADS: &str = "UDPSTP_ENGINE_THREADS";
-/// The pooled executor's wake-up grouping window, in µs.
-const GROUPING: &str = "UDPSTP_ENGINE_GROUPING_US";
 
 /// How the Data Phase Engines run, from the experimental environment
 /// variables `variable` looks up (not a stable interface; ADR 0013,
@@ -191,10 +189,7 @@ const GROUPING: &str = "UDPSTP_ENGINE_GROUPING_US";
 /// - `UDPSTP_ENGINE_HOLD_OFF_US`: a fixed receive hold-off in µs, 0 for
 ///   none;
 /// - `UDPSTP_ENGINE_THREADS`: the most Engine Threads the pooled executor
-///   starts, in place of the CPUs the process may use;
-/// - `UDPSTP_ENGINE_GROUPING_US`: the pooled executor's wake-up grouping
-///   window in µs, 0 for none, the default (no measurement has shown
-///   a window worth making the default: ADR 0008).
+///   starts, in place of the CPUs the process may use.
 ///
 /// A value that isn't a whole number of µs or a positive count leaves the
 /// engine's own choice.
@@ -210,7 +205,6 @@ pub fn engine_settings(variable: impl Fn(&str) -> Option<String>) -> EngineSetti
             _ => None,
         },
         threads: value(THREADS).and_then(|threads| threads.parse().ok()),
-        grouping: micros(GROUPING).unwrap_or_default(),
     }
 }
 
@@ -248,18 +242,14 @@ mod tests {
         }
     }
 
-    //  (D3, D4): `UDPSTP_ENGINE_THREADS` caps the pool's Engine
-    // Threads, a positive count, and `UDPSTP_ENGINE_GROUPING_US` sets its
-    // grouping window in µs, 0 (none) by default. Anything else is
-    // ignored.
+    // ADR 0008: `UDPSTP_ENGINE_THREADS` caps the pool's Engine
+    // Threads with a positive count. Anything else is ignored.
     #[test]
-    fn the_engine_threads_and_the_grouping_window() {
-        let settings = from(&[(THREADS, " 2\n"), (GROUPING, "50")]);
+    fn the_engine_thread_limit_is_a_positive_count() {
+        let settings = from(&[(THREADS, " 2\n")]);
         assert_eq!(settings.threads.map(|n| n.get()), Some(2));
-        assert_eq!(settings.grouping, Duration::from_micros(50));
-        assert_eq!(EngineSettings::default().grouping, Duration::ZERO);
         for value in ["", "0", "-1", "1.5", "two"] {
-            let settings = from(&[(THREADS, value), (GROUPING, value)]);
+            let settings = from(&[(THREADS, value)]);
             assert_eq!(settings, EngineSettings::default(), "{value:?}");
         }
     }

@@ -38,8 +38,7 @@
 //!   Load Receiver sharing an Engine Thread with Load Senders, shows the
 //!   case.
 //! - [`plan_wait`]: until the earliest deadline, or the hold-off's end,
-//!   and with wake-up grouping (a window `W`), until the last deadline
-//!   within `W` of the earliest, never past the hold-off's end; no wait
+//!   never past the hold-off's end; no wait
 //!   while the turn's sending time ran out with Bursts still due, or a
 //!   Test Connection's socket may still hold datagrams outside a hold-off.
 
@@ -127,15 +126,6 @@ impl DeadlineHeap {
     /// The earliest deadline.
     pub(crate) fn earliest(&self) -> Option<MonoTime> {
         self.peek().map(|(at, _)| at)
-    }
-
-    /// The latest deadline no later than `until`.
-    pub(crate) fn last_by(&self, until: MonoTime) -> Option<MonoTime> {
-        self.heap
-            .iter()
-            .map(|&(at, _)| at)
-            .filter(|&at| at <= until)
-            .max()
     }
 
     #[cfg(test)]
@@ -412,11 +402,9 @@ pub(crate) struct Wait {
 /// next turn at once) when `again`, the turn's sending time having run
 /// out with Bursts still due, when a deadline is due, or when the ready
 /// list holds a slot outside a hold-off; else until the earliest deadline
-/// in `heap`, or, with a `grouping` window, the last deadline within it
-/// of the earliest, never past the hold-off's end `hold`.
+/// in `heap`, never past the hold-off's end `hold`.
 pub(crate) fn plan_wait(
     heap: &DeadlineHeap,
-    grouping: Duration,
     hold: Option<MonoTime>,
     ready: bool,
     again: bool,
@@ -425,13 +413,7 @@ pub(crate) fn plan_wait(
     if again || (ready && hold.is_none()) {
         return None;
     }
-    let deadline = heap.earliest().map(|earliest| {
-        if grouping.is_zero() {
-            return earliest;
-        }
-        let window = MonoTime::from_duration(earliest.as_duration() + grouping);
-        heap.last_by(window).unwrap_or(earliest)
-    });
+    let deadline = heap.earliest();
     let until = deadline.into_iter().chain(hold).min();
     if until.is_some_and(|until| until <= now) {
         return None;
@@ -501,18 +483,6 @@ mod tests {
             .collect();
         expected.sort();
         assert_eq!(drain(&mut heap), expected);
-    }
-
-    //  (grouping): the latest deadline no later than a time.
-    #[test]
-    fn the_heap_finds_the_last_deadline_by_a_time() {
-        let mut heap = DeadlineHeap::default();
-        for (slot, us) in [(0, 100), (1, 130), (2, 160), (3, 400)] {
-            heap.set(slot, Some(at(us)));
-        }
-        assert_eq!(heap.last_by(at(150)), Some(at(130)));
-        assert_eq!(heap.last_by(at(160)), Some(at(160)));
-        assert_eq!(heap.last_by(at(99)), None);
     }
 
     //  (design §3.2, the ready list): slots are served in the order
@@ -697,34 +667,22 @@ mod tests {
         heap
     }
 
-    //  (D4, design §3.4): without grouping the wait ends at the
-    // earliest deadline; with a window W it ends at the last deadline
-    // within W of the earliest, so never early and at most W late, and a
-    // lone deadline is waited for exactly.
+    // ADR 0008: the wait ends at the earliest deadline.
     #[test]
-    fn grouping_waits_for_the_last_deadline_within_its_window() {
+    fn the_wait_ends_at_the_earliest_deadline() {
         let deadlines = heap(&[1_000, 1_030, 1_060, 1_200]);
-        let wait = |grouping| plan_wait(&deadlines, grouping, None, false, false, at(0));
-        let until = |us| {
+        assert_eq!(
+            plan_wait(&deadlines, None, false, false, at(0)),
             Some(Wait {
-                until: Some(at(us)),
+                until: Some(at(1_000)),
                 arrivals: true,
             })
-        };
-        assert_eq!(wait(Duration::ZERO), until(1_000));
-        assert_eq!(wait(US(50)), until(1_030));
-        assert_eq!(wait(US(60)), until(1_060));
-        let lone = heap(&[1_000, 1_200]);
-        assert_eq!(
-            plan_wait(&lone, US(50), None, false, false, at(0)),
-            until(1_000)
         );
     }
 
     //  (design §3.6): during a hold-off arrivals don't end the wait,
-    // which ends at the hold-off's end at the latest; grouping never
-    // extends it past that, and a non-empty ready list doesn't cut it
-    // short.
+    // which ends at the hold-off's end at the latest, and a non-empty
+    // ready list doesn't cut it short.
     #[test]
     fn a_hold_off_bounds_the_wait_and_leaves_arrivals_out() {
         let deadlines = heap(&[1_000, 1_040]);
@@ -734,12 +692,19 @@ mod tests {
             arrivals: false,
         });
         assert_eq!(
-            plan_wait(&deadlines, US(50), hold, true, false, at(900)),
+            plan_wait(&deadlines, hold, true, false, at(900)),
+            Some(Wait {
+                until: Some(at(1_000)),
+                arrivals: false,
+            })
+        );
+        assert_eq!(
+            plan_wait(&heap(&[1_040]), hold, true, false, at(900)),
             expected
         );
         let no_deadline = DeadlineHeap::default();
         assert_eq!(
-            plan_wait(&no_deadline, Duration::ZERO, hold, false, false, at(900)),
+            plan_wait(&no_deadline, hold, false, false, at(900)),
             expected
         );
     }
@@ -751,27 +716,11 @@ mod tests {
     #[test]
     fn the_next_turn_starts_at_once_when_work_is_left() {
         let deadlines = heap(&[1_000]);
+        assert_eq!(plan_wait(&deadlines, None, false, true, at(0)), None);
+        assert_eq!(plan_wait(&deadlines, None, true, false, at(0)), None);
+        assert_eq!(plan_wait(&deadlines, None, false, false, at(1_000)), None);
         assert_eq!(
-            plan_wait(&deadlines, Duration::ZERO, None, false, true, at(0)),
-            None
-        );
-        assert_eq!(
-            plan_wait(&deadlines, Duration::ZERO, None, true, false, at(0)),
-            None
-        );
-        assert_eq!(
-            plan_wait(&deadlines, Duration::ZERO, None, false, false, at(1_000)),
-            None
-        );
-        assert_eq!(
-            plan_wait(
-                &DeadlineHeap::default(),
-                Duration::ZERO,
-                None,
-                false,
-                false,
-                at(0)
-            ),
+            plan_wait(&DeadlineHeap::default(), None, false, false, at(0)),
             Some(Wait {
                 until: None,
                 arrivals: true
