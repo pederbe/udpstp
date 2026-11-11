@@ -99,7 +99,7 @@ pub struct ServerSettings {
     /// are dropped silently.
     pub unverified_setups_per_second: u32,
     /// How many authentic Setup Requests one Source may send at once; at
-    /// least test_connections_per_test.
+    /// least tests_per_source multiplied by test_connections_per_test.
     pub source_setup_burst: u32,
     /// How many more a Source may send each second after its burst.
     pub source_setups_per_second: u32,
@@ -309,7 +309,8 @@ pub struct ServerOverrides {
     #[arg(long, value_name = "N")]
     unverified_setups_per_second: Option<u32>,
     /// How many authentic Setup Requests one Source may send at once
-    /// [default: 48]; at least --test-connections-per-test.
+    /// [default: 48]. Must be at least --tests-per-source multiplied by
+    /// --test-connections-per-test.
     #[arg(long, value_name = "N")]
     source_setup_burst: Option<u32>,
     /// How many more a Source may send each second after its burst
@@ -716,13 +717,22 @@ impl ServerSettings {
                 message: "must be 1 to 31536000 seconds (a year)".into(),
             });
         }
-        if self.source_tests_per_quota_period == Some(0)
-            || self.source_bytes_per_quota_period == Some(0)
-        {
-            return Err(ConfigError::Invalid {
-                setting: "source_tests_per_quota_period",
-                message: "a Quota must be at least 1; leave it out for none".into(),
-            });
+        for (setting, is_zero) in [
+            (
+                "source_tests_per_quota_period",
+                self.source_tests_per_quota_period == Some(0),
+            ),
+            (
+                "source_bytes_per_quota_period",
+                self.source_bytes_per_quota_period == Some(0),
+            ),
+        ] {
+            if is_zero {
+                return Err(ConfigError::Invalid {
+                    setting,
+                    message: "a Quota must be at least 1. Leave it out for none".into(),
+                });
+            }
         }
         if self.max_start_row == 0xFFFF {
             return Err(ConfigError::Invalid {
@@ -777,7 +787,7 @@ impl ServerSettings {
         let invalid = || ConfigError::Invalid {
             setting: "ephemeral_ports",
             message: format!(
-                "{:?} is not FIRST-LAST with 1 <= FIRST <= LAST <= 65535",
+                "{:?} is not a valid port range. Use FIRST-LAST, for example 49152-65535. Ports must be from 1 to 65535 and FIRST must not exceed LAST",
                 self.ephemeral_ports
             ),
         };

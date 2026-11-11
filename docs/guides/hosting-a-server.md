@@ -218,6 +218,8 @@ Each step says when you need it. Skip the rest.
 
 Every setting has a command-line flag and a TOML key of the same name, so `--max-hops` is `max_hops`. Flags replace the file's values, and the file replaces the defaults.
 
+Write boolean overrides with `=`, such as `--jumbo=false`. In TOML, write `jumbo = false`.
+
 1. Print the effective configuration to start a file:
 
    ```sh
@@ -256,6 +258,8 @@ An unknown key or an invalid value stops the Server with exit status 50 and name
 ```text
 udpstp: configuration error: ephemeral_ports: "50000-50099" has 100 ports, fewer than max_test_connections (256) plus the Unactivated Test Connection share (128)
 ```
+
+[Troubleshooting configuration errors](../troubleshooting.md#the-server-stops-with-a-configuration-error) explains how to correct port ranges, Setup Request budgets and Quotas.
 
 Keep `jumbo`, `traditional_mtu` and `server_mtu` at their defaults to serve OB-UDPST Clients as well as udpstp ones. A Client whose `--jumbo` or `--traditional-mtu` differs is refused with BADJS or BADTMTU.
 

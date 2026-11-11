@@ -120,7 +120,8 @@ impl ClientStart {
                 "no key to authenticate with; give one with --key-file, or --unauthenticated for a Server that allows Unauthenticated Mode",
             ));
         }
-        let (test_connections, minimum) = test_connection_counts(args).map_err(configuration)?;
+        let (test_connections, minimum) =
+            test_connection_counts(args).map_err(|message| configuration(&message))?;
         let mut servers = Vec::with_capacity(args.servers.len());
         for name in &args.servers {
             let server = resolve(name).map_err(|error| {
@@ -259,29 +260,34 @@ impl ClientStart {
 
 /// The Test Connections and the Minimum Test Connections the options ask
 /// for, or why they can't be.
-fn test_connection_counts(args: &ClientArgs) -> Result<(NonZeroU8, NonZeroU8), &'static str> {
+fn test_connection_counts(args: &ClientArgs) -> Result<(NonZeroU8, NonZeroU8), String> {
     let servers = args.servers.len();
-    let default = u8::try_from(servers).map_err(|_| "at most 255 Servers")?;
+    let default = u8::try_from(servers).map_err(|_| {
+        format!("at most 255 Servers are allowed (got {servers}). Give fewer SERVERs")
+    })?;
     let test_connections = args.test_connections.unwrap_or(default);
     if usize::from(test_connections) < servers {
-        return Err("--test-connections must be at least the number of Servers");
+        return Err(format!(
+            "--test-connections is {test_connections}. Set it to at least {servers} for {servers} Servers, or give fewer SERVERs"
+        ));
     }
     let minimum = args.min_test_connections.unwrap_or(test_connections);
     if minimum > test_connections {
-        return Err("--min-test-connections is at most --test-connections");
+        return Err(format!(
+            "--min-test-connections is {minimum}, but --test-connections is {test_connections}. Lower --min-test-connections to {test_connections} or less, or increase --test-connections"
+        ));
     }
     // The Test's maxBandwidth is split equally between its Test
     // Connections, each stating its share rounded down: below 1 Mbps each
     // there is no share to state, since 0 states none and 1 each would
     // state more than the Client user asked for.
     // (conformance: max-bandwidth-split-across-test-connections)
-    if args
-        .max_bandwidth
-        .is_some_and(|total| total < u16::from(test_connections))
+    if let Some(total) = args.max_bandwidth
+        && total < u16::from(test_connections)
     {
-        return Err(
-            "--max-bandwidth is shared between the Test Connections: give at least 1 Mbps each",
-        );
+        return Err(format!(
+            "--max-bandwidth is {total} Mbps for {test_connections} Test Connections. Use at least {test_connections} Mbps (1 Mbps each), or reduce --test-connections"
+        ));
     }
     // clap takes both from 1, and SERVER is required.
     Ok((
@@ -477,7 +483,7 @@ mod tests {
                     "192.0.2.1",
                 ],
                 50,
-                "pseudonymize needs a pseudonym key file",
+                "--address-privacy pseudonymize needs --address-privacy-key-file FILE",
             ),
             (
                 "a pseudonym key file that isn't there",
@@ -522,7 +528,12 @@ mod tests {
                 50,
                 "no key to authenticate with",
             ),
-            ("more than 255 SERVERs", too_many, 50, "at most 255 Servers"),
+            (
+                "more than 255 SERVERs",
+                too_many,
+                50,
+                "at most 255 Servers are allowed (got 256). Give fewer SERVERs",
+            ),
             (
                 "fewer Test Connections than SERVERs",
                 vec![
@@ -533,7 +544,7 @@ mod tests {
                     "192.0.2.2",
                 ],
                 50,
-                "--test-connections must be at least the number of Servers",
+                "--test-connections is 1. Set it to at least 2 for 2 Servers",
             ),
             (
                 "a minimum above the Test Connections",
@@ -546,7 +557,18 @@ mod tests {
                     "192.0.2.1",
                 ],
                 50,
-                "--min-test-connections is at most --test-connections",
+                "--min-test-connections is 3, but --test-connections is 2. Lower --min-test-connections to 2 or less",
+            ),
+            (
+                "a minimum above the default Test Connections",
+                vec![
+                    "--unauthenticated",
+                    "--min-test-connections",
+                    "2",
+                    "192.0.2.1",
+                ],
+                50,
+                "--min-test-connections is 2, but --test-connections is 1. Lower --min-test-connections to 1 or less",
             ),
             (
                 "less than 1 Mbps each",
@@ -559,7 +581,7 @@ mod tests {
                     "192.0.2.1",
                 ],
                 50,
-                "give at least 1 Mbps each",
+                "--max-bandwidth is 2 Mbps for 3 Test Connections. Use at least 3 Mbps (1 Mbps each)",
             ),
             (
                 "a SERVER that doesn't resolve",
