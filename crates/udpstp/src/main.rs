@@ -69,6 +69,8 @@ Examples:
   udpstp client --key-file keys.toml server.example.net
   udpstp client --key-file keys.toml --direction upstream server.example.net
 
+Write boolean values with '='. For example, --jumbo=false.
+
 Documentation: https://udpstp.com/docs/guides/running-a-test.html")]
     Client(Box<ClientArgs>),
     /// Serve Tests: answer Clients' Setup and Activation Requests and run
@@ -78,6 +80,8 @@ Documentation: https://udpstp.com/docs/guides/running-a-test.html")]
 Examples:
   udpstp server --key-file keys.toml --max-hops 12
   udpstp server --config /etc/udpstp/server.toml
+
+Write boolean overrides with '='. For example, --jumbo=false.
 
 Documentation: https://udpstp.com/docs/guides/hosting-a-server.html")]
     Server(Box<ServerArgs>),

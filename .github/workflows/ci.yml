@@ -259,7 +259,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
-      - run: sudo apt-get update && sudo apt-get install -y cmake libssl-dev
+      # Ubuntu's hosted image provides CMake, a C compiler and OpenSSL 3 headers.
       - name: Reconstruct an incomplete source cache and check interoperability
         run: |
           mkdir -p target/obudpst/v9.1.0/src/.git
