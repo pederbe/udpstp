@@ -94,17 +94,27 @@ fn the_server_loads_a_toml_key_table() {
 
     assert!(output.status.success(), "{}", stderr(&output));
     assert_no_secret(&output, "--print-config");
+    assert!(!diagnostic(&output).contains("deprecated"));
 }
 
-// : a TOML Key Table may name its format, 1, which every valid file
-// has; a newer one is refused above
+// ADR 0013 and ADR 0016: keep the deprecated input through its minor release.
 #[test]
-fn a_toml_key_table_may_name_its_format() {
+fn a_deprecated_format_marker_is_accepted_with_an_actionable_warning() {
     let file = KeyFile::new("format", "keys.toml", &format!("format = 1\n{TOML_TABLE}"));
 
     let output = server_with(&file);
 
     assert!(output.status.success(), "{}", stderr(&output));
+    let warning = diagnostic(&output);
+    assert!(warning.contains("format = 1 is deprecated"), "{warning}");
+    assert!(warning.contains("Remove that line"), "{warning}");
+    assert!(warning.contains("next minor release"), "{warning}");
+    assert_no_secret(&output, "deprecated marker");
+    std::fs::write(file.path(), TOML_TABLE).unwrap();
+    let unmarked = server_with(&file);
+    assert!(unmarked.status.success(), "{}", stderr(&unmarked));
+    assert_eq!(stdout(&output), stdout(&unmarked));
+    assert!(!diagnostic(&unmarked).contains("deprecated"));
 }
 
 // docs/spec.md "Key table" (OB-UDPST's key file format can be loaded
@@ -266,19 +276,19 @@ fn an_invalid_key_file_exits_with_51_and_says_where() {
             "overlap",
         ),
         (
-            "a newer format",
+            "an unsupported format",
             "keys.toml",
             format!("format = 2\n{}", row("key_text = \"s3cr3t\"")),
-            "format 2 is newer",
+            "format must be 1",
         ),
         (
-            "a newer format with a column this version doesn't know",
+            "an unsupported format with a column this version doesn't know",
             "keys.toml",
             format!(
                 "format = 2\n{}",
                 row("key_text = \"s3cr3t\"\nnew_column = true")
             ),
-            "format 2 is newer",
+            "new_column",
         ),
         (
             "format 0",
@@ -290,13 +300,28 @@ fn an_invalid_key_file_exits_with_51_and_says_where() {
             "format in a row",
             "keys.toml",
             row("key_text = \"s3cr3t\"\nformat = 1"),
-            "format must come before the first [[key]]",
+            "unknown field `format`",
         ),
         (
             "an unknown field",
             "keys.toml",
             row("key_text = \"s3cr3t\"\nkey_txet = \"x\""),
             "key_txet",
+        ),
+        (
+            "a deprecated marker with an unknown restriction",
+            "keys.toml",
+            format!(
+                "format = 1\n{}",
+                row("key_text = \"s3cr3t\"\nnew_column = true")
+            ),
+            "new_column",
+        ),
+        (
+            "a format value containing a key",
+            "keys.toml",
+            format!("format = \"s3cr3t\"\n{}", row("key_text = \"s3cr3t\"")),
+            "not valid TOML, or a value of the wrong type",
         ),
         (
             "a key that isn't a string",
@@ -383,6 +408,7 @@ fn an_invalid_key_file_exits_with_51_and_says_where() {
             stderr(&output)
         );
         assert_no_secret(&output, what);
+        assert!(!diagnostic(&output).contains("deprecated"), "{what}");
         assert!(
             stderr(&output).contains(file.path()),
             "{what}: the path remains intact: {}",
