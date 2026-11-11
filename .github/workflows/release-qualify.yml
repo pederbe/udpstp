@@ -170,6 +170,28 @@ jobs:
               if command -v udpstp; then exit 1; fi
               test "$(cat /etc/udpstp/qualification.txt)" = "preserve user configuration"
             '
+          if [[ "$PACKAGE_ARCH" == amd64 ]]; then
+            arch_package=udpstp-x86_64.pkg.tar.zst
+            gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --dir "$assets" --pattern "$arch_package"
+            (cd "$assets" && grep -F "  $arch_package" SHA256SUMS | sha256sum -c -)
+            gh attestation verify "$assets/$arch_package" --repo "$GITHUB_REPOSITORY" \
+              --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/release.yml" \
+              --source-ref "refs/tags/$TAG" --source-digest "$source"
+            docker run --rm --network none -v "$assets:/assets:ro" -v "$helper:/checker:ro" -v "$results:/results" \
+              -e VERSION="$version" archlinux:base sh -ec '
+                sed -i "/^NoExtract[[:space:]]*=/d" /etc/pacman.conf
+                pacman -U --noconfirm /assets/udpstp-x86_64.pkg.tar.zst
+                pacman -Qkk udpstp-bin
+                test ! -L /etc/systemd/system/multi-user.target.wants/udpstp-server.service
+                /checker release-smoke /usr/bin/udpstp "$VERSION" /results/arch-installed
+                mkdir -p /etc/udpstp
+                printf "preserve user configuration\n" > /etc/udpstp/qualification.txt
+                pacman -R --noconfirm udpstp-bin
+                test ! -e /usr/bin/udpstp
+                test ! -e /usr/lib/systemd/system/udpstp-server.service
+                test "$(cat /etc/udpstp/qualification.txt)" = "preserve user configuration"
+              '
+          fi
       - uses: actions/upload-artifact@v7.0.2
         if: always()
         with:

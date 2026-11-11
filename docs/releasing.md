@@ -60,6 +60,8 @@ The Release-plz workflow can also be dispatched on `main` to prepare a release b
 | `udpstp.exe` | The same Windows binary without an archive |
 | `udpstp-<tag>-aarch64-apple-darwin.tar.gz`, `…-x86_64-apple-darwin.tar.gz` | macOS builds |
 | `udpstp_<version>-1_amd64.deb`, `…_arm64.deb`, `udpstp-<version>-1.x86_64.rpm`, `….aarch64.rpm` | Linux packages installing the binary under `/usr/bin`, documentation, licences and a systemd unit. Installation does not enable the service |
+| `udpstp-x86_64.pkg.tar.zst` | Arch Linux package using the qualified release executable, documentation, licences and disabled systemd unit |
+| `udpstp-bin.PKGBUILD`, `udpstp-bin.SRCINFO` | Binary package recipe and metadata with the release version and source checksums |
 | `udpstp-<tag>.cdx.json` | Rust binary dependency inventory in CycloneDX 1.5 |
 | `udpstp.rb` | Homebrew formula rendered from the archive hashes for a full release |
 | `SHA256SUMS` | SHA-256 hashes of the archives, packages, plain exe, dependency inventory and Homebrew formula |
@@ -73,6 +75,23 @@ Each archive contains the binary, README, changelog, licence files and third-par
 The software bill of materials (SBOM) includes Rust dependencies for all targets, including conditional Windows and macOS dependencies. It is a union, so a particular binary does not use every listed dependency. It does not inventory the container's Debian runtime or provide separate inventories per platform. Provenance and dependency inventory attestations answer different questions.
 
 The workflow and [toolchain file](../rust-toolchain.toml) record build tool versions. Hosted runner images and bundled compilers can change, so those pins do not establish bit-for-bit reproducibility.
+
+## Arch Linux packages
+
+The Release workflow renders the [binary recipe](../contrib/aur/udpstp-bin/PKGBUILD)
+with archive checksums and the systemd unit from the tagged source, then builds it
+with `makepkg` in the official Arch Linux image. It preserves the published
+executable bytes and checks installation, file integrity and removal.
+
+Before publication, the existing qualification workflow downloads the package,
+checks its checksum and provenance, and exercises the installed binary with
+authenticated Tests. Removal preserves existing configuration. The package joins
+the other native packages in build provenance and binary inventory attestations.
+
+The release package targets Arch Linux's x86_64 platform. The recipe retains its
+aarch64 inputs for Arch Linux ARM, which needs separate qualification before a
+package is advertised. Publishing a native package does not require an AUR
+account. AUR catalog submission remains separate.
 
 ## Verify a download
 

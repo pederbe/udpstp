@@ -50,6 +50,7 @@ It prints `udpstp` and the version. If the command isn't found, check that the i
 | Platform | Method | Availability |
 | --- | --- | --- |
 | Linux | Archive installer, signed apt and dnf repositories | Available |
+| Arch Linux | Native pacman package | Prepared for regular releases |
 | Linux and macOS | Homebrew | Available |
 | Windows | PowerShell installer and portable download | Available |
 | Windows | WinGet | Awaiting catalog approval |
@@ -80,6 +81,20 @@ sudo dnf install udpstp
 ```
 
 Updates arrive with `dnf upgrade`. Remove the package with `sudo dnf remove udpstp`.
+
+## Arch Linux
+
+The regular release workflow prepares a native Arch Linux package. Once
+`udpstp-x86_64.pkg.tar.zst` is listed on the [latest release](https://github.com/pederbe/udpstp/releases/latest),
+download it and install it with pacman
+
+```sh
+sudo pacman -U udpstp-x86_64.pkg.tar.zst
+```
+
+Download the latest file again and repeat the command to update. Remove it with
+`sudo pacman -R udpstp-bin`. No AUR account or Rust toolchain is needed. The
+Server's service stays disabled until you configure it.
 
 ## Portable downloads
 

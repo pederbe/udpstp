@@ -72,7 +72,7 @@ brew install pederbe/tap/udpstp
 irm https://udpstp.com/install.ps1 | iex
 ```
 
-The [installation guide](https://udpstp.com/docs/guides/installing-udpstp.html) covers signed Linux packages, portable downloads, Cargo and updates.
+The [installation guide](https://udpstp.com/docs/guides/installing-udpstp.html) covers signed apt and dnf packages, Arch Linux packages, portable downloads, Cargo and updates.
 
 ## Everyday use
 
