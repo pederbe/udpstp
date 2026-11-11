@@ -402,11 +402,9 @@ pub struct Record {
     /// (experimental).
     pub burst_lateness_p99_us: Option<u64>,
     /// The Server's executor, by its name in [`mod@names::executor`], the
-    /// Engine Threads the pooled one may start, and its wake-up grouping
-    /// window, in µs.
+    /// Engine Threads the pooled one may start.
     pub executor: Option<&'static str>,
     pub engine_threads: Option<u64>,
-    pub grouping_us: Option<u64>,
     pub message: String,
 }
 
@@ -438,7 +436,6 @@ pub fn record(notice: &ServerNotice, buffer_limits: &str) -> Option<Record> {
         ServerNotice::DataPhaseEngines {
             executor,
             engine_threads,
-            grouping,
             error,
         } => Record {
             // The CPUs the process may use weren't found: one Engine
@@ -446,7 +443,6 @@ pub fn record(notice: &ServerNotice, buffer_limits: &str) -> Option<Record> {
             warning: error.is_some(),
             executor: Some(names::executor(*executor)),
             engine_threads: engine_threads.map(|threads| threads as u64),
-            grouping_us: Some(micros(*grouping)),
             error: error.clone(),
             ..Record::new(
                 event::DATA_PHASE_ENGINES,
@@ -930,7 +926,6 @@ impl ServerLog {
             burst_lateness_p99_us,
             executor,
             engine_threads,
-            grouping_us,
             ..
         } = record;
         let (client, error) = (client.as_deref(), record.error.as_deref());
@@ -968,7 +963,6 @@ impl ServerLog {
                     burst_lateness_p99_us,
                     executor,
                     engine_threads,
-                    grouping_us,
                     "{message}"
                 )
             };
@@ -1442,19 +1436,16 @@ mod tests {
             ServerNotice::DataPhaseEngines {
                 executor: udpstp_runtime::Executor::Pool,
                 engine_threads: Some(2),
-                grouping: Duration::from_micros(50),
                 error: None,
             },
             ServerNotice::DataPhaseEngines {
                 executor: udpstp_runtime::Executor::Pool,
                 engine_threads: Some(1),
-                grouping: Duration::ZERO,
                 error: Some("unsupported".into()),
             },
             ServerNotice::DataPhaseEngines {
                 executor: udpstp_runtime::Executor::PerTestConnection,
                 engine_threads: None,
-                grouping: Duration::ZERO,
                 error: None,
             },
             ServerNotice::Listening(vec!["0.0.0.0:24601".parse().unwrap()]),

@@ -66,7 +66,7 @@ Events an attacker can cause are rate-limited, ten of a kind every 10 s, so a fl
 | `row` | integer | A Sending Rate Table row |
 | `requested_bytes`, `receive_bytes`, `send_bytes` | integer | Socket buffer sizes: asked for, and what the OS gave |
 | `bursts`, `datagrams`, `bytes` | integer | Bursts not sent, their Load PDUs, and their UDP payload bytes |
-| `executor`, `engine_threads`, `grouping_us` | string, integer, integer | How the Data Phase Engines run ([`DataPhaseEngines`](#dataphaseengines)) |
+| `executor`, `engine_threads` | string, integer | How the Data Phase Engines run ([`DataPhaseEngines`](#dataphaseengines)) |
 | `fast_paths` | string | The fast paths a Test Connection used ([`DataPhaseEnded`](#dataphaseended)) |
 | `receive_buffer_overflows` | integer | On Linux, datagrams the OS discarded at the socket before the Server read them, mostly for a full receive buffer |
 | `send_lag_samples`, `send_lag_p50_us`, `send_lag_p99_us`, `send_lag_max_us`, `burst_lateness_p99_us` | integer | Experimental send timing, in µs ([`DataPhaseEnded`](#dataphaseended)) |
@@ -77,7 +77,7 @@ Events an attacker can cause are rate-limited, ten of a kind every 10 s, so a fl
 
 | Event | When | Fields |
 |---|---|---|
-| `DataPhaseEngines` | At start: how the Data Phase Engines run ([below](#dataphaseengines)) | `executor`, `grouping_us`, `engine_threads`, `error` |
+| `DataPhaseEngines` | At start: how the Data Phase Engines run ([below](#dataphaseengines)) | `executor`, `engine_threads`, `error` |
 | `Listening` | The Server listens on an address | `address` |
 | `NoIpv6Listener` | The host has no IPv6, so the Server listens on IPv4 alone | `error` |
 | `TroubleshootingModeOn` | At start, and every minute while Troubleshooting Mode is on | |
@@ -131,7 +131,7 @@ Events an attacker can cause are rate-limited, ten of a kind every 10 s, so a fl
 
 For `pool`, `engine_threads` is the most it starts: one for each CPU the process may use, with a fractional cgroup CPU quota rounded down, so a container limited to 1.9 CPUs gets 1. `error` is a warning when the CPUs the process may use couldn't be found.
 
-`grouping_us` is the pool's wake-up grouping window, 0 by default and for `per_test_connection`. The experimental variables `UDPSTP_ENGINE_THREADS` and `UDPSTP_ENGINE_GROUPING_US` override `engine_threads` and `grouping_us`.
+The experimental variable `UDPSTP_ENGINE_THREADS` overrides `engine_threads`.
 
 ### DataPhaseEnded
 

@@ -8,9 +8,9 @@ BurstsWithheld	bursts:integer bytes:integer datagrams:integer level:string messa
 DataPhaseEnded	burst_lateness_p99_us:integer fast_paths:string level:string message:string reason:string receive_buffer_overflows:integer send_lag_max_us:integer send_lag_p50_us:integer send_lag_p99_us:integer send_lag_samples:integer test_connection_id:integer timestamp:string
 DataPhaseEnded	error:string fast_paths:string level:string message:string reason:string test_connection_id:integer timestamp:string
 DataPhaseEnded	fast_paths:string level:string message:string reason:string receive_buffer_overflows:integer test_connection_id:integer timestamp:string
-DataPhaseEngines	engine_threads:integer error:string executor:string grouping_us:integer level:string message:string timestamp:string
-DataPhaseEngines	engine_threads:integer executor:string grouping_us:integer level:string message:string timestamp:string
-DataPhaseEngines	executor:string grouping_us:integer level:string message:string timestamp:string
+DataPhaseEngines	engine_threads:integer error:string executor:string level:string message:string timestamp:string
+DataPhaseEngines	engine_threads:integer executor:string level:string message:string timestamp:string
+DataPhaseEngines	executor:string level:string message:string timestamp:string
 DatagramsDropped	count:integer level:string message:string test_connection_id:integer timestamp:string
 DelaySamplesDropped	count:integer level:string message:string test_connection_id:integer timestamp:string
 FirstLoadPduReceived	level:string message:string test_connection_id:integer timestamp:string

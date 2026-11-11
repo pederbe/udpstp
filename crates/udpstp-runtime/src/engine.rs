@@ -109,11 +109,6 @@ pub struct EngineSettings {
     /// How many Engine Threads the pooled executor may start, in place of
     /// the number of CPUs the process may use.
     pub threads: Option<NonZeroUsize>,
-    /// The pooled executor's wake-up grouping window: when another
-    /// deadline falls within it of the earliest, an Engine Thread waits
-    /// until the last of them within it and serves them in one turn, each
-    /// at most this late. Zero, the default, for none.
-    pub grouping: Duration,
 }
 
 /// How a Data Phase Engine schedules its Test Connections.

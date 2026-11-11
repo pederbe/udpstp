@@ -511,6 +511,7 @@ impl Loaded {
         match self {
             Self::First(runs) => Ok(matrix::check(runs, args.max_hours, args.home_cap_mbps)?),
             Self::Scale(m) => {
+                scale::matrix::check_execution(m).map_err(|error| error.to_string())?;
                 let needed = scale::matrix::duration_s(&m.runs) + matrix::SETUP_S as f64;
                 if needed > args.max_hours * 3600.0 {
                     return Err(Refused(format!(

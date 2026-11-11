@@ -52,21 +52,6 @@ counts = [4]
 target = 4
 confined = true
 
-[grouping]
-case = "H4c"
-arm = "H4cw50"
-
-[[case]]
-name = "H4cw50"
-direction = "downstream"
-row = 4
-counts = [4]
-target = 4
-judged = false
-engines = ["udpstp"]
-confined_as = "H4c"
-server_env = { UDPSTP_ENGINE_GROUPING_US = "50" }
-
 [precision]
 pairs = [["S500", "S500ptc"], ["S900", "S900ptc"]]
 

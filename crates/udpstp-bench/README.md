@@ -18,7 +18,7 @@ Part of [udpstp](https://github.com/pederbe/udpstp)'s tooling, and never publish
 - `first_round::report`: the Round's report, byte for byte the Python's for the original settings, or none where the Python refuses it too or would compute from what no Round writes. It reads the files the Python reads, when the Python reads them, through a seam: the Round's `--out` on disk, or a test's own. Explicit Server Engine Thread experiments keep their settings separate in the report.
 - `first_round::round`: the first Round's body, which `bench-rounds`' Round bracket runs: the Round's Operator Key in both engines' key files, the hosts created, each prepared (its dead-man switch checked and the host quieted where it is rented, the binaries and keys copied in, its environment recorded), the Jumbo path checked, the Servers started, the path check, the matrix until the deadline or three Tests failing in a row, each Round Run's counters, result and line of `summary.jsonl`, the Servers' logs collected, and the Servers stopped. Cloud-pair counters follow the Test peer's route to the underlying NIC and retain its driver counters. Other host calls retain the original sequence. An explicit Server Engine Thread cap uses an isolated Server for its Test.
 - `obudpst`: the pinned OB-UDPST built on a host of either Round with `scripts/obudpst-build.sh`, the tools installed where they are missing; a failure says what the installation or the build's log said, in the Python's words.
-- `scale::matrix`: the Server-scale matrix's settings, report plan and ordered Round Runs, including confinement, probes, P1, engine rotation, hold-off A/B pairs, grouping, precision pairs and the close-call reserve. Its plan and refusals are compared with the Python at the reference revision recorded in the golden file.
+- `scale::matrix`: the Server-scale matrix's settings, report plan and ordered Round Runs, including confinement, probes, P1, engine rotation, hold-off A/B pairs, precision pairs and the close-call reserve. Historical grouping plans remain readable, but cannot start new Rounds. Its plan and refusals are compared with the Python at the reference revision recorded in the golden file.
 - `scale::commands` and `scale::hosts`: the Server-scale commands and the host readings they use: CPU topology, the `CpuSet` selections used by confinement, IRQ placement, socket-buffer limits and host state. The commands invoke the uploaded Rust sampler.
 - `scale::judge` and `scale::report`: the frozen Server-scale rules, per-run records, point verdicts, Carried Counts, confinement, hold-off A/B, grouping and precision readings, including exact Mann-Whitney probabilities. Evidence loading ends at `RunFiles` and `RoundFiles`; the judgments and reports also work from memory.
 - `scale::schedule`: the run order and its decisions, taking records and time as inputs: calibration, probes, confinement, retries, close calls and precision pairs.
@@ -148,6 +148,9 @@ JSON parser reads expected values. Never regenerate a golden from the Rust code
 being tested. At the switch, executable references in matrix comments and report
 instructions were changed mechanically to Rust commands. No judging expectation
 changed. An amended rule needs independently justified expectations.
+
+The CLI corpus omits the retired grouping presets. Saved matrix, analysis and
+report fixtures retain those experiments.
 
 The default suite covers helpers, matrices, commands, host readings, judging,
 reports, scheduling, provider refusals and both Round brackets. Synthetic

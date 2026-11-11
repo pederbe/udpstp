@@ -7,6 +7,8 @@ The Data Phase prototype compared two engine models:
 - **A:** a thread per Test Connection.
 - **B:** one Engine Thread per core serving many Test Connections from one epoll loop.
 
+The experimental wake-up grouping described below was retired by [ADR 0016](0016-retire-unused-features.md). Engine Threads now always wait for the earliest deadline, and startup logs omit the grouping window. The other decisions remain in force.
+
 Each was measured with and without a spin tail, on a WSL2 host, in two rounds.
 
 **The models differ at Server scale.** On a single Test Connection they are indistinguishable. With A confined to the same four cores, B:

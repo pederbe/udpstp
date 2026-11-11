@@ -334,6 +334,8 @@ fn round_does_what_round_py_does() {
 
 #[test]
 fn scale_round_plans_and_provider_failures_match_the_reference() {
+    // ADR 0016: the old executable grouping presets were removed from
+    // this corpus. Historical matrix and report fixtures remain intact.
     let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/golden/scale-cli.json");
     let golden: Value = serde_json::from_str(&std::fs::read_to_string(path).unwrap()).unwrap();
     let cases = golden["cases"].as_array().unwrap();

@@ -143,6 +143,23 @@ pub struct Matrix {
     pub runs: Vec<ScaleRun>,
 }
 
+/// Saved matrices remain readable, but retired experiments cannot start new Rounds.
+pub fn check_execution(matrix: &Matrix) -> Result<(), Error> {
+    let plan = &matrix.plan;
+    let asks_grouping = |env: &Json| {
+        env.as_dict()
+            .is_some_and(|values| values.contains_key(GROUPING_ENV))
+    };
+    require(
+        !get(plan, "grouping").truthy()
+            && !asks_grouping(get(plan, "client_env"))
+            && !list(get(plan, "cases"))?
+                .iter()
+                .any(|case| asks_grouping(get(case, "server_env"))),
+        "wake-up grouping is no longer supported for new Rounds; remove its grouping cases and environment settings. Saved results remain readable",
+    )
+}
+
 /// CPython's compensated sums, with the re-runs and close-call reserve.
 pub fn duration_s(runs: &[ScaleRun]) -> f64 {
     let seconds = num::sum(

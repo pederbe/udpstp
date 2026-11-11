@@ -564,7 +564,6 @@ impl<A: Adapter> EngineThread<A> {
         self.harvest = true;
         let Some(plan) = schedule::plan_wait(
             &self.heap,
-            context.settings.grouping,
             self.hold.until(),
             !self.ready.is_empty(),
             again,

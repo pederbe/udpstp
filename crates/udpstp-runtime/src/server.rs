@@ -88,13 +88,12 @@ pub enum ServerNotice {
     Tick,
     /// How the Server's Data Phase Engines run, once, as it starts:
     /// the executor, the Engine Threads the pooled one may start (none for
-    /// one thread per Test Connection), and its wake-up grouping window.
+    /// one thread per Test Connection).
     /// `error` says why the CPUs the process may use couldn't be found, in
     /// which case the pooled executor starts one Engine Thread.
     DataPhaseEngines {
         executor: Executor,
         engine_threads: Option<usize>,
-        grouping: std::time::Duration,
         error: Option<String>,
     },
     /// The Server is stopping, for `reason`: the core stops its Test
@@ -485,7 +484,6 @@ impl Engines {
             let notice = ServerNotice::DataPhaseEngines {
                 executor: Executor::Pool,
                 engine_threads: Some(engine_threads),
-                grouping: settings.grouping,
                 error,
             };
             (Self::Pool(Box::new(pool)), notice)
@@ -496,7 +494,6 @@ impl Engines {
             let notice = ServerNotice::DataPhaseEngines {
                 executor: Executor::PerTestConnection,
                 engine_threads: None,
-                grouping: std::time::Duration::ZERO,
                 error: None,
             };
             (Self::PerTestConnection, notice)
