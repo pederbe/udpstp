@@ -72,6 +72,8 @@ The published library crates, `udpstp-wire`, `udpstp-core` and `udpstp-runtime`,
 
 ### The container image
 
+Superseded by [ADR 0017, Latest-only distribution](0017-latest-only-distribution.md).
+
 Publishing a GitHub release starts the separate Release container workflow, which publishes `ghcr.io/pederbe/udpstp:<version>` (such as `:0.1.0`) from its verified Linux binaries. `:<version>` never moves. `:latest` follows releases that are not marked as pre-releases, including one that ends a deprecation period, so a deployment pins `:<version>` and upgrades on purpose. [Release artifacts and verification](../releasing.md) describes its downloads and provenance.
 
 ## Considered options

@@ -117,6 +117,8 @@ For an archive, native package or plain exe, verify the SBOM association separat
 
 The [container workflow](../.github/workflows/release-container.yml) uses the released Linux binaries in a [digest-pinned runtime image](../contrib/container/Release.Containerfile). It verifies the archive checksums and provenance before building. Native platform checks exercise authenticated Tests and shutdown behavior. Container provenance identifies `release-container.yml` as its signer workflow.
 
+New container releases publish only `ghcr.io/pederbe/udpstp:latest`. Pre-releases still run qualification, without publishing an image. A stable release is pushed by digest and attested before `:latest` advances. The workflow checks that the release is still GitHub's latest release before moving the tag. Previously published version tags remain available.
+
 For a published container, verify the immutable image digest rather than a mutable tag:
 
 ```sh
@@ -126,4 +128,8 @@ gh attestation verify oci://ghcr.io/pederbe/udpstp@sha256:IMAGE_DIGEST \
     --source-ref refs/tags/v0.1.0 --source-digest FULL_SOURCE_COMMIT
 ```
 
-The [signed apt and dnf repository](../contrib/package-repository/README.md) distributes the release packages without recompiling them. Homebrew uses the release archives. Cargo, cargo-binstall and other package-manager sources are described in the [installation guide](guides/installing-udpstp.md). Catalog admission and availability are specific to each channel.
+The [signed apt and dnf repository](../contrib/package-repository/README.md) distributes the release packages without recompiling them. Its current indexes list only the latest release. Older package files, apt By-Hash indexes and signed dnf snapshots stay available for downloads already in progress. Upgrade tests install an older package file directly, then upgrade through the current index.
+
+A manual package-repository run always selects GitHub's latest release. A delayed release event for an older version is refused. The workflow checks the latest release again before publishing, so an old retry cannot replace the current index. This replaces the manual `tag` input. [ADR 0017](adr/0017-latest-only-distribution.md) records the distribution policy.
+
+Homebrew uses the release archives. Cargo, cargo-binstall and other package-manager sources are described in the [installation guide](guides/installing-udpstp.md). Catalog admission and availability are specific to each channel.

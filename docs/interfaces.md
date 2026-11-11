@@ -145,4 +145,4 @@ With `address_privacy = "pseudonymize"` (the Server) or `--address-privacy pseud
 
 ## Container images
 
-Each published release provides `ghcr.io/pederbe/udpstp:<version>`, tagged with the release's version number without the leading `v`, which never changes. `:latest` follows releases that are not marked as pre-releases, including one that ends a deprecation period. Pin `:<version>` and upgrade on purpose.
+`ghcr.io/pederbe/udpstp:latest` follows the latest release that is not marked as a pre-release, including one that ends a deprecation period. New releases publish only this tag. Previously published version tags remain available. Pull `:latest` when you want to upgrade. Each image also has an immutable digest for [verification](releasing.md#containers-and-package-repositories).

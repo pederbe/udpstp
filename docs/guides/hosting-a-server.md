@@ -187,7 +187,7 @@ journalctl -u udpstp-server -f
 
 #### In a container
 
-Each release publishes the image `ghcr.io/pederbe/udpstp:<version>`, which runs the Server as a non-root user (uid 65532) with no shell. Pin a version and upgrade on purpose. To build the image yourself:
+The latest release is available as `ghcr.io/pederbe/udpstp:latest`. The image runs the Server as a non-root user (uid 65532) with no shell. Pull it when you want to upgrade. To build the image yourself:
 
 ```sh
 podman build -f contrib/container/Containerfile -t udpstp .
@@ -199,7 +199,7 @@ Run it with the host's network (`--network host`). A container network puts NAT 
 podman secret create udpstp-keys keys.toml
 podman run -d --name udpstp --network host \
     --secret udpstp-keys,target=keys.toml,uid=65532,mode=0400 \
-    ghcr.io/pederbe/udpstp:<version> --max-hops 16
+    ghcr.io/pederbe/udpstp:latest --max-hops 16
 ```
 
 Arguments after the image name are added to `udpstp server`'s and override the image's configuration file, `/etc/udpstp/server.toml`. Or mount your own file there. With Docker, pass the key file as a Compose secret, or bind-mount a file owned by uid 65532 with mode 0400. `podman stop` and `docker stop` stop the Server cleanly within 2 s.

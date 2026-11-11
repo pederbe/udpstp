@@ -2,7 +2,8 @@
 # Install udpstp from a prepared repository in clean Debian, Ubuntu and
 # AlmaLinux containers, with signature checks on, as a user following the
 # installation guide would; then upgrade from PREVIOUS when given, run the
-# binary and remove the package.
+# binary and remove the package. PREVIOUS is a direct-file test fixture,
+# never a version exposed in the current repository indexes.
 #
 # usage: bash contrib/package-repository/test.sh REPOSITORY VERSION [PREVIOUS]
 #
@@ -37,8 +38,9 @@ for image in "${debian_images[@]}"; do
         echo "deb [arch=$arch signed-by=/usr/share/keyrings/udpstp.gpg] file:///repository/apt stable main" \
             > /etc/apt/sources.list.d/udpstp.list
         apt-get update -q
+        test "$(apt-cache show udpstp | sed -n "s/^Version: //p")" = "$VERSION-1"
         if [ -n "$PREVIOUS" ]; then
-            apt-get install -qy "udpstp=$PREVIOUS-1"
+            dpkg -i "/repository/apt/pool/main/u/udpstp/udpstp_${PREVIOUS}-1_${arch}.deb"
             test "$(udpstp --version)" = "udpstp $PREVIOUS"
             apt-get upgrade -qy
         else
@@ -60,8 +62,9 @@ for image in "${rpm_images[@]}"; do
             -e "s|^gpgkey=.*|gpgkey=file:///repository/udpstp.asc|" \
             /repository/udpstp.repo > /etc/yum.repos.d/udpstp.repo
         dnf=(dnf -q -y --disablerepo="*" --enablerepo=udpstp)
+        test "$("${dnf[@]}" list --showduplicates udpstp | awk "/^udpstp[.]/ {print \$2}" | sort -u)" = "$VERSION-1"
         if [ -n "$PREVIOUS" ]; then
-            "${dnf[@]}" install "udpstp-$PREVIOUS"
+            "${dnf[@]}" install "/repository/rpm/udpstp-${PREVIOUS}-1.$(rpm --eval "%{_arch}").rpm"
             test "$(udpstp --version)" = "udpstp $PREVIOUS"
             "${dnf[@]}" upgrade udpstp
         else
