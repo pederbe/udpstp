@@ -8,12 +8,12 @@ When a Test fails, udpstp prints one line that says why and exits with a status 
 udpstp: no answer from 192.0.2.10:24601 within 3 s
 ```
 
-The Client exits with status 200. A Server doesn't answer a request that fails authentication, so a wrong key, a wrong keyId and a blocked port all look the same. Check, in order:
+The Client exits with status 200. A Server doesn't answer a request that fails authentication, so a wrong key, a wrong keyId and a blocked port all look the same. Check in this order:
 
-1. the SERVER address and port
-2. firewalls between you and the Server
-3. the key and keyId
-4. that both clocks are within 5 s of true time
+1. Check the SERVER address and port in your command. The Standard Port is UDP 24601 unless the Server's administrator changed it.
+2. Check the [firewall rules](guides/hosting-a-server.md#open-the-firewall). Setup Requests must reach the Standard Port, and their replies must reach the Client. After Setup, each Test Connection uses the Ephemeral Port the Server assigned.
+3. Check that the Shared Key and keyId match the Server's Key Table, and that the key's lifetimes allow this Test. A key file that loads locally can still fail the Server's authentication check.
+4. Synchronize both hosts' clocks. They must be within 5 s of each other for authenticated requests and responses to pass verification.
 
 If it still fails, ask the Server's administrator to turn on [Troubleshooting Mode](guides/hosting-a-server.md#debug-a-failing-client) for a while. The Client then shows the reason and exits with status 107:
 
@@ -36,7 +36,7 @@ udpstp: key file error: keys.toml: readable or writable by group or others (mode
 
 Both roles refuse a key file that other accounts can read, with exit status 51, before reading any key. On Linux and macOS, run `chmod 600 keys.toml`. On Windows, follow [Key file permissions](guides/windows.md#key-file-permissions).
 
-Other key file errors also exit with status 51. The message names the problem and the line. [Key files](key-files.md) describes the format.
+Other key file errors also exit with status 51. Check the file, row or line named in the message. A missing or unreadable file has no line number. [Key files](key-files.md) describes the format.
 
 ## No key to authenticate with
 
@@ -46,6 +46,32 @@ udpstp: configuration error: no key to authenticate with; give one with
 ```
 
 The Client exits with status 50. Give it the key file the Server's administrator shared, as in [Get a key file](guides/running-a-test.md#get-a-key-file).
+
+## Address privacy settings are incomplete
+
+Both roles exit with status 50 when address privacy settings do not fit together:
+
+| Message | What to do |
+|---|---|
+| `--address-privacy pseudonymize needs --address-privacy-key-file FILE` | Give a pseudonym key file containing at least 32 hexadecimal digits. This key controls address pseudonyms, separately from the Shared Key used to authenticate the Test |
+| `--address-privacy-key-file requires --address-privacy pseudonymize` | Set `--address-privacy pseudonymize`, or remove `--address-privacy-key-file` |
+
+In a Server configuration file, use `address_privacy = "pseudonymize"` and `address_privacy_key_file`. [Protect Client addresses](guides/hosting-a-server.md#protect-client-addresses) shows how to create the key.
+
+## The Client's Test Connection counts are invalid
+
+The Client exits with status 50 and shows the effective values, including defaults:
+
+| Message | What to do |
+|---|---|
+| More than 255 Servers | Give at most 255 SERVERs |
+| `--test-connections` is below the number of Servers | Increase it to the number shown in the error, or give fewer SERVERs |
+| `--min-test-connections` exceeds `--test-connections` | Lower the minimum to the effective count shown in the error, or increase `--test-connections` |
+| `--max-bandwidth` is too small for the Test Connections | Use at least 1 Mbps per Test Connection, or reduce `--test-connections` |
+
+## A name lookup fails for `false`
+
+Join a boolean value to its option with `=`, such as `--jumbo=false`. With `--jumbo false`, the Client treats `false` as a SERVER name. A failed lookup exits with status 75.
 
 ## The Server probably doesn't support mode 2
 
@@ -70,11 +96,11 @@ OB-UDPST 9.1 doesn't support mode 2. Add `--auth-mode 1`, or `--mode-1-server SE
 
 | Status | What to do |
 |---|---|
-| 50 | Fix the command line, or give a key file or `--unauthenticated` |
-| 51 | Fix the key file. The message names the problem and the line |
-| 75 | Check the SERVER name and your network |
+| 50 | Follow the option or setting named in the message |
+| 51 | Fix the named key file, row or line. See [The key file is refused](#the-key-file-is-refused) for access errors |
+| 75 | Read the startup error. For a failed name lookup, check SERVER. For a socket error, check the address and port |
 | 107, 108, 157, 158 | Check the key, the keyId and both clocks |
-| 200 | See [No answer from the Server](#no-answer-from-the-server) |
+| 200 | Before activation, see [No answer from the Server](#no-answer-from-the-server). If the Watchdog ended an active Test after 3 s with nothing received, check the path and Server. Any results cover only what was measured |
 | 201 | Ask for a value the Server allows, or drop `--refuse-coercion` |
 | 202 | Report it, with both ends' versions |
 | 203 | Use Servers with the same configuration for one Multi-Connection Test |
@@ -147,6 +173,12 @@ udpstp: configuration error: ephemeral_ports: "50000-50099" has 100 ports, fewer
 ```
 
 An unknown key or an invalid value stops the Server with exit status 50 and names the setting. Check a configuration before you start the Server with `udpstp server --config FILE --print-config`. [Server configuration](../crates/udpstp/src/config.rs) lists every setting.
+
+| Setting or option | What to change |
+|---|---|
+| `ephemeral_ports` or `--ephemeral-ports` | Use `FIRST-LAST`, such as `50000-50383`, with ports from 1 to 65535 and FIRST no greater than LAST. The range must also hold `max_test_connections` plus the Unactivated Test Connection share. The defaults need 384 ports |
+| `source_setup_burst` or `--source-setup-burst` | Set at least `tests_per_source` multiplied by `test_connections_per_test`. With two Tests per Source and 24 Test Connections per Test, the minimum is 48 |
+| `source_tests_per_quota_period` or `source_bytes_per_quota_period` | Set at least 1. To remove that Quota, leave its setting out of the configuration file and omit its command-line override. Zero does not disable a Quota |
 
 ## The Windows service won't start
 

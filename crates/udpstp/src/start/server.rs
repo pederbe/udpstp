@@ -408,7 +408,7 @@ mod tests {
                 "pseudonyms without a key",
                 Pseudonymize,
                 None,
-                "udpstp: pseudonymize needs a pseudonym key file",
+                "udpstp: --address-privacy pseudonymize needs --address-privacy-key-file FILE",
             ),
             (
                 "a key file that isn't there",
@@ -420,7 +420,7 @@ mod tests {
                 "a key file without pseudonyms",
                 Full,
                 Some("no-such-pseudonym.key"),
-                "udpstp: a pseudonym key file is for pseudonymize only",
+                "udpstp: --address-privacy-key-file requires --address-privacy pseudonymize",
             ),
         ];
         for (what, privacy, key_file, says) in cases {
