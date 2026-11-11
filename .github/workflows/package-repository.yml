@@ -4,22 +4,17 @@ name: Package repository
 # repository at packages.udpstp.com (contrib/package-repository/README.md).
 # It uses the release assets as published, after checking them against the
 # release's SHA256SUMS and their attestations from release.yml, and never
-# rebuilds the programs. Dispatch on a version tag to retry its publication.
+# rebuilds the programs. Dispatch retries publication of the latest release.
 on:
   release:
     types: [published]
   workflow_dispatch:
-    inputs:
-      tag:
-        description: Published release tag, such as v0.1.0
-        required: true
 
 permissions:
   contents: read
   attestations: read
 
-# One run at a time. GitHub keeps only the newest pending run in the group, so
-# dispatch backfills one after another, each after the previous has finished.
+# One run at a time so publication cannot interleave repository generations.
 concurrency:
   group: package-repository
   cancel-in-progress: false
@@ -32,7 +27,7 @@ jobs:
     # restricted to version-tag delivery.
     environment: packages
     env:
-      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      EVENT_TAG: ${{ github.event.release.tag_name }}
       GH_TOKEN: ${{ github.token }}
       BUCKET: udpstp-packages
       # The account ID isn't sensitive, but it stays out of the repository.
@@ -47,7 +42,13 @@ jobs:
           persist-credentials: false
       - name: Check the release
         run: |
+          TAG=$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq .tag_name)
+          if [ -n "$EVENT_TAG" ] && [ "$EVENT_TAG" != "$TAG" ]; then
+            echo 'Only the latest full release can update the package repository.' >&2
+            exit 1
+          fi
           [[ $TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "not a release tag: $TAG" >&2; exit 1; }
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
           test -f contrib/package-repository/udpstp.asc ||
             { echo "contrib/package-repository/udpstp.asc is not committed" >&2; exit 1; }
           # The tags endpoint does not return drafts.
@@ -113,14 +114,12 @@ jobs:
       - name: Install, upgrade and remove from the repository
         run: |
           version=${TAG#v}
-          # When this is the newest version, the next one down is upgraded from;
-          # an older release added later is installed directly.
+          # The previous package is installed directly as an internal fixture.
+          # Current indexes must offer only the latest version.
           versions=$(find "$RUNNER_TEMP/repository/apt/pool" -name 'udpstp_*_amd64.deb' -printf '%f\n' |
             sed 's/^udpstp_\(.*\)-1_amd64\.deb$/\1/' | sort -V)
-          previous=
-          if [ "$(tail -n 1 <<<"$versions")" = "$version" ]; then
-            previous=$(grep -vxF "$version" <<<"$versions" | tail -n 1 || true)
-          fi
+          test "$(tail -n 1 <<<"$versions")" = "$version"
+          previous=$(grep -vxF "$version" <<<"$versions" | tail -n 1 || true)
           bash contrib/package-repository/test.sh "$RUNNER_TEMP/repository" "$version" ${previous:+"$previous"}
       # Publish all immutable references before advancing InRelease and the
       # dnf mirrorlist. Clients already reading the old generation keep working.
@@ -128,7 +127,9 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-        run: bash contrib/package-repository/publish.sh "$RUNNER_TEMP/repository" "$BUCKET"
+        run: |
+          test "$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq .tag_name)" = "$TAG"
+          bash contrib/package-repository/publish.sh "$RUNNER_TEMP/repository" "$BUCKET"
       - name: Check the published repository
         run: |
           cd "$RUNNER_TEMP/repository"
