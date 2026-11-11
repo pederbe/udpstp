@@ -82,7 +82,7 @@ Events an attacker can cause are rate-limited, ten of a kind every 10 s, so a fl
 | `NoIpv6Listener` | The host has no IPv6, so the Server listens on IPv4 alone | `error` |
 | `TroubleshootingModeOn` | At start, and every minute while Troubleshooting Mode is on | |
 | `StartupError` | With `log_file` set: the Server couldn't start | `error`, the message (free text); `exit_status` |
-| `StartupWarning` | With `log_file` set: a warning at startup | `reason`: `DscpAskedAsZero`, `DscpCoercedToZero`, `DontFragmentUnsupported`, `AdmittedRateCapWithoutMaxBandwidth`, `NoTestAdmissible`, `TroubleshootingModeOn`, `SocketBuffersShort`, `SocketBuffersUnknown`, `MaxHopsNotSet` or `TestsPerSource` |
+| `StartupWarning` | With `log_file` set: a warning at startup | `reason`: `DscpAskedAsZero`, `DscpCoercedToZero`, `DontFragmentUnsupported`, `AdmittedRateCapWithoutMaxBandwidth`, `NoTestAdmissible`, `TroubleshootingModeOn`, `SocketBuffersShort`, `SocketBuffersUnknown`, `MaxHopsNotSet`, `TestsPerSource` or `KeyTableFormatDeprecated` |
 | `Stopping` | The Server was asked to stop. It ignores new Setup Requests, sends STOP to its active Test Connections and ends them | `reason`: `SIGTERM`, `SIGINT` or `SIGHUP`; on Windows `CtrlC`, `CtrlBreak`, `CtrlClose` or `CtrlShutdown`; as a Windows service `ServiceStop` or `ServiceShutdown` |
 
 ### Setup and Activation

@@ -8,7 +8,7 @@ Scripts and tools can rely on udpstp's exit statuses, JSON results, key files, u
 |---|---|---|
 | Exit statuses | The rule behind them, and every value assigned | [below](#exit-statuses) |
 | JSON results (`--format json`) | Key names, types, enumerated values. The OB-UDPST part keeps OB-UDPST v9.1.0's schema, except the recorded differences | [JSON results](json-output.md) |
-| Key files | The TOML Key Table's columns and `format`; OB-UDPST's `udpst.keys` as OB-UDPST reads it; the pseudonym key file | [below](#key-files) |
+| Key files | The TOML Key Table's columns, with the deprecated `format` marker accepted during its notice period. OB-UDPST's `udpst.keys` as OB-UDPST reads it and the pseudonym key file | [below](#key-files) |
 | stdout and stderr | Which output goes where | [below](#stdout-and-stderr) |
 | Address pseudonyms | The algorithm, so one key gives one Client the same pseudonym in every version | [below](#address-pseudonyms) |
 
@@ -131,9 +131,11 @@ with `--windows-service`. See [Key handling](security.md#key-handling).
 
 ## Key files
 
-A TOML Key Table that is valid today keeps its meaning in every later version: columns are added, never removed or read differently. It may start with `format = 1`, which a file without it is too.
+A TOML Key Table's columns keep their meaning in later versions: columns are added, never removed or read differently.
 
-The reverse doesn't hold: a file with a column this version doesn't know, or a higher `format`, is refused rather than read in part, since the column it would skip may be a restriction such as a lifetime or a Quota. Upgrade every Server and Client that reads a Key Table before you add a new column to it. [Key files](key-files.md) lists the columns.
+The optional top-level `format = 1` marker is deprecated. It is still accepted with a warning throughout the minor release that first publishes the deprecation and that release's patches. It may be removed in the following minor release. Delete the line before upgrading. The file keeps the same meaning without it ([ADR 0016](adr/0016-retire-unused-features.md)).
+
+A file with a column this version doesn't know, or any `format` value other than 1, is refused rather than read in part, since the column it would skip may be a restriction such as a lifetime or a Quota. Upgrade every Server and Client that reads a Key Table before you add a new column to it. [Key files](key-files.md) lists the columns.
 
 OB-UDPST `udpst.keys` files are read as OB-UDPST reads them. The pseudonym key file is hexadecimal digits, 16 bytes or more, with whitespace around them and nothing else.
 

@@ -56,6 +56,8 @@ The ErrorStatus is OB-UDPST's (`udpst.h`), and the exit status equals it, except
 
 ### Key files
 
+The optional format marker decision below is superseded by [ADR 0016](0016-retire-unused-features.md). `format = 1` is deprecated and still accepted during its minor-release window. Delete that line without changing the Key Table's meaning. The columns and unknown-field rejection remain unchanged.
+
 **Forward-incompatible by design.** Every file valid in a release keeps its meaning in every later one: a column is never removed or read differently, only added. A file written for a newer udpstp, with a column this version doesn't know or a higher `format`, is refused whole rather than read in part, because the column it would skip may be a restriction: a lifetime, a Quota, an Operator Key's limits. An older Server that ignored it would widen what a key allows.
 
 A TOML Key Table may start with `format = 1`; a file without it is format 1. A later format number is needed only for a file that an older udpstp would misread even though it knows every column, which the rule above rules out, so it is reserved for a new format beside this one. A renamed column is an input like any other: its old name is accepted, with a warning, for one minor release. OB-UDPST's `udpst.keys` format is read as OB-UDPST reads it (conformance: obudpst-key-file-reading), and follows OB-UDPST.

@@ -892,10 +892,11 @@ fn an_oversized_datagram_does_not_stop_the_server() {
 #[test]
 fn a_mode1_test_runs_with_a_toml_key_table_and_an_obudpst_key_file() {
     // The same key written both ways: "shared" is 736861726564 in hex.
+    // ADR 0016: the deprecated marker still works for both roles.
     let toml = KeyFile::new(
         "loopback-toml",
         "keys.toml",
-        "[[key]]\nadmin_key_name = \"lab\"\nkey_id = 4\nkey_hex = \"736861726564\"\n\
+        "format = 1\n[[key]]\nadmin_key_name = \"lab\"\nkey_id = 4\nkey_hex = \"736861726564\"\n\
          send_lifetime_start = \"20200101000000Z\"\naccept_lifetime_start = \"20200101000000Z\"\n",
     );
     // A CR, a comment and what follows a NUL byte end the key, as in
@@ -913,6 +914,12 @@ fn a_mode1_test_runs_with_a_toml_key_table_and_an_obudpst_key_file() {
             vec!["--key-id", "4"],
         ),
         ("Server OB-UDPST, Client TOML", &obudpst, &toml, vec![]),
+        (
+            "Server and Client TOML with JSON results",
+            &toml,
+            &toml,
+            vec!["--format", "json"],
+        ),
     ] {
         let server = Server::start(&["--key-file", server_keys.path()]);
         let target = format!("127.0.0.1:{}", server.port);
@@ -922,7 +929,24 @@ fn a_mode1_test_runs_with_a_toml_key_table_and_an_obudpst_key_file() {
 
         let output = client(&args);
 
-        assert_activated(&output, what);
+        if args.contains(&"json") {
+            assert!(output.status.success(), "{what}: {}", stderr(&output));
+            let result: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+            assert!(result["ErrorStatus"].as_u64().is_some_and(|code| code < 50));
+        } else {
+            assert_activated(&output, what);
+        }
+        assert_eq!(
+            prose(&stderr(&output)).contains("format = 1 is deprecated"),
+            client_keys.path().ends_with(".toml"),
+            "{what}: {}",
+            stderr(&output)
+        );
+        assert_eq!(
+            prose(&server.stop()).contains("format = 1 is deprecated"),
+            server_keys.path().ends_with(".toml"),
+            "{what}"
+        );
     }
 }
 

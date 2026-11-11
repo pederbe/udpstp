@@ -22,11 +22,9 @@
 //!   (conformance: key-file-owner);
 //! - a key file over 1 MiB is refused (conformance: key-file-size-limit).
 //!
-//! The TOML Key Table's format may grow, never change: every file valid
-//! now keeps its meaning in later versions. A top-level `format = 1`
-//! names this format, and is 1 when absent; a file with a higher one, or
-//! with a column this version doesn't know, is refused rather than read
-//! partly.
+//! Unknown TOML fields are refused rather than silently dropping a key's
+//! restrictions. The redundant top-level `format = 1` marker is deprecated
+//! but still accepted during its minor-release window (ADR 0016).
 
 use std::collections::HashSet;
 use std::fmt;
@@ -61,8 +59,14 @@ impl fmt::Display for KeyFileError {
     }
 }
 
+/// A validated Key Table and its deprecated input marker, if present.
+pub struct LoadedKeyTable {
+    pub table: KeyTable,
+    pub format_deprecated: bool,
+}
+
 /// Loads the Key Table from `path`, inspecting and reading the same file.
-pub fn load(path: &Path) -> Result<KeyTable, KeyFileError> {
+pub fn load(path: &Path) -> Result<LoadedKeyTable, KeyFileError> {
     let error = |line: Option<usize>, message: String| KeyFileError {
         path: path.display().to_string(),
         line,
@@ -88,7 +92,7 @@ pub fn load(path: &Path) -> Result<KeyTable, KeyFileError> {
     let is_toml = path
         .extension()
         .is_some_and(|ext| ext.eq_ignore_ascii_case("toml"));
-    let entries = if is_toml {
+    let parsed = if is_toml {
         parse_toml(&bytes)
     } else {
         parse_obudpst(&bytes).map_err(|(line, message)| {
@@ -99,11 +103,11 @@ pub fn load(path: &Path) -> Result<KeyTable, KeyFileError> {
         })
     }
     .map_err(|(line, message)| error(line, message))?;
-    if entries.is_empty() {
+    if parsed.entries.is_empty() {
         return Err(error(None, "no keys".into()));
     }
     let mut table = KeyTable::default();
-    for (line, entry) in entries {
+    for (line, entry) in parsed.entries {
         table.insert(entry).map_err(|e| {
             let message = match e {
                 KeyTableError::OverlappingLifetimes { key_id, names } => format!(
@@ -117,7 +121,10 @@ pub fn load(path: &Path) -> Result<KeyTable, KeyFileError> {
             error(line, message)
         })?;
     }
-    Ok(table)
+    Ok(LoadedKeyTable {
+        table,
+        format_deprecated: parsed.format_deprecated,
+    })
 }
 
 /// The supported policy is a startup assessment, not effective-access
@@ -197,7 +204,12 @@ fn check_private(_metadata: &std::fs::Metadata) -> Result<(), String> {
     Ok(())
 }
 
-type Parsed = Result<Vec<(Option<usize>, KeyEntry)>, (Option<usize>, String)>;
+struct ParsedKeyFile {
+    entries: Vec<(Option<usize>, KeyEntry)>,
+    format_deprecated: bool,
+}
+
+type Parsed = Result<ParsedKeyFile, (Option<usize>, String)>;
 
 /// OB-UDPST's format: `<keyId>,<key>` per line, with commas, spaces and
 /// tabs separating fields. A line ends at `#`, `\r` or a NUL byte. The keyId
@@ -249,7 +261,10 @@ fn parse_obudpst(bytes: &[u8]) -> Parsed {
         );
         entries.push((number, entry));
     }
-    Ok(entries)
+    Ok(ParsedKeyFile {
+        entries,
+        format_deprecated: false,
+    })
 }
 
 /// A non-negative integer as C's `strtol` with base 0 reads a whole token.
@@ -269,17 +284,13 @@ fn parse_c_integer(text: &str) -> Option<u64> {
     u64::from_str_radix(digits, radix).ok()
 }
 
-/// The TOML Key Table format this version reads.
-const FORMAT: u32 = 1;
-
 /// Our TOML Key Table: one `[[key]]` table per row (RFC 7210 §2), plus the
 /// Operator extension (ADR 0010).
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct TomlKeyTable {
-    /// The format, 1 when absent; [`check_format`] reads it.
-    #[serde(rename = "format")]
-    _format: Option<toml::Value>,
+    /// Deprecated compatibility input, accepted only when it is 1 (ADR 0016).
+    format: Option<i64>,
     #[serde(default)]
     key: Vec<TomlKey>,
 }
@@ -318,13 +329,12 @@ fn parse_toml(bytes: &[u8]) -> Parsed {
         let line = text[..start].matches('\n').count() + 1;
         (Some(line), toml_error_message(e.message()))
     };
-    // The format first, from any valid TOML: a newer file's unknown
-    // columns must say to upgrade, not that they are unknown.
-    let lenient: toml::Table = toml::from_str(text).map_err(at)?;
-    check_format(&lenient).map_err(|message| (None, message))?;
     let table: TomlKeyTable = toml::from_str(text).map_err(at)?;
+    if table.format.is_some_and(|format| format != 1) {
+        return Err((None, "format must be 1".into()));
+    }
     let mut names = HashSet::new();
-    table
+    let entries = table
         .key
         .into_iter()
         .map(|row| {
@@ -339,31 +349,11 @@ fn parse_toml(bytes: &[u8]) -> Parsed {
                 .map(|entry| (None, entry))
                 .map_err(|m| (None, format!("{name:?}: {m}")))
         })
-        .collect()
-}
-
-/// Refuses a Key Table whose `format` this version can't read: a newer
-/// one, or one not a format at all. `format` must come before the first
-/// `[[key]]`, where TOML puts it in the file rather than in a row.
-fn check_format(table: &toml::Table) -> Result<(), String> {
-    let in_a_row = table
-        .get("key")
-        .and_then(toml::Value::as_array)
-        .is_some_and(|rows| {
-            rows.iter()
-                .any(|row| row.as_table().is_some_and(|row| row.contains_key("format")))
-        });
-    if in_a_row {
-        return Err("format must come before the first [[key]], at the top of the file".into());
-    }
-    match table.get("format").map(toml::Value::as_integer) {
-        None => Ok(()),
-        Some(Some(format)) if format == i64::from(FORMAT) => Ok(()),
-        Some(Some(format)) if format > i64::from(FORMAT) => Err(format!(
-            "format {format} is newer than this udpstp reads ({FORMAT}); upgrade udpstp"
-        )),
-        Some(_) => Err(format!("format must be {FORMAT}")),
-    }
+        .collect::<Result<_, _>>()?;
+    Ok(ParsedKeyFile {
+        entries,
+        format_deprecated: table.format.is_some(),
+    })
 }
 
 /// toml's messages can quote a mistyped value, which may be a key, and its
@@ -529,11 +519,10 @@ mod tests {
         fields
     }
 
-    // , ADR 0013 (a TOML Key Table's columns and format are stable: a
-    // valid file keeps its meaning in later versions)
+    // ADR 0013 and ADR 0016: supported columns include the deprecated marker.
     #[test]
     fn every_key_table_column_is_in_the_checked_in_list() {
-        let mut text = format!("format\t{}\n", super::FORMAT);
+        let mut text = String::from("format\t1\n");
         for (table, fields) in [
             ("table", columns::<super::TomlKeyTable>()),
             ("key", columns::<super::TomlKey>()),

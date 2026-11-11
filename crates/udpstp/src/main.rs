@@ -668,7 +668,19 @@ fn run_server(
         };
     let keys = match &settings.key_file {
         Some(path) => match keyfile::load(path) {
-            Ok(keys) => keys,
+            Ok(loaded) => {
+                if loaded.format_deprecated {
+                    let warning = crate::start::StartupWarning::KeyTableFormatDeprecated {
+                        path: path.clone(),
+                    };
+                    let message = warning.message();
+                    errln!("{}", stderr.diagnostic(color::Role::Warning, &message));
+                    if to_file {
+                        log::startup_warning(warning.name(), &message);
+                    }
+                }
+                loaded.table
+            }
             Err(error) => {
                 let message = format!("udpstp: key file error: {error}");
                 return fail(&message, exit::KEY_FILE_ERROR, to_file);
