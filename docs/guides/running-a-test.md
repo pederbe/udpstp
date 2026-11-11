@@ -80,6 +80,8 @@ Use `--unauthenticated` only on networks where every host is trusted. It protect
 
 `--jumbo` and `--traditional-mtu` must match the Server's settings, or it refuses the Test.
 
+Write boolean values with `=`, such as `--jumbo=false` or `--json-extension=false`. With `--jumbo false`, the Client treats `false` as another SERVER and tries to look up that name.
+
 ## Read the results
 
 The Client prints its progress, then the results:
@@ -129,9 +131,9 @@ udpstp client --key-file keys.toml --test-connections 4 server.example.net
 ```
 
 - `--test-connections N` runs 1 to 255 Test Connections. OB-UDPST Servers accept at most 24, and so does a udpstp Server by default.
-- Several SERVERs share the Test Connections in turn. They must all be IPv4 or all IPv6.
-- `--min-test-connections N` sets how many must start for the Test to go on. By default all of them must.
-- `--max-bandwidth` is for the whole Test, shared equally between its Test Connections.
+- Several SERVERs share the Test Connections in turn. Give at least one Test Connection per SERVER. They must all be IPv4 or all IPv6.
+- `--min-test-connections N` sets how many must start and keep running for the Test to go on. It cannot exceed `--test-connections`, whose default is one per SERVER. By default all Test Connections must succeed.
+- `--max-bandwidth` is for the whole Test, shared equally between its Test Connections. Allow at least 1 Mbps each. For four Test Connections, use `--max-bandwidth 4` or higher.
 
 ## If the Server answers from another address
 

@@ -297,16 +297,28 @@ fn an_invalid_configuration_exits_with_50_and_says_why() {
     let bad_value = ConfigFile::new("value", "port = 0\n");
     let not_toml = ConfigFile::new("syntax", "port = = 1\n");
     let backwards = ConfigFile::new("range", "ephemeral_ports = \"50000-40000\"\n");
-    let cases: [(&str, Vec<&str>, &str); 7] = [
+    let test_quota = ConfigFile::new("test-quota", "source_tests_per_quota_period = 0\n");
+    let byte_quota = ConfigFile::new("byte-quota", "source_bytes_per_quota_period = 0\n");
+    let cases: [(&str, Vec<&str>, &str); 9] = [
+        (
+            "a zero Test Quota",
+            vec!["server", "--config", test_quota.path(), "--print-config"],
+            "source_tests_per_quota_period: a Quota must be at least 1",
+        ),
+        (
+            "a zero byte Quota",
+            vec!["server", "--config", byte_quota.path(), "--print-config"],
+            "source_bytes_per_quota_period: a Quota must be at least 1",
+        ),
         (
             "a backwards Ephemeral Port range",
             vec!["server", "--config", backwards.path(), "--print-config"],
-            "ephemeral_ports",
+            "Use FIRST-LAST, for example 49152-65535",
         ),
         (
             "a Ephemeral Port range from 0",
             vec!["server", "--ephemeral-ports", "0-100", "--print-config"],
-            "ephemeral_ports",
+            "Ports must be from 1 to 65535 and FIRST must not exceed LAST",
         ),
         (
             "an unknown setting",

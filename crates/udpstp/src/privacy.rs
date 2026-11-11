@@ -58,10 +58,16 @@ impl Addresses {
     pub fn new(privacy: AddressPrivacy, key_file: Option<&Path>) -> Result<Self, String> {
         let key = match (privacy, key_file) {
             (AddressPrivacy::Pseudonymize, None) => {
-                return Err("pseudonymize needs a pseudonym key file".into());
+                return Err(
+                    "--address-privacy pseudonymize needs --address-privacy-key-file FILE".into(),
+                );
             }
             (AddressPrivacy::Pseudonymize, Some(path)) => Some(read_key(path)?),
-            (_, Some(_)) => return Err("a pseudonym key file is for pseudonymize only".into()),
+            (_, Some(_)) => {
+                return Err(
+                    "--address-privacy-key-file requires --address-privacy pseudonymize. Set it or remove --address-privacy-key-file".into(),
+                );
+            }
             (_, None) => None,
         };
         Ok(Self { privacy, key })
