@@ -25,6 +25,7 @@ mod conformance;
 mod contrast;
 mod finish;
 mod markdown;
+mod pages;
 mod prepare;
 mod reference;
 
@@ -46,14 +47,7 @@ pub fn docs_url(book: &str) -> String {
     }
 }
 
-/// The repository paths of the book's user pages: every part but Project,
-/// whose pages are for contributors.
-pub fn user_pages() -> impl Iterator<Item = &'static str> {
-    prepare::SOURCES
-        .iter()
-        .filter(|(_, _, part, _)| *part != "Project")
-        .map(|(source, ..)| *source)
-}
+pub use pages::user_pages;
 
 /// The repository, where links to files outside the book go.
 pub const REPO: &str = "https://github.com/pederbe/udpstp";
