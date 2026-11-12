@@ -296,6 +296,11 @@ On Linux the Server runs one Engine Thread for each CPU it may use, each serving
 
 For high-rate Multi-Connection Tests, give the Server at least as many CPUs as such a Test has Test Connections.
 
+On Hyper-V guests, avoid CPU 0 when choosing the Server's CPU affinity. Where
+the host allows it, steer receive softirq work off the Engine Threads' logical
+CPUs. This needs host-level configuration, which the unprivileged Server cannot
+apply itself.
+
 A Server that falls behind says so in its `TestSummary` log lines, with `skipped_bursts` when it couldn't send on time and `receive_buffer_overflows` for its Receive Buffer Overflows.
 
 ### Debug a failing Client
