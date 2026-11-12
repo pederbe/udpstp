@@ -87,14 +87,7 @@ Publishing a GitHub release starts the separate Release container workflow, whic
 
 ## Consequences
 
-- A change to a stable interface fails a test, and the change's commit rewrites the checked-in list with `UDPSTP_BLESS=1`, where the diff shows it for review:
-  - CLI options, value names, spellings and defaults, from clap's Command model: `tests/golden/cli.txt` (`crates/udpstp/src/interfaces.rs`);
-  - every TOML key, from a fully populated settings struct, and every default: `server-settings.toml` and `server-defaults.toml`; the same test checks that each Server option sets the key of its name, and that values are spelled alike in both;
-  - log event names and enumerated values: `names.txt`, from the tables in `names.rs`; each JSON log line's keys and types: `log-fields.txt`, and every event in the table is logged (`log.rs`);
-  - the JSON results: `completed.json`, `bimodal.json` and `extension.json` (`json.rs`);
-  - exit statuses: `exit-statuses.txt` (`exit.rs`);
-  - the Key Table's columns and format: `key-table-columns.txt` (`keyfile.rs`);
-  - the pseudonym algorithm: known answers in `privacy.rs`.
+- Recorded interface fixtures make changes fail a test and expose intentional updates in the commit diff for review. The [testing guide](../testing.md#cli-and-loopback-integration-tests-s2a-s2b) lists the fixtures, their source modules and the regeneration command.
 - Each release's changelog lists what was added, deprecated and removed; [releasing.md](../releasing.md) has the step.
 - Open: how an enumerated value is emitted under both names during its period, since one field holds one value (a second field for the new value, or the old value kept until the period ends). The first such deprecation decides it.
 - Whatever 0.1.0 ships in the JSON results, exit statuses, key files, stdout and stderr, and pseudonyms becomes stable, inconsistencies too. The golden tests still catch every CLI, settings and log change during 0.x, so each one is deliberate and has its changelog entry. Two command-line inconsistencies were settled before 0.1.0: the Client's `--checksum` takes an optional boolean as the Server's does, and the Server's `--delay-var` / `delay_var`, the statistic it classifies by, became `--delay-var-statistic` / `delay_var_statistic`, so `--delay-var` names only the Client's choice of delay variation.
