@@ -185,6 +185,13 @@ journalctl -u udpstp-server -f
 
 `server.toml` is your configuration file. Leave `key_file` out of it, since the unit passes the key file itself. To bind a port below 1024, add `AmbientCapabilities=CAP_NET_BIND_SERVICE` and `CapabilityBoundingSet=CAP_NET_BIND_SERVICE`.
 
+#### With procd on OpenWrt
+
+The optional `udpstp-server` APK runs the Server under OpenWrt's procd service
+manager. It uses an unprivileged account, disables core dumps and sends its
+log to `logread`. Follow the [OpenWrt service setup](installing-udpstp.md#optional-server-service)
+to install it, configure its private key and enable it.
+
 #### In a container
 
 The latest release is available as `ghcr.io/pederbe/udpstp:latest`. The image runs the Server as a non-root user (uid 65532) with no shell. Pull it when you want to upgrade. To build the image yourself:

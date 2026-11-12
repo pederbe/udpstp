@@ -31,4 +31,7 @@ esac
 mkdir -p "$1/udpstp"
 sed -e "s/@VERSION@/$version/g" -e "s/@HASH@/$hash/g" "$here/Makefile.in" > "$work/Makefile"
 cp "$work/Makefile" "$1/udpstp/Makefile"
+mkdir -p "$1/udpstp/files"
+cp "$here/files/udpstp-server.init" "$here/files/udpstp.config" \
+    "$here/files/server.toml" "$1/udpstp/files/"
 printf 'Prepared udpstp %s in %s/udpstp\n' "$version" "$1"

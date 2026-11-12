@@ -141,6 +141,65 @@ commands. Stop any manually started Server before the upgrade and restart it
 afterwards. Remove the package with `apk del udpstp`. Upgrade and removal leave
 your key files and configuration in place.
 
+### Optional Server service
+
+Install the separately built `udpstp-server.apk` to let OpenWrt's procd
+service manager run the Server. Install `udpstp.apk` first as above, then
+transfer and install the service package
+
+```sh
+scp -O udpstp-server.apk root@router:/tmp/udpstp-server.apk
+ssh root@router 'apk add --no-network --allow-untrusted /tmp/udpstp-server.apk'
+```
+
+On the router, give the service its own copy of your key file. The package
+creates an unprivileged account named `udpstp`. Its key file must belong to
+that account and stay private
+
+```sh
+umask 077
+cp /etc/udpstp/keys.toml /etc/udpstp-server/keys.toml
+chown udpstp:udpstp /etc/udpstp-server/keys.toml
+chmod 600 /etc/udpstp-server/keys.toml
+```
+
+Edit `/etc/udpstp-server/server.toml`. The supplied file listens only on
+`127.0.0.1`. Set `listen` to the router address your Clients will use, choose
+`max_hops` for your path, and allow inbound UDP on the Standard Port from
+that network. Leave `key_file` out of the configuration, since the service
+passes its own key path. The package changes no firewall rules.
+
+Enable the Server in OpenWrt's UCI configuration, then start it
+
+```sh
+uci set udpstp.server.enabled='1'
+uci commit udpstp
+service udpstp-server start
+service udpstp-server status
+logread -e udpstp
+```
+
+The Server now starts at boot and procd restarts it after a failure. The
+enable flag defaults to `0`, so installation and boot keep the Server stopped
+until you opt in. OpenWrt registers the init script for boot independently
+of that flag. Missing keys or invalid configuration leave no running Server.
+Check `status` and `logread` after startup.
+
+After changing the settings or keys, run `service udpstp-server restart`.
+To stop the Server and keep it off at boot
+
+```sh
+uci set udpstp.server.enabled='0'
+uci commit udpstp
+service udpstp-server stop
+```
+
+For updates, build and transfer both APKs, then install them together with
+`apk add --no-network --allow-untrusted /tmp/udpstp.apk /tmp/udpstp-server.apk`.
+Your enable flag, modified settings and key file stay in place. OpenWrt
+restarts an enabled Server during the upgrade. `apk del udpstp-server` stops
+and removes the service, leaving the Client package, key and modified settings.
+
 ## Portable downloads
 
 The [release page](https://github.com/pederbe/udpstp/releases) provides archives for the supported targets. Extract an archive and run its `udpstp` executable. [Platform differences](../platforms.md) explains the available features.
