@@ -9,131 +9,9 @@ use std::process::Command;
 
 use super::conformance::{self, Facts};
 use super::markdown::{self, Diagrams, LinkMap};
-use super::{DOCS, Paths, SITE, copy, docs_url, html_escape, read, slug, write};
+use super::pages::Page;
+use super::{DOCS, Paths, SITE, copy, docs_url, html_escape, read, write};
 use crate::req::Status;
-
-/// One page of the book.
-pub struct Page {
-    /// Its path in the book, `guides/running-a-test.md`.
-    pub book: String,
-    /// Its entry in the chapter list.
-    pub label: String,
-    /// The part of the chapter list it is in; empty before the first part.
-    pub part: &'static str,
-    pub nested: bool,
-    /// The Markdown served beside the page, and read by agents.
-    pub markdown: String,
-}
-
-/// A repository page on the site: (repository path, book path, part, label,
-/// or the file's heading when empty). `run` sets the order.
-pub(super) const SOURCES: &[(&str, &str, &str, &str)] = &[
-    // The book's front page, before the first part.
-    ("website/pages/index.md", "index.md", "", ""),
-    (
-        "docs/guides/installing-udpstp.md",
-        "guides/installing-udpstp.md",
-        "Getting started",
-        "Installation",
-    ),
-    (
-        "docs/guides/building-udpstp.md",
-        "guides/building-udpstp.md",
-        "Getting started",
-        "Building from source",
-    ),
-    (
-        "docs/getting-started.md",
-        "getting-started.md",
-        "Getting started",
-        "",
-    ),
-    (
-        "docs/guides/README.md",
-        "guides/index.md",
-        "Guides",
-        "Overview",
-    ),
-    (
-        "docs/guides/running-a-test.md",
-        "guides/running-a-test.md",
-        "Guides",
-        "Running a Test",
-    ),
-    (
-        "docs/guides/hosting-a-server.md",
-        "guides/hosting-a-server.md",
-        "Guides",
-        "",
-    ),
-    ("docs/guides/windows.md", "guides/windows.md", "Guides", ""),
-    (
-        "docs/guides/operator-features.md",
-        "guides/operator-features.md",
-        "Guides",
-        "",
-    ),
-    (
-        "docs/understanding-results.md",
-        "understanding-results.md",
-        "Explanation",
-        "",
-    ),
-    ("docs/security.md", "security.md", "Explanation", ""),
-    (
-        "docs/interfaces.md",
-        "reference/interfaces.md",
-        "Reference",
-        "",
-    ),
-    (
-        "docs/server-log.md",
-        "reference/server-log.md",
-        "Reference",
-        "",
-    ),
-    (
-        "docs/json-output.md",
-        "reference/json-output.md",
-        "Reference",
-        "",
-    ),
-    (
-        "docs/key-files.md",
-        "reference/key-files.md",
-        "Reference",
-        "",
-    ),
-    (
-        "docs/platforms.md",
-        "reference/platforms.md",
-        "Reference",
-        "",
-    ),
-    ("GLOSSARY.md", "glossary.md", "Reference", "Glossary"),
-    ("docs/troubleshooting.md", "troubleshooting.md", "Help", ""),
-    (
-        "docs/conformance/README.md",
-        "conformance/format.md",
-        "Project",
-        "How the records work",
-    ),
-    (
-        "SECURITY.md",
-        "security-policy.md",
-        "Project",
-        "Reporting a vulnerability",
-    ),
-    ("docs/architecture.md", "architecture.md", "Project", ""),
-    ("docs/technology.md", "technology.md", "Project", ""),
-    (
-        "CONTRIBUTING.md",
-        "contributing.md",
-        "Project",
-        "Contributing",
-    ),
-    ("website/pages/about.md", "about.md", "Project", ""),
-];
 
 /// Repository paths that aren't pages themselves but have one.
 const ALIASES: &[(&str, &str)] = &[
@@ -183,10 +61,7 @@ pub fn run(paths: &Paths) -> Result<(), String> {
     };
 
     // Where each repository file is published.
-    let mut map: BTreeMap<String, String> = SOURCES
-        .iter()
-        .map(|(source, book, ..)| (source.to_string(), book.to_string()))
-        .collect();
+    let mut map = super::pages::repository_links();
     for (source, book) in ALIASES {
         map.insert(source.to_string(), book.to_string());
     }
@@ -213,90 +88,7 @@ pub fn run(paths: &Paths) -> Result<(), String> {
     let conformance = conformance::generate(&loaded, &adr_links, &git_ref)?;
     let reference = super::reference::pages(root, &binary, &conformance.record_pages)?;
 
-    let mut pages: Vec<Page> = Vec::new();
-    let from_repo = |source: &str, book: &str, part, nested, label: &str| -> Result<Page, String> {
-        let text = read(&root.join(source))?;
-        let text = if source == "GLOSSARY.md" {
-            glossary(&text)
-        } else {
-            text
-        };
-        let markdown = links.rewrite(&text, source, book);
-        let label = if label.is_empty() {
-            markdown::title(&markdown).ok_or_else(|| format!("{source}: no # heading"))?
-        } else {
-            label.to_string()
-        };
-        Ok(Page {
-            book: book.to_string(),
-            label,
-            part,
-            nested,
-            markdown,
-        })
-    };
-    let generated = |book: &str, part, nested, markdown: String| Page {
-        label: markdown::title(&markdown).unwrap_or_default(),
-        book: book.to_string(),
-        part,
-        nested,
-        markdown,
-    };
-    let repo = |source: &str, nested: bool| -> Result<Page, String> {
-        let &(source, book, part, label) = SOURCES
-            .iter()
-            .find(|s| s.0 == source)
-            .ok_or_else(|| format!("{source} isn't in SOURCES"))?;
-        from_repo(source, book, part, nested, label)
-    };
-    let reference_page = |path: &str| -> Result<Page, String> {
-        let (_, markdown) = reference
-            .iter()
-            .find(|(p, _)| p == path)
-            .ok_or_else(|| format!("no generated page {path}"))?;
-        Ok(generated(path, "Reference", false, markdown.clone()))
-    };
-    // In the chapter list's order.
-    pages.push(repo("website/pages/index.md", false)?);
-    pages.push(repo("docs/guides/installing-udpstp.md", false)?);
-    pages.push(repo("docs/guides/building-udpstp.md", true)?);
-    pages.push(repo("docs/getting-started.md", false)?);
-    for source in [
-        "docs/guides/README.md",
-        "docs/guides/running-a-test.md",
-        "docs/guides/hosting-a-server.md",
-        "docs/guides/windows.md",
-        "docs/guides/operator-features.md",
-    ] {
-        pages.push(repo(source, false)?);
-    }
-    pages.push(reference_page("reference/cli.md")?);
-    pages.push(reference_page("reference/configuration.md")?);
-    pages.push(reference_page("reference/exit-statuses.md")?);
-    pages.push(repo("docs/json-output.md", false)?);
-    pages.push(repo("docs/server-log.md", false)?);
-    // The key file format, then the recorded choices from keyfile.rs.
-    let mut key_files = repo("docs/key-files.md", false)?;
-    key_files
-        .markdown
-        .push_str(&reference_page("reference/key-files.md")?.markdown);
-    pages.push(key_files);
-    pages.push(repo("docs/platforms.md", false)?);
-    pages.push(repo("docs/interfaces.md", false)?);
-    pages.push(repo("GLOSSARY.md", false)?);
-    pages.push(repo("docs/understanding-results.md", false)?);
-    pages.push(repo("docs/security.md", false)?);
-    for (index, (path, markdown)) in conformance.pages.iter().enumerate() {
-        pages.push(generated(path, "Conformance", index > 0, markdown.clone()));
-    }
-    pages.push(repo("docs/troubleshooting.md", false)?);
-    pages.push(repo("CONTRIBUTING.md", false)?);
-    pages.push(repo("docs/conformance/README.md", true)?);
-    pages.push(repo("docs/architecture.md", false)?);
-    pages.push(repo("docs/technology.md", true)?);
-    pages.push(repo("SECURITY.md", false)?);
-    pages.push(generated("citation.md", "Project", false, citation(root)?));
-    pages.push(repo("website/pages/about.md", false)?);
+    let pages = super::pages::assemble(&links, &reference, &conformance.pages, citation(root)?)?;
 
     // The book: SUMMARY, pages with their diagrams, 404, theme and config.
     let src = paths.src();
@@ -599,49 +391,6 @@ fn citation(root: &Path) -> Result<String, String> {
          ```yaml\n{}\n```\n",
         cff.trim_end()
     ))
-}
-
-/// GLOSSARY.md as the glossary page: each term a heading with its own anchor,
-/// and no term linked automatically anywhere else.
-fn glossary(context: &str) -> String {
-    let mut out = String::from(
-        "# Glossary\n\n\
-         Press **Ctrl+F** (**Command+F** on macOS) to find a term on this page.\n\n\
-         udpstp uses these terms the same way in its output, documentation, code and issues. \
-         They come from the repository's `GLOSSARY.md`. Each term has its own anchor, so you \
-         can link to it. _Avoid_ lists words udpstp doesn't use for it.\n",
-    );
-    let mut lines = context.lines().peekable();
-    // Skip the title and the introduction up to the first group of terms.
-    while let Some(line) = lines.peek() {
-        if line.starts_with("### ") {
-            break;
-        }
-        lines.next();
-    }
-    for line in lines {
-        // The last group names the bench tooling's own vocabulary, which
-        // readers of the site never meet.
-        if line == "### Benchmark rounds" {
-            break;
-        }
-        if let Some(group) = line.strip_prefix("### ") {
-            let _ = writeln!(out, "\n## {group}");
-        } else if let Some(terms) = line.strip_prefix("**").and_then(|l| l.strip_suffix("**:")) {
-            let names: Vec<&str> = terms.split("** / **").collect();
-            out.push('\n');
-            for extra in names.iter().skip(1) {
-                let _ = writeln!(out, "<a id=\"{}\"></a>", slug(extra));
-            }
-            let _ = writeln!(out, "### {} {{#{}}}\n", names.join(" / "), slug(names[0]));
-        } else if let Some(avoid) = line.strip_prefix("_Avoid_:") {
-            let _ = writeln!(out, "\n_Avoid:_{avoid}");
-        } else {
-            out.push_str(line);
-            out.push('\n');
-        }
-    }
-    out
 }
 
 /// README.md's diagram of a Test has no description line; the landing page
@@ -1034,19 +783,6 @@ fn markers(page: &str) -> Vec<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn glossary_terms_get_anchors() {
-        let context = "# UDPSTP\n\nIntro.\n\n## Language\n\n### Roles\n\n**Client**:\nThe endpoint.\n_Avoid_: Initiator\n\n**Load Sender** / **Load Receiver**:\nThe ends.\n";
-        let page = glossary(context);
-        assert!(page.contains("## Roles\n"));
-        assert!(page.contains("### Client {#client}\n"));
-        assert!(page.contains(
-            "<a id=\"load-receiver\"></a>\n### Load Sender / Load Receiver {#load-sender}\n"
-        ));
-        assert!(page.contains("_Avoid:_ Initiator"));
-        assert!(!page.contains("Intro."));
-    }
 
     fn facts() -> Facts {
         Facts {

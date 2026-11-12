@@ -1149,6 +1149,26 @@ fn print_config_writes_no_log_file() {
     assert!(log_file_lines(&dir.dir).is_empty());
 }
 
+// ADR 0013: --print-config reports errors on stderr, without opening its
+// configured log, even when loading settings fails.
+#[test]
+fn invalid_print_config_writes_no_log_file() {
+    let dir = ConfigFile::new("invalid-log-file-print", "");
+    let logs = dir.dir.join("logs");
+    let output = udpstp(&[
+        "server",
+        "--log-file",
+        logs.join("server.log").to_str().expect("UTF-8 temp path"),
+        "--print-config",
+        "--source-setups-per-second",
+        "0",
+    ]);
+    assert_eq!(output.status.code(), Some(CONFIGURATION_ERROR));
+    assert!(stdout(&output).is_empty(), "{}", stdout(&output));
+    assert!(stderr(&output).contains("source_setups_per_second"));
+    assert!(!logs.exists(), "invalid preview opened its log directory");
+}
+
 //  (--windows-service runs only where the Service Control Manager
 // started the process, and only on Windows)
 #[test]

@@ -181,6 +181,7 @@ arbitrary private helpers, intermediate state or implementation tables.
 | `results::render_at` | Human result text for the supplied result and width. The test-only `render` function is a convenience caller. |
 | `test_results::print` | Ordered stdout/stderr output and exit status for a runtime outcome and options. |
 | `log::subscriber_at` | Human or JSON events captured through the supplied writer. |
+| `site::pages::assemble` | Chapter order and nesting, repository content, generated insertions and appended reference text. |
 | `site::finish::{head, contents_landmark, ensure_contents_title, ensure_noindex, search_teasers}` | Generated document or script bytes and rejection of changed upstream templates. |
 | `site::finish::{check_page_metadata, check_hosting_routes}` | Validation of document identity, structured data and serving URLs. |
 | `site::finish::mdbook_accessibility` | Generated markup and the returned match results used by the build's guards. Their expectations are independently specified. |
