@@ -1,0 +1,4 @@
+# Choose the router's address and MaxHops for the path before enabling the service.
+listen = ["127.0.0.1"]
+max_hops = 12
+# The service supplies /etc/udpstp-server/keys.toml separately.

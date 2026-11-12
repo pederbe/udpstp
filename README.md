@@ -166,7 +166,7 @@ udpstp runs complete Tests and reports their results.
 | Conformance Records and interoperability tests with OB-UDPST | Done |
 | Hosted documentation | Done |
 | Release binaries, signed Linux packages and installers | Done |
-| OpenWrt package for x86_64, with a manually started Server | Done |
+| OpenWrt packages for x86_64, with an optional procd Server service | Done |
 
 [Platform differences](docs/platforms.md) describes options that depend on the operating system. JSON results, exit statuses, key files and address pseudonyms are stable. The command line, configuration and Server JSON logs can change in minor 0.x releases, with changes listed in the [changelog](CHANGELOG.md).
 
