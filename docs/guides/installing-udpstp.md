@@ -63,7 +63,7 @@ The apt and dnf repositories provide normal package-manager updates and the Serv
 
 ### Debian and Ubuntu
 
-Add the repository once, then install udpstp
+Add the repository once, then install udpstp:
 
 ```sh
 curl -fsSL https://packages.udpstp.com/udpstp.gpg | sudo tee "/usr/share/keyrings/udpstp.gpg" >/dev/null
@@ -87,7 +87,7 @@ Updates arrive with `dnf upgrade`. Remove the package with `sudo dnf remove udps
 
 The regular release workflow prepares a native Arch Linux package. Once
 `udpstp-x86_64.pkg.tar.zst` is listed on the [latest release](https://github.com/pederbe/udpstp/releases/latest),
-download it and install it with pacman
+download it and install it with pacman:
 
 ```sh
 sudo pacman -U udpstp-x86_64.pkg.tar.zst
@@ -106,7 +106,7 @@ source feed is separate from OpenWrt's upstream packages feed. There is no
 hosted APK repository. Other router targets are not yet qualified.
 
 Transfer your built `udpstp.apk` to the router, replacing `router` with its
-address, then install it
+address, then install it:
 
 ```sh
 scp -O udpstp.apk root@router:/tmp/udpstp.apk
@@ -119,13 +119,13 @@ needs about 5 MiB of storage and uses OpenWrt's existing libc package, with no
 additional runtime libraries to install.
 
 Create a Shared Key on your computer as in the [quickstart](../getting-started.md),
-then transfer its `keys.toml` through SSH into a private directory
+then transfer its `keys.toml` through SSH into a private directory:
 
 ```sh
 ssh root@router 'set -e; umask 077; mkdir -p /etc/udpstp; chmod 700 /etc/udpstp; cat > /etc/udpstp/keys.toml; chmod 600 /etc/udpstp/keys.toml' < keys.toml
 ```
 
-On the router, run a Client against your Server
+On the router, run a Client against your Server:
 
 ```sh
 udpstp client --key-file /etc/udpstp/keys.toml --max-hops 12 server.example.net
@@ -145,7 +145,7 @@ your key files and configuration in place.
 
 Install the separately built `udpstp-server.apk` to let OpenWrt's procd
 service manager run the Server. Install `udpstp.apk` first as above, then
-transfer and install the service package
+transfer and install the service package:
 
 ```sh
 scp -O udpstp-server.apk root@router:/tmp/udpstp-server.apk
@@ -154,7 +154,7 @@ ssh root@router 'apk add --no-network --allow-untrusted /tmp/udpstp-server.apk'
 
 On the router, give the service its own copy of your key file. The package
 creates an unprivileged account named `udpstp`. Its key file must belong to
-that account and stay private
+that account and stay private:
 
 ```sh
 umask 077
@@ -169,7 +169,7 @@ Edit `/etc/udpstp-server/server.toml`. The supplied file listens only on
 that network. Leave `key_file` out of the configuration, since the service
 passes its own key path. The package changes no firewall rules.
 
-Enable the Server in OpenWrt's UCI configuration, then start it
+Enable the Server in OpenWrt's UCI configuration, then start it:
 
 ```sh
 uci set udpstp.server.enabled='1'
@@ -186,7 +186,7 @@ of that flag. Missing keys or invalid configuration leave no running Server.
 Check `status` and `logread` after startup.
 
 After changing the settings or keys, run `service udpstp-server restart`.
-To stop the Server and keep it off at boot
+To stop the Server and keep it off at boot:
 
 ```sh
 uci set udpstp.server.enabled='0'
@@ -206,13 +206,13 @@ The [release page](https://github.com/pederbe/udpstp/releases) provides archives
 
 ## Cargo
 
-With [Rust installed](https://rustup.rs), build a release from source
+With [Rust installed](https://rustup.rs), build a release from source:
 
 ```sh
 cargo install --locked udpstp
 ```
 
-With [cargo-binstall](https://github.com/cargo-bins/cargo-binstall) installed, fetch a matching prebuilt release
+With [cargo-binstall](https://github.com/cargo-bins/cargo-binstall) installed, fetch a matching prebuilt release:
 
 ```sh
 cargo binstall udpstp
