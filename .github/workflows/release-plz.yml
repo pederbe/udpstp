@@ -45,6 +45,10 @@ jobs:
           persist-credentials: false
       - run: rustup toolchain install
         if: steps.prepare.outputs.run == 'true'
+      - uses: taiki-e/install-action@cfdb7ed4ccc7c7dce37759eae89dc5674b469b39 # v2
+        if: steps.prepare.outputs.run == 'true'
+        with:
+          tool: git-cliff@2.14.2
       - id: release-plz
         if: steps.prepare.outputs.run == 'true'
         uses: release-plz/action@66b324fd6c72d05d2a08568492ecdd62bfb8a62b # v0.5.148

@@ -1,47 +1,28 @@
 name: Interop report
-description: Results of running udpstp against OB-UDPST or another UDPSTP implementation.
+description: Results of running udpstp against another UDPSTP implementation.
 labels: [needs-triage]
 body:
-  - type: input
-    id: peer
+  - type: textarea
+    id: problem
     attributes:
-      label: Peer implementation and version
-      placeholder: e.g. OB-UDPST 9.1.0
-    validations:
-      required: true
-  - type: dropdown
-    id: roles
-    attributes:
-      label: Roles
-      options:
-        - udpstp Client, peer Server
-        - Peer Client, udpstp Server
-    validations:
-      required: true
-  - type: dropdown
-    id: direction
-    attributes:
-      label: Direction
-      options:
-        - Downstream
-        - Upstream
-    validations:
-      required: true
-  - type: dropdown
-    id: auth
-    attributes:
-      label: Authentication Mode
-      options:
-        - Mode 1
-        - Mode 2
-        - Unauthenticated Mode
+      label: Problem
+      description: |
+        What interoperability problem or result did you observe?
     validations:
       required: true
   - type: textarea
-    id: result
+    id: outcome
     attributes:
-      label: What happened
-      description: Did the Test complete? Include the output of both ends, with any keys removed.
-      render: text
+      label: Desired outcome
+      description: |
+        What should happen between these implementations?
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: |
+        Include both implementations and versions, Client and Server roles, Upstream or Downstream direction, Authentication Mode, commands and output from both ends where available. Remove Shared Keys and other private data. Say which details are unknown.
     validations:
       required: true

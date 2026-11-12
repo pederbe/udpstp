@@ -24,7 +24,7 @@ The [Release workflow](../.github/workflows/release.yml) builds the archives, na
 
 ## Release process
 
-Every Friday at 07:37 UTC, [release-plz](https://release-plz.dev) opens or updates one release pull request when there are unreleased changes. It updates Cargo versions and writes a dated section in the root changelog from merged pull request titles. Internal changes do not trigger releases. The pull request merges automatically after the required CI checks pass. New commits on `main` refresh an open release pull request so its checks cover the current source.
+Every Friday at 07:37 UTC, [release-plz](https://release-plz.dev) opens or updates one release pull request when there are unreleased changes. It updates Cargo versions and writes a dated section in the root changelog from merged pull request titles, including relevant changes outside the Cargo packages. Entries stay short, mark breaking changes and link to the pull request. Migration instructions belong in its Solution section. Internal changes do not trigger releases. The pull request merges automatically after the required CI checks pass. New commits on `main` refresh an open release pull request so its checks cover the current source.
 
 After preparing each release pull request, the workflow refreshes `fuzz/Cargo.lock` on its branch to match the local crate versions. It commits the lockfile only when it changes, before enabling auto-merge. Existing registry dependency versions stay locked.
 
@@ -34,7 +34,7 @@ Published notes are already on `main` before tagging, and stay under their dated
 
 ### One-time setup
 
-The repository needs auto-merge enabled and its `CI` check required on `main`. Set squash merge defaults to the pull request title and body, preserving conventional titles and upgrade instructions. Set `RELEASE_PLZ_TOKEN` to a repository-scoped token with Contents and Pull requests write access. This lets release pull requests run CI and lets published releases start distribution workflows. Release-plz uses the built-in workflow token for tags and drafts, then explicitly dispatches the Release workflow because workflow-token events do not start other workflows.
+The repository needs auto-merge enabled and its `CI` check required on `main`. Set squash merge defaults to the pull request title and body, preserving conventional titles and the linked Solution section's upgrade instructions. Set `RELEASE_PLZ_TOKEN` to a repository-scoped token with Contents and Pull requests write access. This lets release pull requests run CI and lets published releases start distribution workflows. Release-plz uses the built-in workflow token for tags and drafts, then explicitly dispatches the Release workflow because workflow-token events do not start other workflows.
 
 Configure crates.io trusted publishing for `udpstp`, `udpstp-wire`, `udpstp-core`, `udpstp-runtime` and `udpstp-key-permissions`, with repository `pederbe/udpstp` and workflow `release-plz.yml`. The workflow uses short-lived OpenID Connect credentials, so no crates.io API token is stored in GitHub. See the [release-plz setup guide](https://release-plz.dev/docs/github/quickstart).
 

@@ -3,27 +3,26 @@ description: udpstp does something wrong, or crashes.
 labels: [bug, needs-triage]
 body:
   - type: textarea
-    id: what
+    id: problem
     attributes:
-      label: What happened
-      description: What you ran, what you expected, and what happened instead.
+      label: Problem
+      description: |
+        What happened, and how does it affect your task?
     validations:
       required: true
   - type: textarea
-    id: output
+    id: outcome
     attributes:
-      label: Output
-      description: The output of both the Client and the Server, if you have it. Remove any keys first.
-      render: text
-  - type: input
-    id: version
-    attributes:
-      label: Version or commit
-      placeholder: udpstp --version, or a commit hash
+      label: Desired outcome
+      description: |
+        What should happen instead? You do not need to propose a fix.
     validations:
       required: true
-  - type: input
-    id: platform
+  - type: textarea
+    id: evidence
     attributes:
-      label: Operating systems
-      placeholder: e.g. Client on Ubuntu 24.04, Server on Debian 12
+      label: Evidence
+      description: |
+        Include commands, relevant configuration, udpstp version or commit, both operating systems, and output from the Client and Server where available. Remove Shared Keys and other private data. Describe your observations even if you cannot reproduce the problem yet, and say which details are unknown.
+    validations:
+      required: true
