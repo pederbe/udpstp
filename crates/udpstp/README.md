@@ -46,7 +46,7 @@ udpstp measures between two hosts that share a key, so you need a Server at the 
 
 ## Installation
 
-With Rust installed
+With Rust installed:
 
 ```sh
 cargo install --locked udpstp
