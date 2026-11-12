@@ -5,12 +5,22 @@ body:
   - type: textarea
     id: problem
     attributes:
-      label: The problem
-      description: What are you trying to do, and what gets in the way?
+      label: Problem
+      description: |
+        What are you trying to do, and what gets in the way?
     validations:
       required: true
   - type: textarea
-    id: proposal
+    id: outcome
     attributes:
-      label: What you'd like
-      description: If it relates to RFC 9946 or RFC 9097, cite the section.
+      label: Desired outcome
+      description: |
+        What would udpstp let you do? You do not need to design the solution.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: |
+        Examples, workarounds or relevant links, if available. Cite the section for a request related to RFC 9946 or RFC 9097.

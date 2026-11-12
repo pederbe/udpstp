@@ -7,6 +7,9 @@ Report security problems through [private vulnerability reporting](https://githu
 ## Build and test
 
 Install Rust through rustup. `rust-toolchain.toml` selects the toolchain and components.
+On Linux, install the `git-cliff` version pinned in the
+[release workflow](.github/workflows/release-plz.yml) before running workspace tests.
+The release-note tests use local Git fixtures without contacting GitHub.
 
 ```sh
 git clone https://github.com/pederbe/udpstp
@@ -41,7 +44,30 @@ Write a conventional pull request title describing the change for users, such as
 
 For interface deprecations, use `feat(deprecate):`. For removals, use `feat(remove)!:`. These produce the Deprecated and Removed sections required by the interface policy. Other breaking changes appear under Changed and carry a bold Breaking label.
 
-Describe capabilities, fixes, installation and compatibility consequences in the pull request's Changelog section. Include essential upgrade instructions in the title or a `BREAKING CHANGE:` paragraph at the end of the description, after any checklists. The repository preserves the pull request title and description in the squash commit, so release-plz can include those instructions in the generated notes. Do not add hand-written Unreleased entries. The weekly release pull request commits dated notes before publication. See [Releasing](docs/releasing.md#release-process).
+Describe capabilities, fixes, installation and compatibility effects in Solution, including any migration or upgrade steps. Changelog entries use short titles, mark breaking changes and link to the pull request. No changelog or breaking-change footer is required. Do not add hand-written Unreleased entries. The weekly release pull request commits dated notes before publication, including relevant changes outside the Cargo packages. See [Releasing](docs/releasing.md#release-process).
+
+## Public issues and pull requests
+
+Issue descriptions use **Problem**, **Desired outcome** and **Evidence**.
+Describe the task and its impact, the result that would resolve it, and available
+reproduction details or examples. Incomplete observations are welcome.
+Pull requests use **Problem**, **Solution** and **Validation**. Explain the
+reason for the change, its behavior and compatibility effects, and meaningful
+checks. Put migration or upgrade instructions in Solution. Keep small changes
+brief and links and examples within these sections.
+
+Public descriptions and comments cover software behavior, technical rationale
+and evidence. Keep private discussions, authorization exchanges, personal
+decision history and handoffs out of them. State technical outcomes directly
+and attribute checks accurately. Comments are for technical questions, findings
+and review discussion.
+
+Edit descriptions only to keep technical facts, scope, evidence and acceptance
+criteria accurate within the work at hand. Preserve the reporter's observations
+and human-written wording unless a rewrite is requested. Leave merged PR
+descriptions alone unless a correction is requested. Track progress with
+checklists, linked issues and labels. These rules also apply to API updates.
+Check these limits before posting or editing.
 
 ## Licence and conduct
 

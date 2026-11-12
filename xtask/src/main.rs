@@ -13,6 +13,8 @@ mod site;
 mod winget;
 mod winget_submission;
 
+#[cfg(all(test, target_os = "linux"))]
+mod changelog_tests;
 #[cfg(test)]
 mod check_selection_tests;
 #[cfg(test)]

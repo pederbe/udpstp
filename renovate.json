@@ -8,7 +8,8 @@
     "rust-toolchain",
     "npm",
     "github-actions",
-    "dockerfile"
+    "dockerfile",
+    "custom.regex"
   ],
   "ignorePaths": [
     "**/target/**",
@@ -25,6 +26,18 @@
   "automerge": true,
   "automergeType": "pr",
   "platformAutomerge": true,
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^\\.github/workflows/.*\\.yml$/"],
+      "matchStrings": ["tool: git-cliff@(?<currentValue>\\d+\\.\\d+\\.\\d+)"],
+      "depNameTemplate": "git-cliff",
+      "packageNameTemplate": "orhun/git-cliff",
+      "datasourceTemplate": "github-releases",
+      "versioningTemplate": "semver",
+      "extractVersionTemplate": "^v(?<version>.+)$"
+    }
+  ],
   "packageRules": [
     {
       "matchPackageNames": [

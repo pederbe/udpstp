@@ -6,6 +6,22 @@ changelog_update = false
 release_always = false
 features_always_increment_minor = true
 pr_name = "chore: release{% if version %} v{{ version }}{% endif %}"
+pr_body = """
+## Problem
+
+Unreleased changes need a versioned release.
+
+## Solution
+{% for release in releases %}
+- `{{ release.package }}`: {% if release.previous_version %}{{ release.previous_version }} → {% endif %}{{ release.next_version }}
+{% endfor %}
+
+Update CHANGELOG.md with short entries linked to their pull requests.
+
+## Validation
+
+Required CI checks validate this release before automatic merging.
+"""
 release_commits = '^(feat|fix|perf|docs|revert)(\([^)]*\))?!?:|^[a-z]+(\([^)]*\))?!:|^[A-Z]|(?m:^BREAKING[ -]CHANGE:)'
 
 [[package]]
@@ -55,23 +71,27 @@ release = false
 header = """# Changelog
 
 ## [Unreleased]
+
 """
 body = """
-
-## [{{ version }}] - {{ timestamp | date(format="%Y-%m-%d") }}
+{% if package is defined -%}
+UDPSTP_REPOSITORY_CHANGELOG {{ version }} {{ timestamp | date(format="%Y-%m-%d") }} {% if previous %}{{ previous.version }}{% endif %}
+{% else -%}
+## [{{ version | trim_start_matches(pat="v") }}] - {{ get_env(name="UDPSTP_RELEASE_DATE", default=timestamp | date(format="%Y-%m-%d")) }}
 {% for group, commits in commits | group_by(attribute="group") %}
 ### {{ group | striptags | trim }}
 {% for commit in commits | unique(attribute="message") %}
-- {% if commit.breaking %}**Breaking:** {% endif %}{{ commit.message | split(pat="\n") | first | trim | upper_first }}\
-{% if commit.breaking and commit.breaking_description and commit.breaking_description != commit.message %}
-
-{{ commit.breaking_description | trim }}
-
-{% endif %}
+- {% if commit.breaking %}**Breaking:** {% endif %}{{ commit.message | split(pat="\n") | first | trim | upper_first }}
 {%- endfor %}
 {% endfor %}
+{% endif -%}
 """
 trim = true
+# Release-plz selects Cargo-package commits. Render the same release from the
+# whole repository so installation and packaging changes also reach the notes.
+postprocessors = [
+  { pattern = '(?m)^UDPSTP_REPOSITORY_CHANGELOG ', replace_command = "bash scripts/changelog.sh" },
+]
 sort_commits = "oldest"
 protect_breaking_commits = true
 commit_preprocessors = [
@@ -84,6 +104,7 @@ commit_parsers = [
   { footer = "^BREAKING[ -]CHANGE:", group = "<!-- 0 -->Changed" },
   { message = "^feat(\\([^)]*\\))?:", group = "<!-- 1 -->Added" },
   { message = "^fix\\(deps\\):", group = "<!-- 4 -->Dependencies" },
+  { message = "^fix\\(security\\):", group = "<!-- 2 -->Security" },
   { message = "^fix(\\([^)]*\\))?:", group = "<!-- 2 -->Fixed" },
   { message = "^perf(\\([^)]*\\))?:", group = "<!-- 3 -->Performance" },
   { message = "^docs(\\([^)]*\\))?:", group = "<!-- 5 -->Documentation" },
