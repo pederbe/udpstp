@@ -32,7 +32,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - uses: actions/setup-node@v7
         with:
-          node-version: '26.13.0'
+          node-version: '26.13.1'
           cache: npm
           cache-dependency-path: website/package-lock.json
       - uses: taiki-e/install-action@v2
@@ -69,7 +69,7 @@ jobs:
           path: target/site/public
       - uses: actions/setup-node@v7
         with:
-          node-version: '26.13.0'
+          node-version: '26.13.1'
       - name: Require the checked main revision and deploy its retained files
         env:
           GH_TOKEN: ${{ github.token }}
