@@ -50,6 +50,14 @@ define Package/udpstp-server/conffiles
 /etc/udpstp-server/server.toml
 endef
 
+define Package/udpstp-server/postinst
+#!/bin/sh
+if [ -z "$${IPKG_INSTROOT}" ] && [ "$${PKG_UPGRADE}" = 1 ]; then
+	/etc/init.d/udpstp-server restart
+fi
+exit 0
+endef
+
 define Build/Configure
 endef
 
