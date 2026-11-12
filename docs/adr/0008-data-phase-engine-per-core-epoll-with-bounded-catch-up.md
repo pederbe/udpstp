@@ -1,6 +1,6 @@
 # The Data Phase Engine: a pool of Engine Threads on a Linux Server, one per Test Connection elsewhere, with bounded catch-up
 
-**Status: Accepted** (2026-09-23), amended by ADR 0011 and ADR 0012, and rewritten on 2026-10-01 to record the implemented pool model. The frozen Data Phase interface, bounded catch-up, over-rate policing, timer slack of 1 ns and the CLOCK_MONOTONIC_RAW Test Time Base stand as first decided.
+**Status: Accepted** (2026-09-23), amended by ADR 0011 and ADR 0012 for policing and catch-up, and ADR 0016 for wake-up grouping. Rewritten on 2026-10-01 to record the implemented pool model. The frozen Data Phase interface, bounded catch-up, over-rate policing, timer slack of 1 ns and the CLOCK_MONOTONIC_RAW Test Time Base stand as first decided.
 
 The Data Phase prototype compared two engine models:
 
@@ -19,7 +19,7 @@ Each was measured with and without a spin tail, on a WSL2 host, in two rounds.
 
 A was better where high-rate Test Connections shared a core: on eight 1.25 Gbps Test Connections, and on one core carrying a 1 Mpps receive beside a sender, where B protected the receive and its sender skipped more.
 
-**The first implementation ran A everywhere** (one thread per Test Connection, with batched sends and receives and a `ppoll` wait on its socket), since on a single Test Connection the models tie. On a real host it fell behind. In the home lab's Server-capacity check, at a 500-byte Load PDU every 1 ms per Test Connection, confined to one core's two logical CPUs, udpstp's Server carried 125 Test Connections Downstream where OB-UDPST's carried 150: at 150 it left 6 % of its Load PDUs unsent with both logical CPUs busy and about 143,000 wake-ups a second. A profile put its extra cycles in switching among its threads, entering system calls and reading clocks.
+**The first implementation ran A everywhere** (one thread per Test Connection, with batched sends and receives and a `ppoll` wait on its socket), since on a single Test Connection the models tie. On a real host it fell behind. In the Server-capacity check, at a 500-byte Load PDU every 1 ms per Test Connection, confined to one core's two logical CPUs, udpstp's Server carried 125 Test Connections Downstream where OB-UDPST's carried 150: at 150 it left 6 % of its Load PDUs unsent with both logical CPUs busy and about 143,000 wake-ups a second. A profile put its extra cycles in switching among its threads, entering system calls and reading clocks.
 
 **With the pool, the same check read "not behind" in both directions**. Downstream on the same two logical CPUs, udpstp's Server carried 150, the check's top, on 0.86 busy logical CPUs and about 78,000 wake-ups a second; Upstream on one logical CPU it carried 150 on 0.34, where the thread per Test Connection had needed 0.93 and about 161,000 wake-ups a second. A single-Test precision check, one Test Connection Downstream at rows 500 and 900, found the pool no worse than a thread per Test Connection in Skipped and Withheld Load PDUs, Sub-Interval shortfall, send lag or Burst lateness.
 
@@ -59,7 +59,7 @@ The same contract suite passes against every executor: the simulator's, the per-
 
 ## Considered Options
 
-- **A thread per Test Connection on every platform, tuned** (fewer clock reads and empty reads per wake-up). It is what ran first, and the home lab's check found it short on one core. Tuning it keeps one switch per Burst per Test Connection, which a shared Engine Thread avoids whenever several Bursts fall due together; the pool was chosen over a tuning pass, and the check then read "not behind" with it.
+- **A thread per Test Connection on every platform, tuned** (fewer clock reads and empty reads per wake-up). It is what ran first, and the Server-capacity check found it short on one core. Tuning it keeps one switch per Burst per Test Connection, which a shared Engine Thread avoids whenever several Bursts fall due together. The pool was chosen over a tuning pass, and the check then read "not behind" with it.
 - **Pinned Engine Threads, one per core,** as first decided. The example systemd unit's `SystemCallFilter=~@privileged @resources` denies `sched_setaffinity` with SIGSYS, and no measurement showed pinning helping; the service's CPU affinity places an unpinned pool where the Server administrator wants it. Revisit with a measurement that shows migrations costing precision.
 - **timerfd in the epoll set.** Each turn re-arms it, a system call more per wake-up than a `ppoll` timeout, and keeping arrivals from ending a wait during the hold-off would need `epoll_ctl` calls or a nested epoll set.
 - **The epoll wait's own timeout.** `epoll_wait` takes milliseconds; `epoll_pwait2`, which takes nanoseconds, needs Linux 5.11, and the Linux builds run on 4.18 and later.
@@ -69,7 +69,7 @@ The same contract suite passes against every executor: the simulator's, the per-
 - **A pool on Windows and macOS.** Windows' readiness waits through mio round to milliseconds; macOS's kqueue would do, but no macOS Server needs the scale yet.
 - **Sends batched across Test Connections with `io_uring`.** Submitting needs `unsafe` in the safe wrappers, and its system calls are outside the unit's filter; `sendmmsg` takes one socket.
 - **A spin tail, or an idle-poll threshold.** Round 2 showed no benefit for their CPU.
-- **Grouping wake-ups by default,** as OB-UDPST's fixed 100 µs tick does: an Engine Thread whose next deadlines fall within a window of the earliest waits for the last of them and serves them in one turn, each Burst at most the window late and still stamped at departure. It is built, as an experimental setting with no grouping by default. With a 50 µs window the check also read "not behind" and the Server woke about 60 % less often at 125 Test Connections, but what grouping costs Test Connections sharing an Engine Thread could only be shown on loopback, and the home lab's laptop gave no loopback setup that ran without Skipped Bursts (episodes in which the host slowed every operation, not the pool), so its cost stayed unmeasured. Revisit with a measurement of that cost.
+- **Grouping wake-ups by default,** as OB-UDPST's fixed 100 µs tick does: an Engine Thread whose next deadlines fall within a window of the earliest waits for the last of them and serves them in one turn, each Burst at most the window late and still stamped at departure. It was built as an experimental setting, disabled by default. With a 50 µs window the Server-capacity check also read "not behind" and the Server woke about 60 % less often at 125 Test Connections. Its precision cost for Test Connections sharing an Engine Thread remained unmeasured because the available loopback runs could not isolate it from host-wide stalls and Skipped Bursts. Without that evidence, grouping was not adopted as the default. ADR 0016 later retired the experiment.
 - **The Engine Thread count as a stable Server setting.** It is an experimental override for measurements; Server administrators size the pool with CPU affinity or a container's CPU limit, which it follows.
 
 ## Consequences
@@ -89,9 +89,9 @@ The same contract suite passes against every executor: the simulator's, the per-
   - The release profile keeps `panic = "unwind"`.
   - In the pool, a stop reaches an Engine Thread at its next turn, or at once through its eventfd while it waits.
   - A Test Connection's end does nothing on its Engine Thread that could stall the others: reading the process's UDP tables for its Receive Buffer Overflows happens off it.
-  - The Server logs how its engines run once as it starts: the executor, the most Engine Threads it may start and the grouping window.
-- **Settings.** The Engine Thread count, the grouping window, the hold-off, the catch-up budget and the kernel send timestamps are passed to the Data Phase Engine when it starts; the binary reads the experimental environment variables that set them, which stay experimental (ADR 0013).
+  - The Server logs how its engines run once as it starts, including the executor and the most Engine Threads it may start.
+- **Settings.** The Engine Thread count, the hold-off, the catch-up budget and the kernel send timestamps are passed to the Data Phase Engine when it starts. The binary reads the experimental environment variables that set them, which stay experimental (ADR 0013).
 - **A Data Phase socket leaves the Control Phase's reactor** when its Data Phase starts, so its traffic never wakes the Control Phase.
 - **The hold-off's buffer share counts payload bytes,** not the memory the kernel charges for them, so on loopback and veth, which charge a datagram split from a UDP GSO message far more than its size, a fast Load Receiver sharing an Engine Thread with Load Senders can overflow its receive buffer; over a NIC the share holds.
 - **Per-datagram random payload needs a generator cheap enough for 1 Mpps.** A naive one saturated the Engine Thread.
-- **Deployment guidance.** Hyper-V guests should avoid CPU 0. Timer slack must be 1 ns. Receive softirq is steered off the Engine Threads' logical CPUs where the host allows; an unprivileged process can't do it itself. A Server confined with the service's CPU affinity or a container CPU limit runs as many Engine Threads as it is given CPUs.
+- **Deployment.** Timer slack must be 1 ns. A Server confined with the service's CPU affinity or a container CPU limit runs as many Engine Threads as it is given CPUs. The [hosting guide](../guides/hosting-a-server.md#give-it-enough-cpus) owns CPU-placement and receive softirq guidance.
