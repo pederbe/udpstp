@@ -630,7 +630,7 @@ fn run_server(
         Ok(settings) => settings,
         Err(error) => {
             let message = format!("udpstp: configuration error: {error}");
-            let logged = (!args.settings_only)
+            let logged = (!args.print_config)
                 .then(|| {
                     args.overrides
                         .log_file
