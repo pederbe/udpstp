@@ -29,8 +29,8 @@
   "customManagers": [
     {
       "customType": "regex",
-      "managerFilePatterns": ["/^\\\\.github/workflows/.*\\\\.yml$/"],
-      "matchStrings": ["tool: git-cliff@(?<currentValue>\\\\d+\\\\.\\\\d+\\\\.\\\\d+)"],
+      "managerFilePatterns": ["/^\\.github/workflows/.*\\.yml$/"],
+      "matchStrings": ["tool: git-cliff@(?<currentValue>\\d+\\.\\d+\\.\\d+)"],
       "depNameTemplate": "git-cliff",
       "packageNameTemplate": "orhun/git-cliff",
       "datasourceTemplate": "github-releases",

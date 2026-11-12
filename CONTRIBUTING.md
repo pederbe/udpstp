@@ -7,6 +7,9 @@ Report security problems through [private vulnerability reporting](https://githu
 ## Build and test
 
 Install Rust through rustup. `rust-toolchain.toml` selects the toolchain and components.
+On Linux, install the `git-cliff` version pinned in the
+[release workflow](.github/workflows/release-plz.yml) before running workspace tests.
+The release-note tests use local Git fixtures without contacting GitHub.
 
 ```sh
 git clone https://github.com/pederbe/udpstp
