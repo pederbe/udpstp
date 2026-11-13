@@ -547,7 +547,7 @@ fn page_description(page: &Page) -> String {
             "Fix udpstp problems by symptom: no answer from the Server, refused Tests, key file errors, result warnings, socket buffers and Windows firewall rules."
         }
         "contributing.md" => {
-            "Build and test udpstp, follow the Rust and protocol conventions, and prepare contributions with Requirement traceability."
+            "Find udpstp's contribution guide, development setup, protocol conventions, design decisions and private security reporting route."
         }
         "citation.md" => {
             "How to cite udpstp in research and publications, with BibTeX and the project's citation metadata."

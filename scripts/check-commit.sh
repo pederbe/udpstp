@@ -70,8 +70,7 @@ fi
 rustup toolchain install
 cargo fmt --all --check
 cargo clippy --locked --workspace --all-targets -- -D warnings
-# macOS-only code, compiled but not run: there is no macOS CI until
-# 0.1.0. Once, on the Windows side, so Linux doesn't repeat it.
+# Compile macOS-only code from Windows as an additional local check.
 case $platform in
 MINGW* | MSYS* | CYGWIN*)
     rustup target add aarch64-apple-darwin
