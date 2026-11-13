@@ -116,10 +116,11 @@ pub struct EngineSettings {
 pub enum Executor {
     /// Engine Threads, as many as the CPUs the process may use, each
     /// serving many Test Connections from one loop: a Linux Server's own.
+    #[cfg_attr(not(any(target_os = "linux", target_os = "android")), allow(dead_code))]
     Pool,
     /// One thread per Test Connection: the Client's, and every endpoint's
     /// on Windows and macOS.
-    #[allow(dead_code)] // Constructed by the platform-specific executor path.
+    #[cfg_attr(any(target_os = "linux", target_os = "android"), allow(dead_code))]
     PerTestConnection,
 }
 

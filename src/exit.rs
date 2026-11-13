@@ -1,4 +1,3 @@
-#![forbid(unsafe_code)]
 //! Process exit statuses (docs/spec.md, "CLI, configuration, output and exit
 //! codes"): the ErrorStatus OB-UDPST reports (`udpst.h`), except that a
 //! Test that completed with only warnings exits 0.
@@ -31,6 +30,8 @@
 //! signal" status; that comes with matching OB-UDPST. OB-UDPST keeps the last
 //! warning and lets a warning replace an error; we keep the most severe.
 //! (conformance: exit-zero-with-warnings, exit-own-error-statuses, exit-most-severe-warning, client-interrupt)
+
+#![forbid(unsafe_code)]
 
 use crate::protocol::{DataEvent, Event, TestAbort};
 use crate::runtime::TestOutcome;

@@ -259,6 +259,7 @@ pub enum TransportError {
     /// EMSGSIZE: a Path MTU event.
     MsgSize,
     /// ICMP time exceeded: MaxHops is too small for the path.
+    #[cfg_attr(target_vendor = "apple", allow(dead_code))]
     TimeExceeded,
 }
 

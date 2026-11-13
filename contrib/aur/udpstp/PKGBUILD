@@ -32,7 +32,8 @@ check() {
     cd "$pkgname-$pkgver"
     export RUSTUP_TOOLCHAIN=stable CARGO_TARGET_DIR=target
     # The protocol core and the wire format: no sockets or namespaces.
-    cargo test --frozen -p udpstp-wire -p udpstp-core
+    cargo test --frozen -p udpstp --bin udpstp protocol::
+    cargo test --frozen -p udpstp --bin udpstp wire::
 }
 
 package() {

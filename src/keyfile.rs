@@ -1,4 +1,3 @@
-#![forbid(unsafe_code)]
 //! Key files (docs/spec.md, "Key table"): our TOML Key Table, or an OB-UDPST
 //! `udpst.keys` file. A file whose name ends in `.toml` is a TOML Key Table;
 //! any other is read as OB-UDPST's format.
@@ -26,6 +25,8 @@
 //! Unknown TOML fields are refused rather than silently dropping a key's
 //! restrictions. The redundant top-level `format = 1` marker is deprecated
 //! but still accepted during its minor-release window (ADR 0016).
+
+#![forbid(unsafe_code)]
 
 use std::collections::HashSet;
 use std::fmt;

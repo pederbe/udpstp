@@ -53,7 +53,7 @@ They are test fixtures: golden JSON output for the OB-UDPST-compatible JSON form
 
 `client_json_examples.sh` is the upstream script that produced the client examples; it records the command line behind each one. A blob hash equals `git hash-object` of the committed file, so `git ls-tree -r HEAD testdata/obudpst-9.1.0` shows whether a file or its mode has drifted from upstream. `.gitattributes` marks vendored files `-text`, so Git never rewrites their line endings.
 
-Tests reach the fixtures from their crate with `concat!(env!("CARGO_MANIFEST_DIR"), "/../../testdata/obudpst-9.1.0/<file>")` (for `include_str!` or `std::fs`); the published crates leave their tests out of the package (`exclude = ["tests/"]`), so paths outside the crate are fine.
+Tests reach the fixtures from the root package with `concat!(env!("CARGO_MANIFEST_DIR"), "/testdata/obudpst-9.1.0/<file>")`, for `include_str!` or `std::fs`. The application package excludes test fixtures and suites from its published source, as recorded in the root `Cargo.toml`.
 
 ## Website fonts
 
