@@ -24,7 +24,7 @@ Read the [glossary](GLOSSARY.md), [architecture](docs/architecture.md) and [test
 [Design decisions](https://github.com/pederbe/udpstp/tree/main/docs/adr)
 explain the reasoning behind important technical choices.
 
-The project started on the latest stable Rust and supports the last three stable releases from then on. The workspace's `rust-version` is the oldest supported version, which CI builds and tests. Raise it only when a newer release is needed and the oldest one leaves the last three, and describe the compatibility change.
+The project supports the last three stable Rust releases. The workspace's `rust-version` is the oldest supported version, which CI builds and tests. Raise it only when a newer release is needed and the oldest one leaves the last three, and describe the compatibility change.
 
 Use the [validation workflow](docs/testing.md#validation-workflow) to select relevant checks and keep generated files current. Automated checks also validate pull requests.
 
@@ -44,7 +44,7 @@ Write a conventional pull request title describing the change for users, such as
 
 For interface deprecations, use `feat(deprecate):`. For removals, use `feat(remove)!:`. These produce the Deprecated and Removed sections required by the interface policy. Other breaking changes appear under Changed and carry a bold Breaking label.
 
-Describe capabilities, fixes, installation and compatibility effects in Solution, including any migration or upgrade steps. Changelog entries use short titles, mark breaking changes and link to the pull request. No changelog or breaking-change footer is required. Do not add hand-written Unreleased entries. The weekly release pull request commits dated notes before publication, including relevant changes outside the Cargo packages. See [Releasing](docs/releasing.md#release-process).
+Put compatibility effects and migration or upgrade steps in Solution. Release notes are generated from merged pull request titles. Do not add hand-written Unreleased entries or changelog footers. For release-tool changes, see the repository's [release guide](docs/releasing.md).
 
 ## Public issues and pull requests
 
@@ -56,18 +56,9 @@ reason for the change, its behavior and compatibility effects, and meaningful
 checks. Put migration or upgrade instructions in Solution. Keep small changes
 brief and links and examples within these sections.
 
-Public descriptions and comments cover software behavior, technical rationale
-and evidence. Keep private discussions, authorization exchanges, personal
-decision history and handoffs out of them. State technical outcomes directly
-and attribute checks accurately. Comments are for technical questions, findings
-and review discussion.
-
-Edit descriptions only to keep technical facts, scope, evidence and acceptance
-criteria accurate within the work at hand. Preserve the reporter's observations
-and human-written wording unless a rewrite is requested. Leave merged PR
-descriptions alone unless a correction is requested. Track progress with
-checklists, linked issues and labels. These rules also apply to API updates.
-Check these limits before posting or editing.
+Keep public discussion focused on software behavior, technical rationale and
+evidence. Remove private data from reports, attribute checks accurately, and
+preserve other people's observations and wording when updating a report.
 
 ## Licence and conduct
 

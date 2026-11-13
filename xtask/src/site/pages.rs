@@ -145,7 +145,7 @@ const CHAPTERS: &[Chapter] = &[
         false,
     ),
     Repository(
-        "CONTRIBUTING.md",
+        "website/pages/contributing.md",
         "contributing.md",
         "Project",
         "Contributing",

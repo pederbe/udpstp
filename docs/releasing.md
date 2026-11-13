@@ -7,36 +7,36 @@ After publishing qualified Windows assets, the release workflow dispatches
 generates its portable manifest, and checks validation, installation, authenticated
 loopback operation and removal on Windows. With submission enabled it uses
 Komac to submit the version, then completes and reads back the PR description.
-Microsoft still controls catalog admission.
 
-Run the WinGet workflow on `main` with a published tag to retry delivery. Submission
-defaults to off for manual runs. Enabling it requires `WINGET_ENABLED=true` and
-`WINGET_TOKEN` in the `distribution` environment. The token must support Komac
-submission and editing its author's PR in `microsoft/winget-pkgs`.
-A separate `WINGET_FORK_TOKEN` in the same environment synchronizes the submission
-fork before submission. Limit it to that fork with Contents and Workflows write
-permissions, keeping `WINGET_TOKEN` public-only. Preparation does not use the fork
-credential. Synchronization does not force or overwrite a divergent fork.
-Retries reuse a matching open PR and preserve manual description edits. The CLA
-checkbox reflects Microsoft's official check and never signs an agreement.
+The [WinGet workflow](../.github/workflows/winget.yml) provides a preparation-only
+route and a separate submission action. Its inputs and environment declarations
+are the source for current options and credential requirements. Preparation does
+not use the fork credential. Synchronization does not force or overwrite a
+divergent fork. Retries reuse a matching open PR and preserve manual description
+edits. The CLA checkbox reflects Microsoft's official check and never signs an
+agreement. Microsoft controls catalog admission.
 
 The [Release workflow](../.github/workflows/release.yml) builds the archives, native packages and verification files described here. Distribution channels become available when their first release is published. See [Installing udpstp](guides/installing-udpstp.md) for availability and installation instructions.
 
 ## Release process
 
-Every Friday at 07:37 UTC, [release-plz](https://release-plz.dev) opens or updates one release pull request when there are unreleased changes. It updates Cargo versions and writes a dated section in the root changelog from merged pull request titles, including relevant changes outside the Cargo packages. Entries stay short, mark breaking changes and link to the pull request. Migration instructions belong in its Solution section. Internal changes do not trigger releases. The pull request merges automatically after the required CI checks pass. New commits on `main` refresh an open release pull request so its checks cover the current source.
+[Release-plz](https://release-plz.dev) prepares Cargo versions and dated changelog
+entries from merged pull request titles, including relevant changes outside the
+Cargo packages. Migration instructions belong in the pull request's Solution
+section. The [release workflow](../.github/workflows/release-plz.yml) owns the
+schedule, release selection and refresh behavior. Required CI checks gate its
+release pull request.
 
 After preparing each release pull request, the workflow refreshes `fuzz/Cargo.lock` on its branch to match the local crate versions. It commits the lockfile only when it changes, before enabling auto-merge. Existing registry dependency versions stay locked.
 
-Merging the release pull request publishes changed crates to crates.io in dependency order and creates their tags. The five published crates share a version group so a feature or breaking change in a library also raises the binary's version appropriately. Unchanged crates may keep their previous versions. The binary uses `vVERSION`, while the libraries use `PACKAGE-vVERSION`. Only the binary creates a GitHub draft release, using its combined changelog section as the release notes. The Release workflow builds and attests the assets, attaches them to that draft, runs the existing downloaded-archive and native-package qualification, and publishes it after those checks pass. Publication starts the existing container and signed package repository workflows. No manual dispatch or per-release approval is needed.
+Merging the release pull request publishes changed crates to crates.io in dependency order and creates their tags. The published crates share a version group so a feature or breaking change in a library also raises the binary's version appropriately. Unchanged crates may keep their previous versions. The binary uses `vVERSION`, while the libraries use `PACKAGE-vVERSION`. Only the binary creates a GitHub draft release, using its combined changelog section as the release notes. The Release workflow builds and attests the assets, attaches them to that draft, runs the downloaded-archive and native-package qualification, and publishes it after those checks pass. Publication starts the container and signed package repository workflows.
 
 Published notes are already on `main` before tagging, and stay under their dated version heading. Keep `## [Unreleased]` empty. Release-plz manages version numbers and dependency requirements, including the library crates required by `cargo install udpstp`. Test helpers, benchmarks, fuzzing and `xtask` are not released.
 
-### One-time setup
-
-The repository needs auto-merge enabled and its `CI` check required on `main`. Set squash merge defaults to the pull request title and body, preserving conventional titles and the linked Solution section's upgrade instructions. Set `RELEASE_PLZ_TOKEN` to a repository-scoped token with Contents and Pull requests write access. This lets release pull requests run CI and lets published releases start distribution workflows. Release-plz uses the built-in workflow token for tags and drafts, then explicitly dispatches the Release workflow because workflow-token events do not start other workflows.
-
-Configure crates.io trusted publishing for `udpstp`, `udpstp-wire`, `udpstp-core`, `udpstp-runtime` and `udpstp-key-permissions`, with repository `pederbe/udpstp` and workflow `release-plz.yml`. The workflow uses short-lived OpenID Connect credentials, so no crates.io API token is stored in GitHub. See the [release-plz setup guide](https://release-plz.dev/docs/github/quickstart).
+Release-plz uses short-lived trusted-publishing credentials for Cargo uploads.
+The workflow explicitly dispatches the binary build because tags and drafts
+created with the built-in workflow token do not start another workflow. This
+dispatch boundary matters when recovering a partially completed publication.
 
 ### Recovery
 
@@ -48,7 +48,8 @@ After restoring missing items for accepted versions, rerun the original Release-
 
 If packaging or qualification fails, the GitHub release remains a draft. Rerun the failed Release jobs. Asset uploads replace only files in the unpublished draft. Published releases are immutable.
 
-The Release-plz workflow can also be dispatched on `main` to prepare a release before the next weekly run. A failure stops the affected delivery stage and is visible in GitHub Actions.
+Use the workflow's current inputs when retrying a delivery stage. A failure
+stops the affected stage and is visible in GitHub Actions.
 
 ## What a release contains
 
