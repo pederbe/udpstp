@@ -63,7 +63,7 @@ const LAST_ERRORED_AT_LEAST: u32 = 4;
 const LAST_ERRORED_ONE_IN: u32 = 4;
 
 /// Whether a search met the path's limit at its end: of its last
-/// [`LAST_TRIAL_INTERVALS`](crate::protocol::LAST_TRIAL_INTERVALS) Trial Intervals,
+/// [`LAST_TRIAL_INTERVALS`](crate::protocol::interval::LAST_TRIAL_INTERVALS) Trial Intervals,
 /// from the first Errored Interval among them on, at least
 /// [`LAST_ERRORED_AT_LEAST`] were Errored Intervals and at least one in
 /// [`LAST_ERRORED_ONE_IN`], counting Hold Intervals of both kinds among
