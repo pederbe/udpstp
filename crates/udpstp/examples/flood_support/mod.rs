@@ -18,7 +18,6 @@ use udpstp_wire::activation::{
     self, ACTIVATION_PDU_LEN, ActivationPdu, SR_INDEX_DEFAULT, SendingRate, cmd_request as act_cmd,
     rate_adj_algo,
 };
-use udpstp_wire::auth::derive_keys;
 use udpstp_wire::setup::{SETUP_PDU_LEN, SetupPdu, cmd_request as setup_cmd, modifier};
 use udpstp_wire::{AUTH_DIGEST_LEN, PROTOCOL_VERSION, auth_mode};
 
@@ -76,7 +75,7 @@ impl Kind {
 /// recomputed as the second (authUnixTime) rolls over.
 #[derive(Clone)]
 pub struct KeyMaterial {
-    pub shared: Vec<u8>,
+    pub shared: udpstp_wire::auth::SharedKey,
     pub key_id: u8,
 }
 
@@ -333,7 +332,7 @@ pub fn flood_until(
     // A key holder's Derived Keys for the current second, recomputed as it
     // rolls over so the flood keeps hitting the Server's Derived Key cache.
     let mut second = now_unix();
-    let mut client_key = key.map(|k| *derive_keys(&k.shared, second).client());
+    let mut client_key = key.map(|k| *k.shared.derive(second).client());
     // A forged flood's stale authUnixTime, a fresh value each datagram.
     let mut stale = now_unix().wrapping_sub(3600);
 
@@ -358,7 +357,7 @@ pub fn flood_until(
                 let now = now_unix();
                 if now != second {
                     second = now;
-                    client_key = key.map(|k| *derive_keys(&k.shared, second).client());
+                    client_key = key.map(|k| *k.shared.derive(second).client());
                 }
                 (second, client_key.as_ref())
             } else {

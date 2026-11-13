@@ -303,7 +303,7 @@ pub fn run(args: &Args, flag: &Flag, out: &mut dyn FnMut(&str)) -> Result<u8, St
             .port();
         server_guard = Some(Server(
             Command::new(&path)
-                .args(["server", "--key-file"])
+                .args(["server", "--listen", "127.0.0.1", "--key-file"])
                 .arg(&key_path)
                 .args(["--port", &port.to_string(), "--max-hops", "64"])
                 .stdin(Stdio::null())

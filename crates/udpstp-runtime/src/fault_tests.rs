@@ -14,7 +14,6 @@
 use std::net::UdpSocket;
 use std::time::{Duration, Instant};
 
-use tokio::sync::mpsc;
 use udpstp_core::{DataEvent, Direction, EndReason, SocketId};
 
 use crate::DEFAULT_SOCKET_BUFFER_SIZE;
@@ -203,7 +202,7 @@ fn run_test_on(
     let (client, server, _) = activate(|| clock.now(), direction, row, client_addr, test_port);
     // As the Server's Control Phase connects it on activation.
     server_socket.connect(client_addr).unwrap();
-    let (report, mut reports) = mpsc::unbounded_channel();
+    let (report, mut reports) = crate::engine::reports::channel();
     let buffers = DEFAULT_SOCKET_BUFFER_SIZE;
     let faulty_socket = || Faulty {
         inner: Platform,
@@ -339,7 +338,7 @@ fn start_on(
     socket: UdpSocket,
     clock: Clock,
     settings: EngineSettings,
-    report: mpsc::UnboundedSender<FromEngine>,
+    report: crate::engine::reports::Sender,
     open: Faulty<Platform>,
 ) -> engine::Engine {
     let buffers = DEFAULT_SOCKET_BUFFER_SIZE;
@@ -418,7 +417,7 @@ fn a_panic_as_the_socket_opens_still_reports_the_end() {
         client_addr,
         test_port,
     );
-    let (report, mut reports) = mpsc::unbounded_channel();
+    let (report, mut reports) = crate::engine::reports::channel();
     let faulty = Faulty {
         inner: Platform,
         faults: Faults::parse("panic_on_open=1"),

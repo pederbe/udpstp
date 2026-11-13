@@ -16,6 +16,60 @@ use udpstp_core::{
 
 const KEY: &[u8] = b"a consumer key";
 
+// RFC 9946 §11 item 6 and spec story 73. Quotas include unfinished
+// intervals, independently of measurement results, in either direction.
+#[udpstp_req::req("RFC9946-11-6")]
+#[test]
+fn short_tests_consume_source_and_key_byte_quotas() {
+    for direction in [Direction::Upstream, Direction::Downstream] {
+        for per_key in [false, true] {
+            let quota = QuotaLimits {
+                tests: None,
+                bytes: Some(1),
+            };
+            let mut row = harness::always_valid(7, KEY);
+            if per_key {
+                row.quota = quota;
+            }
+            let mut keys = KeyTable::default();
+            keys.insert(row).unwrap();
+            let scenario = Scenario::new(30)
+                .server_keys(keys)
+                .client_mode1(7, KEY)
+                .client_direction(direction);
+            let scenario = if per_key {
+                scenario
+            } else {
+                scenario.server_config(|c| {
+                    c.source_quota = QuotaLimits {
+                        tests: None,
+                        bytes: Some(1),
+                    }
+                })
+            };
+            let outcome = scenario
+                .client_stops_data_phase_at(Duration::from_millis(500))
+                .add_client_in_another_test_at(direction, Duration::from_secs(3))
+                .run_for(Duration::from_secs(4));
+            outcome.check(
+                outcome.client_activated_direction(0) == Some(direction),
+                "first Test activates",
+            );
+            outcome.check(
+                connfail(&outcome, 1),
+                "partial load consumes the byte-only Quota",
+            );
+            outcome.check(
+                !outcome
+                    .server_data_events
+                    .iter()
+                    .any(|(_, e)| matches!(e, udpstp_core::DataEvent::SubIntervalMeasured(_))),
+                "no completed measurement interval is needed",
+            );
+        }
+    }
+}
+
 fn refused_at_setup(outcome: &Outcome) -> usize {
     outcome
         .server_events

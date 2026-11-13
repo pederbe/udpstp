@@ -78,6 +78,7 @@ MINGW* | MSYS* | CYGWIN*)
     ;;
 esac
 cargo test --locked --workspace
+cargo test --locked -p udpstp --example setup_flood
 cargo run --locked --package xtask -- req
 if [ -n "$(git status --porcelain -- docs/conformance/summary.md docs/conformance/interop-masks.toml)" ]; then
     git diff -- docs/conformance/summary.md docs/conformance/interop-masks.toml

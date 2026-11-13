@@ -92,8 +92,8 @@ impl End {
 /// pool, the Clients' on it too or on threads of their own.
 pub(crate) struct Harness {
     pub(crate) clock: Clock,
-    report: mpsc::UnboundedSender<FromEngine>,
-    reports: mpsc::UnboundedReceiver<FromEngine>,
+    report: crate::engine::reports::Sender,
+    reports: crate::engine::reports::Receiver,
     pub(crate) pool: EnginePool<Recipe>,
     pub(crate) ends: BTreeMap<u32, End>,
     /// Each end's engine, by its SocketId, kept until the harness goes:
@@ -128,7 +128,7 @@ impl Harness {
     /// `settings`, its recipe `prototype`.
     pub(crate) fn new(threads: usize, settings: EngineSettings, prototype: Recipe) -> Self {
         let clock = Clock::new();
-        let (report, reports) = mpsc::unbounded_channel();
+        let (report, reports) = crate::engine::reports::channel();
         let settings = EngineSettings {
             threads: std::num::NonZeroUsize::new(threads),
             ..settings

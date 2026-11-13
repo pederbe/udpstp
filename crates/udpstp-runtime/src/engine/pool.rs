@@ -46,9 +46,9 @@ use std::sync::{Arc, mpsc};
 use std::thread::JoinHandle;
 use std::time::{Duration, Instant};
 
+use crate::engine::reports;
 use nix::sys::epoll::{Epoll, EpollCreateFlags};
 use nix::sys::eventfd::{EfdFlags, EventFd};
-use tokio::sync::mpsc as reports;
 use udpstp_core::{DataPhase, EndReason, SocketId};
 
 use super::schedule::{self, Load, Place};
@@ -74,7 +74,7 @@ pub(crate) struct EnginePool<O> {
     max: usize,
     clock: Clock,
     settings: EngineSettings,
-    report: reports::UnboundedSender<FromEngine>,
+    report: reports::Sender,
     /// The adapter recipe each Test Connection's socket opens with.
     open: O,
     /// The key of the next Test Connection handed over.
@@ -149,18 +149,14 @@ pub(crate) struct Handover<O> {
 /// Reports a Test Connection's end: as it ends, or, if it never gets to,
 /// as it is dropped.
 pub(crate) struct ExitReporter {
-    report: reports::UnboundedSender<FromEngine>,
+    report: reports::Sender,
     socket: SocketId,
     buffers: Option<SocketBuffers>,
     armed: bool,
 }
 
 impl ExitReporter {
-    fn new(
-        report: reports::UnboundedSender<FromEngine>,
-        socket: SocketId,
-        buffers: Option<SocketBuffers>,
-    ) -> Self {
+    fn new(report: reports::Sender, socket: SocketId, buffers: Option<SocketBuffers>) -> Self {
         Self {
             report,
             socket,
@@ -177,7 +173,7 @@ impl ExitReporter {
         facts: EngineFacts,
     ) {
         self.armed = false;
-        let _ = self.report.send(FromEngine::Exited {
+        self.report.send(FromEngine::Exited {
             socket: self.socket,
             reason,
             error,
@@ -204,7 +200,7 @@ impl Drop for ExitReporter {
         // Reads nothing but its own plain fields: this may run as a panic
         // unwinds, where a second panic would abort the process.
         if self.armed {
-            let _ = self.report.send(FromEngine::Exited {
+            self.report.send(FromEngine::Exited {
                 socket: self.socket,
                 reason: None,
                 error: Some(FAILED.into()),
@@ -265,7 +261,7 @@ impl<O: Open + Clone> EnginePool<O> {
     pub(crate) fn new(
         clock: Clock,
         settings: EngineSettings,
-        report: reports::UnboundedSender<FromEngine>,
+        report: reports::Sender,
         open: O,
     ) -> (Self, Result<usize, io::Error>) {
         let allowed = settings

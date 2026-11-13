@@ -121,6 +121,12 @@ impl Recorded {
 }
 
 impl Core for Recorded {
+    fn is_load_receiver(&self) -> bool {
+        self.inner.is_load_receiver()
+    }
+    fn take_load_bytes(&mut self) -> u64 {
+        self.inner.take_load_bytes()
+    }
     fn stop(&mut self, now: Now) {
         self.call("stop", now);
         self.inner.stop(now);
@@ -187,6 +193,7 @@ impl Core for Recorded {
 /// datagram at a time, or in batches on Linux, as the kernel would give
 /// them, all from the peer.
 struct Wire {
+    fail_after: Option<(usize, bool)>,
     peer: SocketAddr,
     inbox: Arc<Mutex<VecDeque<Vec<u8>>>>,
     sent: Arc<Mutex<Vec<Vec<u8>>>>,
@@ -205,6 +212,12 @@ impl Open for Wire {
 
 impl Adapter for Wire {
     fn send(&mut self, datagram: &[u8], _: Option<MonoTime>) -> io::Result<usize> {
+        if let Some((limit, panic)) = self.fail_after
+            && self.sent.lock().unwrap().len() >= limit
+        {
+            assert!(!panic, "injected send panic");
+            return Err(io::ErrorKind::InvalidInput.into());
+        }
         self.sent.lock().unwrap().push(datagram.to_vec());
         Ok(datagram.len())
     }
@@ -293,6 +306,16 @@ struct Sender {
 }
 
 fn load_sender(clock: &Scripted, log: &Log, row: u16) -> Sender {
+    load_sender_reporting(clock, log, row, super::reports::channel().0, None)
+}
+
+fn load_sender_reporting(
+    clock: &Scripted,
+    log: &Log,
+    row: u16,
+    report: super::reports::Sender,
+    fail_after: Option<(usize, bool)>,
+) -> Sender {
     let client: SocketAddr = "127.0.0.1:40001".parse().unwrap();
     let test_port: SocketAddr = "127.0.0.1:40002".parse().unwrap();
     let (_, server, _) = activate(
@@ -309,6 +332,7 @@ fn load_sender(clock: &Scripted, log: &Log, row: u16) -> Sender {
     let inbox = Arc::new(Mutex::new(VecDeque::new()));
     let sent = Arc::new(Mutex::new(Vec::new()));
     let wire = Wire {
+        fail_after,
         peer: client,
         inbox: inbox.clone(),
         sent: sent.clone(),
@@ -332,9 +356,82 @@ fn load_sender(clock: &Scripted, log: &Log, row: u16) -> Sender {
     };
     log.borrow_mut().clear();
     Sender {
-        slot: Slot::new(SocketId(2), recorded, socket),
+        slot: Slot::new(SocketId(2), recorded, socket, report),
         inbox,
         sent,
+    }
+}
+
+// Spec story 73. Final accounting must precede Admission release even
+// when unwinding or an I/O error prevents the usual forwarding turn.
+#[test]
+fn dropping_a_slot_charges_its_actual_partial_transfer_once() {
+    for forwarded in [false, true] {
+        for unwind in [false, true] {
+            let log: Log = Rc::default();
+            let clock = Scripted::new(&log);
+            let (report, mut received) = super::reports::channel();
+            let mut sender = load_sender_reporting(&clock, &log, 4, report.clone(), None);
+            let times = Fresh(&clock);
+            sender
+                .slot
+                .send_due(
+                    &times,
+                    clock.quiet().mono.as_duration() + Duration::from_millis(1),
+                )
+                .unwrap();
+            let bytes: usize = sender.sent.lock().unwrap().iter().map(Vec::len).sum();
+            assert!(bytes > 0);
+            if forwarded {
+                sender.slot.forward_events(&report);
+            }
+            let _ = std::panic::catch_unwind(std::panic::AssertUnwindSafe(move || {
+                let _sender = sender;
+                if unwind {
+                    panic!("injected executor failure");
+                }
+            }));
+            let mut charged = Vec::new();
+            while let Ok(message) = received.try_recv() {
+                if let super::FromEngine::Event {
+                    event: DataEvent::LoadBytes { bytes },
+                    ..
+                } = message
+                {
+                    charged.push(bytes);
+                }
+            }
+            assert_eq!(charged, [bytes as u64]);
+        }
+    }
+}
+
+#[test]
+fn a_failed_send_plan_keeps_its_successfully_sent_prefix() {
+    for panic in [false, true] {
+        let log: Log = Rc::default();
+        let clock = Scripted::new(&log);
+        let (report, mut received) = super::reports::channel();
+        let sender = load_sender_reporting(&clock, &log, 40, report, Some((1, panic)));
+        let sent = sender.sent.clone();
+        let outcome = std::panic::catch_unwind(std::panic::AssertUnwindSafe(move || {
+            let mut sender = sender;
+            let times = Fresh(&clock);
+            sender.slot.send_due(
+                &times,
+                clock.quiet().mono.as_duration() + Duration::from_millis(1),
+            )
+        }));
+        assert!(outcome.is_err() || outcome.unwrap().is_err());
+        let bytes: usize = sent.lock().unwrap().iter().map(Vec::len).sum();
+        assert!(bytes > 0);
+        let mut charged = 0;
+        while let Ok(super::FromEngine::Event { event, .. }) = received.try_recv() {
+            if let DataEvent::LoadBytes { bytes } = event {
+                charged += bytes;
+            }
+        }
+        assert_eq!(charged, bytes as u64);
     }
 }
 

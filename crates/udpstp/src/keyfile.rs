@@ -532,7 +532,7 @@ mod tests {
                 text.push_str(&format!("{table}\t{field}\n"));
             }
         }
-        crate::results::tests::golden("key-table-columns.txt", &text);
+        assert_eq!(text, include_str!("../tests/golden/key-table-columns.txt"));
     }
 }
 

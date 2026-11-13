@@ -46,11 +46,11 @@ use std::sync::atomic::Ordering;
 use std::sync::mpsc;
 use std::time::Duration;
 
+use crate::engine::reports;
 use nix::errno::Errno;
 use nix::poll::{PollFd, PollFlags};
 use nix::sys::epoll::{Epoll, EpollEvent, EpollFlags, EpollTimeout};
 use nix::sys::time::TimeSpec;
-use tokio::sync::mpsc as reports;
 use udpstp_core::{EndReason, MonoTime};
 
 use super::{Counting, ExitReporter, Handover, Hooks, Shared};
@@ -59,7 +59,7 @@ use crate::clock::Clock;
 use crate::engine::schedule::{self, DeadlineHeap, HoldOff, Holding, ReadyList};
 use crate::engine::slot::Slot;
 use crate::engine::times::{Times, Turn};
-use crate::engine::{EngineFacts, EngineSettings, FromEngine, SLICE};
+use crate::engine::{EngineFacts, EngineSettings, SLICE};
 use crate::socket::classify::{Action, Call, classify};
 use crate::socket::send_stamps::Numbering;
 use crate::socket::{Adapter, Open, OverflowCount, Settings, Socket};
@@ -153,7 +153,7 @@ pub(super) struct Context<O> {
     pub(super) stops: mpsc::Receiver<u64>,
     pub(super) clock: Clock,
     pub(super) settings: EngineSettings,
-    pub(super) report: reports::UnboundedSender<FromEngine>,
+    pub(super) report: reports::Sender,
     pub(super) overflows: Option<mpsc::Sender<Counting>>,
     pub(super) hooks: Hooks,
 }
@@ -363,7 +363,12 @@ impl<A: Adapter> EngineThread<A> {
             clock: context.clock,
         };
         let opened = catch_unwind(AssertUnwindSafe(|| {
-            Slot::new(socket_id, data_phase, Socket::open(open, socket, &settings))
+            Slot::new(
+                socket_id,
+                data_phase,
+                Socket::open(open, socket, &settings),
+                context.report.clone(),
+            )
         }));
         let Ok(mut slot) = opened else {
             let facts = reporter.plain_facts();

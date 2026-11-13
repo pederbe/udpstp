@@ -688,6 +688,65 @@ fn capped(outcome: &Outcome) -> Vec<DataEvent> {
         .collect()
 }
 
+// Spec story 9 and client-keeps-to-its-max-bandwidth. Use emitted packet
+// lengths, including the actual IP headers, rather than remote size fields.
+#[udpstp_req::req("RFC9946-11-5")]
+#[test]
+fn short_and_random_payloads_keep_the_actual_ip_rate_within_the_cap() {
+    for ipv6 in [false, true] {
+        for size in [1, 31, 32, 51, 52, RANDOM_SIZE | 1, RANDOM_SIZE | 51] {
+            for later in [false, true] {
+                let tiny = [1000, size, 100, 1000, size, 100, size];
+                let ordinary = [1000, 1222, 1, 0, 0, 0, 0];
+                let mut scenario = Scenario::new(40).client_max_bandwidth(1);
+                if ipv6 {
+                    scenario = scenario.ipv6();
+                }
+                let outcome = scripted_on(
+                    scenario,
+                    if later { ordinary } else { tiny },
+                    later.then_some(tiny),
+                    Duration::from_secs(2),
+                );
+                let source: SocketAddr = if ipv6 {
+                    harness::CLIENT_ADDR_V6
+                } else {
+                    harness::CLIENT_ADDR
+                }
+                .parse()
+                .unwrap();
+                let groups = bursts(&outcome, source);
+                // Each Transmitter has its own start offset. Measure its
+                // complete Bursts between matching boundaries, then add
+                // the rates without mixing partial windows.
+                let mut rate = 0.0;
+                for count in [100, 101] {
+                    let loads: Vec<_> = groups
+                        .iter()
+                        .filter(|(at, sizes)| {
+                            **at >= Duration::from_millis(200) && sizes.len() == count
+                        })
+                        .collect();
+                    outcome.check(loads.len() >= 2, "each Transmitter sends repeated Bursts");
+                    let first = *loads.first().unwrap().0;
+                    let last = *loads.last().unwrap().0;
+                    let bits: usize = loads
+                        .iter()
+                        .filter(|(at, _)| **at < last)
+                        .flat_map(|(_, sizes)| sizes.iter())
+                        .map(|len| (len + if ipv6 { 48 } else { 28 }) * 8)
+                        .sum();
+                    rate += bits as f64 / (last - first).as_secs_f64();
+                }
+                outcome.check(
+                    rate <= 1_000_001.0,
+                    &format!("actual IP rate {rate}, size {size}, IPv6 {ipv6}, update {later}"),
+                );
+            }
+        }
+    }
+}
+
 // maxBandwidth: the most the Client wants to be sent or to send; docs/spec.md
 // story 9 (conformance: client-keeps-to-its-max-bandwidth)
 #[udpstp_req::req("RFC9946-11-5")]

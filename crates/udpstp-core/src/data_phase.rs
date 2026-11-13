@@ -266,6 +266,11 @@ pub enum TransportError {
 /// are coalesced until polled, so reporting never allocates.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DataEvent {
+    /// Locally reported load bytes since the preceding accounting event,
+    /// independent of completed measurement intervals or peer statistics.
+    /// A runtime sender uses its successful socket sends for Quotas,
+    /// separately from logically lost sends counted in measurements.
+    LoadBytes { bytes: u64 },
     /// Skipped Bursts were not sent: each was at least the catch-up budget
     /// late when its turn came, and not the most recent Burst due (ADR
     /// 0012).
@@ -344,8 +349,8 @@ pub enum DataEvent {
     SendingRateCapped {
         /// How many structures were capped.
         structures: u32,
-        /// The highest rate one of them asked for, IP-layer with IPv4
-        /// headers, in kbit/s.
+        /// The highest rate one of them asked for after packet-size
+        /// normalization, including IP headers, in kbit/s.
         highest_kbps: u64,
         /// The stated maxBandwidth, in kbit/s.
         cap_kbps: u64,
@@ -659,7 +664,7 @@ impl DataPhase {
             setup.test_interval,
             setup.peer.ip().to_canonical().is_ipv4(),
         );
-        let capped = keep_to(sender.assigned, setup.max_bandwidth_kbps).1;
+        let capped = keep_to(sender.assigned, setup.max_bandwidth_kbps, ip_version).1;
         let cap = setup.max_bandwidth_kbps.unwrap_or_default();
         let mut phase = Self::new(setup, Role::LoadSender(Box::new(sender)));
         if let Some(assigned) = capped {
@@ -1033,11 +1038,12 @@ impl DataPhase {
             "each Send Plan is reported before the next is polled"
         );
         sender.deferred = (sent < plan.datagrams()).then(|| plan.tail(sent));
+        let bytes = match &sender.deferred {
+            Some(tail) => plan.bytes() - tail.bytes(),
+            None => plan.bytes(),
+        };
+        self.pending.load_bytes = self.pending.load_bytes.saturating_add(bytes as u64);
         if matches!(self.phase, Phase::Testing { .. }) {
-            let bytes = match &sender.deferred {
-                Some(tail) => plan.bytes() - tail.bytes(),
-                None => plan.bytes(),
-            };
             sender
                 .sent_grid
                 .add(now.mono, sent, bytes as u64, &mut self.pending.sent);
@@ -1056,6 +1062,9 @@ impl DataPhase {
     /// (conformance: wall-clock-step-drops-delay-samples, kernel-receive-timestamp-clamped)
     #[cfg_attr(feature = "hotpath", hotpath::measure)]
     pub fn handle_load_batch(&mut self, batch: RxBatch<'_>) {
+        if !matches!(self.role, Role::LoadReceiver(_)) {
+            return;
+        }
         let offset = |now: Now| now.wall.as_unix().as_nanos() as i128 - mono_ns(now.mono);
         let consistent =
             (offset(batch.after) - offset(batch.before)).abs() <= CLOCK_PAIR_TOLERANCE_NS;
@@ -1073,6 +1082,15 @@ impl DataPhase {
             .map(|mono| mono + self.wall_offset_ns);
             let valid = load_pdu_valid(datagram, self.checksum);
             if valid {
+                // Quota volume includes STOP and every valid datagram
+                // already read in this batch, unlike measurement results.
+                self.pending.load_bytes = self
+                    .pending
+                    .load_bytes
+                    .saturating_add(datagram.actual_len as u64);
+                if !matches!(self.phase, Phase::Testing { .. } | Phase::Stopping { .. }) {
+                    continue;
+                }
                 self.heard(arrived);
                 // A STOP ends the counting, as in OB-UDPST: the Load PDU
                 // carrying it is not counted, and later ones are ignored.
@@ -1080,7 +1098,7 @@ impl DataPhase {
                 self.stop_received(datagram.header[2]);
             }
             if !matches!(self.phase, Phase::Testing { .. } | Phase::Stopping { .. }) {
-                return;
+                continue;
             }
             let Role::LoadReceiver(receiver) = &mut self.role else {
                 return;
@@ -1422,6 +1440,12 @@ impl DataPhase {
     pub fn poll_event(&mut self) -> Option<DataEvent> {
         self.pending.take()
     }
+
+    /// Takes actual load bytes not yet returned by `poll_event`, including
+    /// an unfinished interval when the engine fails or is dropped.
+    pub fn take_load_bytes(&mut self) -> u64 {
+        std::mem::take(&mut self.pending.load_bytes)
+    }
 }
 
 /// Server: classifies the Trial Interval `status` reports, as a Clean,
@@ -1494,6 +1518,7 @@ fn status_authentic(status: &StatusPdu, pdu: &[u8], auth: &StatusAuth, now: Now)
 /// Counts waiting to be reported as [`DataEvent`]s.
 #[derive(Default)]
 struct PendingEvents {
+    load_bytes: u64,
     first_load_pdu: bool,
     skipped_bursts: u32,
     skipped_datagrams: u32,
@@ -1568,6 +1593,11 @@ impl PendingEvents {
     }
 
     fn take(&mut self) -> Option<DataEvent> {
+        if self.load_bytes > 0 {
+            return Some(DataEvent::LoadBytes {
+                bytes: std::mem::take(&mut self.load_bytes),
+            });
+        }
         if std::mem::take(&mut self.first_load_pdu) {
             return Some(DataEvent::FirstLoadPduReceived);
         }
@@ -1719,17 +1749,20 @@ fn sanitize(rate: &SendingRate, max_payload: u32) -> SendingRate {
     }
 }
 
-/// The IP-layer rate `rate` asks for, with IPv4 headers as the Sending
-/// Rate Table's rows are rated (ADR 0004), random sizes at their maximum,
-/// in kbit/s.
-fn ip_kbps(rate: &SendingRate) -> u64 {
+/// The IP-layer rate actually sent after size normalization (ADR 0004),
+/// random sizes at their maximum, rounded up to whole kbit/s.
+fn ip_kbps(rate: &SendingRate, ip_version: IpVersion) -> u64 {
+    let overhead = match ip_version {
+        IpVersion::V4 => 28,
+        IpVersion::V6 => 48,
+    };
     let packets = |payload: u32, count: u32| match payload & !RANDOM_SIZE {
         0 => 0,
-        payload => u64::from(payload + 28) * u64::from(count),
+        _ => (u64::from(Size::new(payload, ip_version).max) + overhead) * u64::from(count),
     };
     let per = |interval: u32, bytes: u64| match interval {
         0 => 0,
-        interval => bytes * 8000 / u64::from(interval),
+        interval => (bytes * 8000).div_ceil(u64::from(interval)),
     };
     per(
         rate.tx_interval1,
@@ -1744,8 +1777,12 @@ fn ip_kbps(rate: &SendingRate) -> u64 {
 /// it asked for if that was above it. Its intervals are lengthened
 /// by the ratio, rounded up, so its sizes and Bursts stay as the Server
 /// chose them (conformance: client-keeps-to-its-max-bandwidth).
-fn keep_to(rate: SendingRate, cap_kbps: Option<u64>) -> (SendingRate, Option<u64>) {
-    let assigned = ip_kbps(&rate);
+fn keep_to(
+    rate: SendingRate,
+    cap_kbps: Option<u64>,
+    ip_version: IpVersion,
+) -> (SendingRate, Option<u64>) {
+    let assigned = ip_kbps(&rate, ip_version);
     let Some(cap) = cap_kbps.filter(|&cap| cap > 0 && assigned > cap) else {
         return (rate, None);
     };
@@ -1925,7 +1962,7 @@ impl LoadSender {
         rng: &mut SplitMix64,
     ) -> Self {
         let assigned = sanitize(rate, max_payload);
-        let rate = keep_to(assigned, cap_kbps).0;
+        let rate = keep_to(assigned, cap_kbps, ip_version).0;
         let mut start =
             || MonoTime::from_duration(now.mono.as_duration() + rng.duration_in(START_OFFSET));
         let starts = [start(), start()];
@@ -1962,7 +1999,7 @@ impl LoadSender {
             return None;
         }
         self.assigned = assigned;
-        let (rate, capped) = keep_to(assigned, self.cap_kbps);
+        let (rate, capped) = keep_to(assigned, self.cap_kbps, self.ip_version);
         if rate == self.rate {
             return capped;
         }
@@ -3163,6 +3200,61 @@ mod tests {
             after: now(ms),
             datagrams: &[datagram],
         });
+    }
+
+    // Spec story 73. STOP ends measurements, not accounting for the
+    // datagrams the runtime already received in that batch.
+    #[test]
+    fn a_first_stop_and_its_batch_tail_are_charged_without_measurements() {
+        let mut phase = receiver_phase(Duration::from_secs(10));
+        let datagrams = [(2, 1400), (0, 800)].map(|(test_action, actual_len)| {
+            let mut datagram = RxDatagram {
+                header: [0; LOAD_HEADER_LEN],
+                actual_len,
+                kernel_wall: None,
+                tos: None,
+            };
+            LoadHeader {
+                seq_no: 1,
+                test_action,
+                ..LoadHeader::default()
+            }
+            .encode_into(&mut datagram.header);
+            datagram
+        });
+        phase.handle_load_batch(RxBatch {
+            before: now(1),
+            after: now(1),
+            datagrams: &datagrams,
+        });
+        // A socket read may split its datagrams into several core batches,
+        // including the one-datagram portable fallback after STOP.
+        phase.handle_load_batch(RxBatch {
+            before: now(1),
+            after: now(1),
+            datagrams: &datagrams[1..],
+        });
+        let events: Vec<_> = std::iter::from_fn(|| phase.poll_event()).collect();
+        assert_eq!(
+            events
+                .iter()
+                .filter_map(|event| match event {
+                    DataEvent::LoadBytes { bytes } => Some(bytes),
+                    _ => None,
+                })
+                .sum::<u64>(),
+            3000
+        );
+        assert!(
+            !events
+                .iter()
+                .any(|event| matches!(event, DataEvent::SubIntervalMeasured(_)))
+        );
+        assert!(
+            events
+                .iter()
+                .any(|event| matches!(event, DataEvent::Ended(_)))
+        );
     }
 
     fn status_at(phase: &mut DataPhase, ms: u64) -> StatusPdu {

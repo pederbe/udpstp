@@ -50,6 +50,8 @@ Give `log_file` a folder of its own: the Server deletes the oldest file whose na
 
 Events an attacker can cause are rate-limited, ten of a kind every 10 s, so a flood can't fill the disk. The rest are counted in a `Suppressed` event.
 
+Data Phase diagnostics also share a queue budget of 256 notices. When the Control Phase falls behind, counter notices are combined and reported as the Test Connection ends. Individual Trial Interval classifications and Lost Status Backoff notices can be dropped before logging and are absent from `Suppressed` counts. Measurement results, byte Quota accounting and Test Connection exits are retained.
+
 ## Fields
 
 | Field | Type | What |

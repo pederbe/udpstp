@@ -409,6 +409,7 @@ enum Batched {
 
 /// A Test Connection's socket in its Data Phase, over adapter `A`.
 pub(crate) struct Socket<A> {
+    load_bytes_sent: u64,
     adapter: A,
     peer: SocketAddr,
     /// One datagram, for reads one at a time.
@@ -435,6 +436,7 @@ impl<A: Adapter> Socket<A> {
         #[cfg(any(target_os = "linux", target_os = "android"))]
         let offers = adapter.offers();
         Self {
+            load_bytes_sent: 0,
             peer: settings.peer,
             buf: vec![0u8; MAX_DATAGRAM].into_boxed_slice(),
             #[cfg(any(target_os = "linux", target_os = "android"))]
@@ -571,6 +573,9 @@ impl<A: Adapter> Socket<A> {
             sent = self.adapter.send(datagram, stamped);
         }
         let Err(error) = sent else {
+            if stamped.is_some() {
+                self.load_bytes_sent = self.load_bytes_sent.saturating_add(datagram.len() as u64);
+            }
             return Ok(true);
         };
         match classify(Call::Send, &error) {
@@ -622,6 +627,9 @@ impl<A: Adapter> Socket<A> {
                 Ok(0) => break,
                 Ok(taken) => {
                     let messages = &batches.messages[next..next + taken];
+                    self.load_bytes_sent = self
+                        .load_bytes_sent
+                        .saturating_add(messages.iter().map(|m| m.bytes as u64).sum::<u64>());
                     sent += messages.iter().map(|m| m.datagrams).sum::<u32>();
                     next += taken;
                     // The calls the batch went with, as the adapter made
@@ -917,6 +925,14 @@ impl<A: Adapter> Socket<A> {
             sink.path_error(kind);
         }
         true
+    }
+}
+
+impl<A> Socket<A> {
+    /// Local Load bytes accounted at each successful send, retaining a
+    /// prefix even when a later send errors or panics before report_sent.
+    pub(crate) fn load_bytes_sent(&self) -> u64 {
+        self.load_bytes_sent
     }
 }
 

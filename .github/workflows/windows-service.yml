@@ -1,6 +1,6 @@
 name: Windows service
 
-# A bounded check on one disposable runner, started only by the maintainer.
+# Bounded checks on disposable runners, started only by the maintainer.
 on:
   workflow_dispatch:
 
@@ -18,6 +18,10 @@ env:
 
 jobs:
   service:
+    strategy:
+      fail-fast: false
+      matrix:
+        fixture: [windows-service-check, windows-key-service-check]
     runs-on: windows-latest
     timeout-minutes: 20
     defaults:
@@ -28,14 +32,14 @@ jobs:
       - run: rustup toolchain install
       - uses: Swatinem/rust-cache@v2
       - run: cargo build --locked -p udpstp
-      - name: Service lifecycle
+      - name: Service fixture
         run: |
-          & scripts/windows-service-check.ps1 -Udpstp target/debug/udpstp.exe -AllowMachineChanges -Evidence "$env:RUNNER_TEMP/windows-service"
+          & "scripts/${{ matrix.fixture }}.ps1" -Udpstp target/debug/udpstp.exe -AllowMachineChanges -Evidence "$env:RUNNER_TEMP/windows-service"
       - name: Save service evidence
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: windows-service-${{ github.sha }}
+          name: ${{ matrix.fixture }}-${{ github.sha }}
           path: ${{ runner.temp }}/windows-service
           retention-days: 3
           if-no-files-found: warn
