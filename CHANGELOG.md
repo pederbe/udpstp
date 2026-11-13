@@ -4,6 +4,39 @@ User-facing changes in udpstp, including capabilities, installation and compatib
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-13
+
+### Removed
+
+- Remove release selection from the install scripts ([#34](https://github.com/pederbe/udpstp/pull/34))
+- **Breaking:** Retire wake-up grouping and offer only the latest release ([#42](https://github.com/pederbe/udpstp/pull/42))
+
+### Added
+
+- Add native Arch Linux release packages ([#37](https://github.com/pederbe/udpstp/pull/37))
+- Package udpstp for OpenWrt ([#45](https://github.com/pederbe/udpstp/pull/45))
+- Add an optional OpenWrt Server service ([#46](https://github.com/pederbe/udpstp/pull/46))
+
+### Deprecated
+
+- Deprecate redundant Key Table format markers ([#41](https://github.com/pederbe/udpstp/pull/41))
+
+### Fixed
+
+- Make CLI diagnostics and recovery guidance actionable ([#40](https://github.com/pederbe/udpstp/pull/40))
+- Keep failed configuration previews from opening logs ([#50](https://github.com/pederbe/udpstp/pull/50))
+
+### Documentation
+
+- Reorganize the documentation and add troubleshooting ([#32](https://github.com/pederbe/udpstp/pull/32))
+- Move the documentation to udpstp.com/docs/ ([#33](https://github.com/pederbe/udpstp/pull/33))
+- Restore punctuation before installation examples ([#47](https://github.com/pederbe/udpstp/pull/47))
+- Complete the Cargo installation sentence ([#48](https://github.com/pederbe/udpstp/pull/48))
+- Clarify the contributor link to design decisions ([#51](https://github.com/pederbe/udpstp/pull/51))
+- Clarify ADR status and separate operating guidance ([#52](https://github.com/pederbe/udpstp/pull/52))
+- Focus contributor guidance on contribution tasks ([#55](https://github.com/pederbe/udpstp/pull/55))
+
+
 ## [0.1.3] - 2026-11-10
 
 ### Other changes
