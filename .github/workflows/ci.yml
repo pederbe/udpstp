@@ -103,6 +103,7 @@ jobs:
           Get-Command Get-Acl | Select-Object Name, Source
           [Security.AccessControl.FileSecurity]::new() | Out-Null
       - run: cargo test --locked --workspace
+      - run: cargo test --locked -p udpstp --example setup_flood
       - name: Traceability check
         run: cargo run --locked --package xtask -- req
       - name: Conformance summary is up to date
@@ -143,7 +144,7 @@ jobs:
           printf '[[key]]\nadmin_key_name = "ci"\nkey_id = 1\nkey_text = "ci-unit-key"\n' > "$RUNNER_TEMP/keys.toml"
           chmod 600 "$RUNNER_TEMP/keys.toml"
           sudo install -m 600 "$RUNNER_TEMP/keys.toml" /etc/udpstp/keys.toml
-          printf 'max_hops = 8\nlog_format = "json"\n' | sudo tee /etc/udpstp/server.toml > /dev/null
+          printf 'listen = ["127.0.0.1"]\nmax_hops = 8\nlog_format = "json"\n' | sudo tee /etc/udpstp/server.toml > /dev/null
           sudo install -m 644 contrib/systemd/udpstp-server.service /etc/systemd/system/
           sudo systemctl daemon-reload
           sudo systemctl start udpstp-server

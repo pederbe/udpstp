@@ -97,7 +97,7 @@ pub use interval::{
     Classification, DelayVarStatistic, IntervalClass, LAST_TRIAL_INTERVALS, TrialIntervalCounts,
 };
 pub use io::{DatagramMeta, IpVersion, Output, SocketId, Transmit};
-pub use keys::{AlgId, Kdf, KeyEntry, KeyRole, KeyTable, KeyTableError, Lifetime};
+pub use keys::{AlgId, Kdf, KeyEntry, KeyRole, KeyTable, KeyTableError, Lifetime, SendKeyError};
 pub use parameters::DscpSet;
 pub use quota::QuotaLimits;
 pub use results::{

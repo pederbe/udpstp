@@ -13,6 +13,7 @@ use udpstp_core::{DataEvent, DataPhase, Direction, Now, SocketId, TransportError
 use super::*;
 use crate::clock::Reading;
 use crate::contract::activate;
+use crate::engine::FromEngine;
 use crate::engine::times::Fresh;
 use crate::socket::{Offers, Woke, batch, batch_read};
 
@@ -122,10 +123,10 @@ impl Reading for Fixed {
     }
 }
 
-fn context() -> (Context<Wire>, reports::UnboundedReceiver<FromEngine>) {
+fn context() -> (Context<Wire>, reports::Receiver) {
     let (_, starts) = mpsc::channel();
     let (_, stops) = mpsc::channel();
-    let (report, received) = reports::unbounded_channel();
+    let (report, received) = reports::channel();
     let context = Context {
         shared: Arc::new(Shared {
             wake: EventFd::from_flags(EfdFlags::EFD_CLOEXEC | EfdFlags::EFD_NONBLOCK).unwrap(),

@@ -7,8 +7,6 @@ use std::num::NonZeroU16;
 use std::task::{Context, Poll};
 use std::time::Duration;
 
-use tokio::sync::mpsc;
-
 use udpstp_core::{
     ClientConfig, ControlPhaseFailure, Coordinator, DataEvent, DatagramMeta, Direction, EndReason,
     Endpoint, Event, Output, SocketId, TestPlan, Transmit, TransportError,
@@ -298,7 +296,7 @@ async fn run_test_with_send(
     // Whether each Test Connection's result is final.
     let mut decided = vec![false; count];
     let mut directions: Vec<Option<Direction>> = vec![None; count];
-    let (engine_sender, mut from_engine) = mpsc::unbounded_channel();
+    let (engine_sender, mut from_engine) = crate::engine::reports::channel();
     let mut connections: HashMap<SocketId, Connection> = HashMap::new();
     let mut sends_first = false;
     // Each Test Connection's outcome is kept by its mcIndex.

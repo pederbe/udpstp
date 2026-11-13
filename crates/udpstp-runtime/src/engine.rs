@@ -34,8 +34,8 @@
 //! A panic on the engine's thread, as its socket opens or in the core,
 //! retires only this Test Connection, and its end is always reported, so
 //! its admission is released. The engine reports
-//! through an unbounded channel, so a busy Control Phase never holds it up
-//! (ADR 0003).
+//! without blocking (ADR 0003). Peer-paced notices share a fixed queue
+//! budget, while result, accounting and exit records are retained.
 //! The plan-executor contract (`contract_tests.rs`) checks what it
 //! puts on the wire against the simulator's executor's.
 
@@ -47,7 +47,6 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::Duration;
 
-use tokio::sync::mpsc;
 use udpstp_core::{DataEvent, DataPhase, EndReason, SocketId};
 
 use crate::buffers::SocketBuffers;
@@ -61,6 +60,7 @@ pub(crate) mod pool;
 mod pool_tests;
 // The pooled executor's policy is pure, and tested everywhere; only Linux
 // runs it.
+pub(crate) mod reports;
 #[cfg_attr(not(any(target_os = "linux", target_os = "android")), allow(dead_code))]
 pub(crate) mod schedule;
 mod slot;
@@ -236,7 +236,7 @@ pub(crate) fn spawn(
     buffer_size: usize,
     clock: Clock,
     settings: EngineSettings,
-    report: mpsc::UnboundedSender<FromEngine>,
+    report: reports::Sender,
 ) -> io::Result<Engine> {
     #[cfg(feature = "fault-injection")]
     if let Some(faulty) = socket::faults::from_env() {
@@ -302,7 +302,7 @@ pub(crate) fn spawn_with<O: Open>(
     buffer_size: usize,
     clock: Clock,
     settings: EngineSettings,
-    report: mpsc::UnboundedSender<FromEngine>,
+    report: reports::Sender,
     open: O,
 ) -> io::Result<Engine> {
     data_phase.set_catch_up_budget(settings.catch_up_budget());
@@ -349,7 +349,7 @@ pub(crate) fn spawn_with<O: Open>(
                     receive_buffer,
                     settings.hold_off,
                 ));
-                let slot = slot.insert(Slot::new(socket_id, data_phase, socket));
+                let slot = slot.insert(Slot::new(socket_id, data_phase, socket, report.clone()));
                 PerTestConnection {
                     slot,
                     times: Fresh(clock),
@@ -373,7 +373,8 @@ pub(crate) fn spawn_with<O: Open>(
                 },
                 |slot| slot.facts(buffers),
             );
-            let _ = report.send(FromEngine::Exited {
+            drop(slot);
+            report.send(FromEngine::Exited {
                 socket: socket_id,
                 reason,
                 error,
@@ -393,7 +394,7 @@ struct PerTestConnection<'a, A> {
     /// Every reading a fresh clock pair, as this executor always read the
     /// clock.
     times: Fresh<Clock>,
-    report: &'a mpsc::UnboundedSender<FromEngine>,
+    report: &'a reports::Sender,
     stop: Arc<AtomicBool>,
     /// Waiting on the socket between turns, while the kernel takes ppoll
     ///

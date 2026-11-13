@@ -58,7 +58,7 @@ function Key([string]$Format, [string]$Policy) {
     $file = New-Object Security.AccessControl.FileSecurity
     $file.SetSecurityDescriptorSddlForm("O:BAD:P(A;;FA;;;BA)(A;;FA;;;SY)(A;;FR;;;$sid)$extra", $sections)
     [IO.File]::SetAccessControl($path, $file)
-    Set-Content $Config @("key_file = '$path'", 'log_format = "json"', 'max_hops = 8') -Encoding ASCII
+    Set-Content $Config @("key_file = '$path'", 'listen = ["127.0.0.1"]', 'log_format = "json"', 'max_hops = 8') -Encoding ASCII
     return $path
 }
 function Install([string]$Label, [bool]$ExpectedSuccess) {

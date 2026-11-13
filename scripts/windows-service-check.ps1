@@ -157,6 +157,7 @@ Set-Content -LiteralPath $Keys -Value $keyTable -Encoding ASCII -NoNewline
 Set-Content -LiteralPath $ClientKeys -Value $keyTable -Encoding ASCII -NoNewline
 $goodConfig = @(
     "key_file = '$Keys'",
+    'listen = ["127.0.0.1"]',
     'log_format = "json"',
     'max_hops = 8'
 )

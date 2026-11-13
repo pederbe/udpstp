@@ -15,7 +15,7 @@
 //!     --target 127.0.0.1:24601 --kind forged-unsigned --rate 20000 --seconds 5
 //!
 //! cargo run --release -p udpstp --example setup_flood -- \
-//!     --target 127.0.0.1:24601 --kind key-holder --key-hex <64 hex> --key-id 1 \
+//!     --target 127.0.0.1:24601 --kind key-holder --key-file keys.toml --key-id 1 \
 //!     --rate 20000 --seconds 5 --sources 2000
 //! ```
 //!
@@ -25,13 +25,17 @@
 #[allow(dead_code)]
 mod flood_common;
 
+#[path = "../src/keyfile.rs"]
+#[allow(dead_code)]
+mod keyfile;
+
 use std::net::SocketAddr;
 use std::process::ExitCode;
 use std::sync::atomic::AtomicBool;
 use std::time::{Duration, Instant};
 
 use flood_common::{
-    FloodConfig, KeyMaterial, Kind, MAX_RATE_PPS, bind_sources, flood_until, is_private, parse_hex,
+    FloodConfig, KeyMaterial, Kind, MAX_RATE_PPS, bind_sources, flood_until, is_private,
 };
 
 /// The longest a flood may run in one invocation.
@@ -51,22 +55,25 @@ struct Options {
 
 fn usage() -> String {
     "usage: setup_flood --target ADDR:PORT --kind forged-unsigned|forged-wrong-key|key-holder \
---rate PPS --seconds N [--sources N] [--threads N] [--key-hex HEX --key-id ID] [--allow-public]"
+--rate PPS --seconds N [--sources N] [--threads N] [--key-file PATH --key-id ID] [--allow-public]"
         .into()
 }
 
 fn parse() -> Result<Options, String> {
+    parse_args(std::env::args().skip(1))
+}
+
+fn parse_args(mut args: impl Iterator<Item = String>) -> Result<Options, String> {
     let mut target: Option<SocketAddr> = None;
     let mut kind: Option<Kind> = None;
     let mut rate: Option<u64> = None;
     let mut seconds: Option<u64> = None;
     let mut sources = 1usize;
     let mut threads = 2usize;
-    let mut key_hex: Option<String> = None;
+    let mut key_file = None;
     let mut key_id: Option<u8> = None;
     let mut allow_public = false;
 
-    let mut args = std::env::args().skip(1);
     while let Some(arg) = args.next() {
         let mut value = || args.next().ok_or_else(|| format!("{arg} needs a value"));
         match arg.as_str() {
@@ -78,7 +85,7 @@ fn parse() -> Result<Options, String> {
             "--seconds" => seconds = Some(value()?.parse().map_err(|e| format!("--seconds: {e}"))?),
             "--sources" => sources = value()?.parse().map_err(|e| format!("--sources: {e}"))?,
             "--threads" => threads = value()?.parse().map_err(|e| format!("--threads: {e}"))?,
-            "--key-hex" => key_hex = Some(value()?),
+            "--key-file" => key_file = Some(std::path::PathBuf::from(value()?)),
             "--key-id" => key_id = Some(value()?.parse().map_err(|e| format!("--key-id: {e}"))?),
             "--allow-public" => allow_public = true,
             "-h" | "--help" => return Err(usage()),
@@ -106,13 +113,26 @@ only for a Server you run)",
         ));
     }
     let (key, flood_key_id) = if kind.needs_key() {
-        let hex = key_hex.ok_or("--kind key-holder needs --key-hex")?;
-        let shared = parse_hex(&hex)?;
+        let path = key_file.ok_or("--kind key-holder needs --key-file")?;
         let id = key_id.ok_or("--kind key-holder needs --key-id")?;
-        (Some(KeyMaterial { shared, key_id: id }), id)
+        let table = keyfile::load(&path).map_err(|e| e.to_string())?;
+        let now = udpstp_core::WallTime::from_unix(Duration::from_secs(u64::from(
+            flood_common::now_unix(),
+        )));
+        let entry = table
+            .table
+            .sending(now, Some(id))
+            .map_err(|_| "no unambiguous keyId with a current send lifetime")?;
+        (
+            Some(KeyMaterial {
+                shared: entry.key.clone(),
+                key_id: id,
+            }),
+            id,
+        )
     } else {
-        if key_hex.is_some() {
-            return Err("--key-hex is only for --kind key-holder".into());
+        if key_file.is_some() {
+            return Err("--key-file is only for --kind key-holder".into());
         }
         // For a forged flood --key-id names the keyId to stamp: name one the
         // Server holds so the request reaches the digest check (a KDF run and
@@ -207,4 +227,71 @@ fn main() -> ExitCode {
         "setup_flood: sent {sent} datagrams in {elapsed:.2} s = {pps:.0} pps (~{mbps:.1} Mbit/s IPv4)"
     );
     ExitCode::SUCCESS
+}
+
+#[cfg(test)]
+#[path = "../tests/common/key_file.rs"]
+mod test_key_file;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use test_key_file::KeyFile;
+
+    fn options(extra: &[&str]) -> Result<Options, String> {
+        let base = [
+            "--target",
+            "127.0.0.1:24601",
+            "--kind",
+            "key-holder",
+            "--rate",
+            "1",
+            "--seconds",
+            "1",
+        ];
+        parse_args(
+            base.into_iter()
+                .chain(extra.iter().copied())
+                .map(str::to_owned),
+        )
+    }
+
+    #[test]
+    fn a_protected_key_file_supplies_the_pinned_authentication_key() {
+        let file = KeyFile::new(
+            "flood-private",
+            "keys.toml",
+            "[[key]]\nadmin_key_name = 'example'\nkey_id = 7\nkey_text = 'test-only-secret'\n",
+        );
+        let parsed = options(&["--key-file", file.path(), "--key-id", "7"]).unwrap();
+        let key = parsed.key.unwrap();
+        let expected = udpstp_wire::auth::SharedKey::new(b"test-only-secret".to_vec()).derive(100);
+        assert_eq!(key.shared.derive(100).client(), expected.client());
+        assert_eq!(key.key_id, 7);
+        assert!(options(&["--key-file", file.path(), "--key-id", "8"]).is_err());
+    }
+
+    #[test]
+    fn raw_key_arguments_are_refused_without_echoing_the_value() {
+        let error = options(&["--key-hex", "test-only-secret", "--key-id", "7"])
+            .err()
+            .unwrap();
+        assert!(error.contains("unknown argument --key-hex"));
+        assert!(!error.contains("test-only-secret"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_key_file_readable_by_other_accounts_is_refused() {
+        let file = KeyFile::new("flood-public", "udpst.keys", "7,test-only-secret\n");
+        file.set_mode(0o644);
+        let error = options(&["--key-file", file.path(), "--key-id", "7"])
+            .err()
+            .unwrap();
+        assert!(!error.contains("test-only-secret"));
+        assert!(
+            error.contains("readable or writable by group or others"),
+            "{error}"
+        );
+    }
 }

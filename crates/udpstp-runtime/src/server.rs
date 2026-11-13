@@ -160,7 +160,7 @@ pub async fn serve(
     }
     let clock = Clock::new();
     let (sender, mut received) = mpsc::channel(QUEUE);
-    let (engine_sender, mut from_engines) = mpsc::unbounded_channel();
+    let (engine_sender, mut from_engines) = crate::engine::reports::channel();
     // Each listener with the address it's bound to. The configured ones
     // must all bind; by default the IPv6 wildcard may be missing.
     let mut listeners: Vec<(IpAddr, Arc<Listener>)> = Vec::new();
@@ -470,7 +470,7 @@ impl Engines {
     fn new(
         clock: Clock,
         settings: EngineSettings,
-        report: &mpsc::UnboundedSender<FromEngine>,
+        report: &crate::engine::reports::Sender,
     ) -> (Self, ServerNotice) {
         #[cfg(any(target_os = "linux", target_os = "android"))]
         {
@@ -512,7 +512,7 @@ impl Engines {
         buffer_size: usize,
         clock: Clock,
         settings: EngineSettings,
-        report: &mpsc::UnboundedSender<FromEngine>,
+        report: &crate::engine::reports::Sender,
     ) -> io::Result<Engine> {
         match self {
             #[cfg(not(any(target_os = "linux", target_os = "android")))]

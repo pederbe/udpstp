@@ -510,7 +510,7 @@ fn main() -> std::process::ExitCode {
     let shared = flood_common::parse_hex(KEY_HEX).expect("valid key hex");
     let probe_shared = flood_common::parse_hex(PROBE_KEY_HEX).expect("valid key hex");
     let key = KeyMaterial {
-        shared: shared.clone(),
+        shared: udpstp_wire::auth::SharedKey::new(shared.clone()),
         key_id: KEY_ID,
     };
     let sources = match bind_sources(options.sources, target) {

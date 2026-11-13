@@ -1268,8 +1268,7 @@ impl Endpoint for Server {
     /// Test's, for the Quotas it is charged to.
     fn handle_data_event(&mut self, _now: Now, socket: SocketId, event: &DataEvent) {
         let bytes = match event {
-            DataEvent::Sent(sent) => sent.bytes,
-            DataEvent::SubIntervalMeasured(measured) => measured.bytes,
+            DataEvent::LoadBytes { bytes } => *bytes,
             _ => return,
         };
         self.admission.add_load_bytes(socket, bytes);

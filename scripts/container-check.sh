@@ -38,7 +38,7 @@ else
 fi
 "$engine" run -d --name "$name" --network host \
     -v "$work/secret.toml:/run/secrets/keys.toml:ro,Z" \
-    "$image" --port "$port" --max-hops 8 >/dev/null
+    "$image" --listen 127.0.0.1 --port "$port" --max-hops 8 >/dev/null
 owned=true
 sleep 2
 if ! "$client" client --key-file "$work/keys.toml" --test-interval 5 "127.0.0.1:$port" >"$work/client.log" 2>&1; then

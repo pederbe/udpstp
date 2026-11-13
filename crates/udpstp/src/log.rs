@@ -686,7 +686,8 @@ fn data_record(data: &DataEvent) -> Option<Record> {
         | DataEvent::SubIntervalMeasured(_)
         | DataEvent::Sent(_)
         | DataEvent::SentEstimated(_)
-        | DataEvent::Ended(_) => return None,
+        | DataEvent::Ended(_)
+        | DataEvent::LoadBytes { .. } => return None,
         // Only a Client caps its sending rate, or counts its Trial
         // Intervals.
         DataEvent::SendingRateCapped { .. } | DataEvent::TrialIntervalsCounted(_) => return None,

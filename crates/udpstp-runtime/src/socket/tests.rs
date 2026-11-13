@@ -206,6 +206,34 @@ fn a_send_plan_goes_until_the_send_buffer_is_full() {
     assert!(heard.errors.is_empty());
 }
 
+#[cfg(any(target_os = "linux", target_os = "android"))]
+#[test]
+fn failed_batched_and_fallback_plans_retain_their_sent_bytes() {
+    for fallback in [false, true] {
+        let mut socket = open(Scripted {
+            batches: [
+                Ok(1),
+                Err(if fallback {
+                    nix::errno::Errno::ENOSYS.into()
+                } else {
+                    io::ErrorKind::InvalidInput.into()
+                }),
+            ]
+            .into(),
+            sends: [Ok(1222), Err(io::ErrorKind::InvalidInput.into())].into(),
+            sendmmsg: true,
+            ..Scripted::default()
+        });
+        let mut heard = Heard::default();
+        assert!(
+            socket
+                .send_plan(&BURST[..], &[0; 3041], STAMPED, &mut heard)
+                .is_err()
+        );
+        assert_eq!(socket.load_bytes_sent(), if fallback { 2444 } else { 1222 });
+    }
+}
+
 // ADR 0006: a single send too large to leave with DF set counts as sent
 // and lost, a Path MTU event, rather than holding back every later Burst
 #[test]
@@ -222,6 +250,11 @@ fn a_datagram_too_large_for_the_path_counts_as_sent() {
         .send_plan(&BURST[..], &[0; 3041], STAMPED, &mut heard)
         .unwrap();
     assert_eq!(sent, 3, "the first counts as sent, the rest went");
+    assert_eq!(
+        socket.load_bytes_sent(),
+        1819,
+        "the rejected datagram consumes no byte Quota"
+    );
     assert_eq!(heard.errors, [TransportError::MsgSize]);
     assert_eq!(
         socket.adapter.made,
@@ -276,6 +309,11 @@ mod linux {
             .send_plan(&BURST[..], &[0; 3041], STAMPED, &mut heard)
             .unwrap();
         assert_eq!(sent, 3);
+        assert_eq!(
+            socket.load_bytes_sent(),
+            1819,
+            "only successful sends consume byte Quota"
+        );
         assert_eq!(heard.errors, [TransportError::MsgSize]);
         assert_eq!(
             socket.adapter.made,

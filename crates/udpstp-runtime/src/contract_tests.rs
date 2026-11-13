@@ -25,7 +25,6 @@ use std::net::{SocketAddr, UdpSocket};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
-use tokio::sync::mpsc;
 #[cfg(any(target_os = "linux", target_os = "android"))]
 use udpstp_core::TransportError;
 use udpstp_core::{DataEvent, Direction, MonoTime, Now, SocketId};
@@ -554,7 +553,7 @@ fn the_data_phase_engine_meets_the_contract() {
         .next_burst_at()
         .map(|at| at.as_duration() + activated_at.wall.as_unix() - activated_at.mono.as_duration());
     socket.connect(test_port).unwrap();
-    let (report, mut reports) = mpsc::unbounded_channel();
+    let (report, mut reports) = crate::engine::reports::channel();
     let engine = engine::spawn_with(
         SocketId(1),
         data_phase,

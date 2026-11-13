@@ -9,12 +9,12 @@
 use std::io;
 use std::time::Duration;
 
-use tokio::sync::mpsc;
 use udpstp_core::{
     DataEvent, DataPhase, EndReason, MonoTime, Now, RxBatch, RxPdu, SendPlan, SocketId,
     TransportError,
 };
 
+use super::reports;
 use super::times::Times;
 use super::{EngineFacts, FromEngine};
 use crate::buffers::SocketBuffers;
@@ -28,6 +28,8 @@ const STATUS_BUF: usize = 2048;
 /// frozen Data Phase interface's own, which [`DataPhase`] answers, and in
 /// tests a recording of them that says which reading each call got.
 pub(crate) trait Core {
+    fn is_load_receiver(&self) -> bool;
+    fn take_load_bytes(&mut self) -> u64;
     fn stop(&mut self, now: Now);
     fn poll_burst(&mut self, now: Now, horizon: Duration) -> Option<SendPlan>;
     fn write_datagrams(&mut self, plan: &SendPlan, now: Now, buf: &mut [u8]);
@@ -43,6 +45,12 @@ pub(crate) trait Core {
 }
 
 impl Core for DataPhase {
+    fn is_load_receiver(&self) -> bool {
+        DataPhase::is_load_receiver(self)
+    }
+    fn take_load_bytes(&mut self) -> u64 {
+        DataPhase::take_load_bytes(self)
+    }
     fn stop(&mut self, now: Now) {
         DataPhase::stop(self, now);
     }
@@ -93,7 +101,12 @@ impl Core for DataPhase {
 }
 
 /// One Test Connection's Data Phase on its socket.
-pub(crate) struct Slot<A, D = DataPhase> {
+pub(crate) struct Slot<A, D: Core = DataPhase> {
+    report: reports::Sender,
+    load_bytes: u64,
+    load_receiver: bool,
+    reported_load_bytes: u64,
+    counters: reports::Counters,
     socket_id: SocketId,
     data_phase: D,
     socket: Socket<A>,
@@ -135,8 +148,18 @@ impl<D: Core, T: Times> Sink for ToDataPhase<'_, D, T> {
 impl<A: Adapter, D: Core> Slot<A, D> {
     /// The slot of Test Connection `socket_id`, whose Data Phase runs on
     /// `socket`, opened.
-    pub(crate) fn new(socket_id: SocketId, data_phase: D, socket: Socket<A>) -> Self {
+    pub(crate) fn new(
+        socket_id: SocketId,
+        data_phase: D,
+        socket: Socket<A>,
+        report: reports::Sender,
+    ) -> Self {
         Self {
+            report,
+            load_bytes: 0,
+            load_receiver: data_phase.is_load_receiver(),
+            reported_load_bytes: 0,
+            counters: reports::Counters::default(),
             socket_id,
             data_phase,
             socket,
@@ -258,15 +281,24 @@ impl<A: Adapter, D: Core> Slot<A, D> {
 
     /// Passes the Data Phase's events on to `report`; whether it has
     /// ended.
-    pub(crate) fn forward_events(&mut self, report: &mpsc::UnboundedSender<FromEngine>) -> bool {
+    pub(crate) fn forward_events(&mut self, report: &reports::Sender) -> bool {
         while let Some(event) = self.data_phase.poll_event() {
+            if let DataEvent::LoadBytes { bytes } = event {
+                if self.load_receiver {
+                    self.load_bytes = self.load_bytes.saturating_add(bytes);
+                }
+                continue;
+            }
             if let DataEvent::Ended(reason) = event {
                 self.ended = Some(reason);
+                self.report_load_bytes();
             }
-            let _ = report.send(FromEngine::Event {
+            if !report.send(FromEngine::Event {
                 socket: self.socket_id,
                 event,
-            });
+            }) {
+                self.counters.retain(event);
+            }
         }
         self.ended.is_some()
     }
@@ -375,5 +407,34 @@ impl<A: Adapter, D: Core> Slot<A, D> {
     #[cfg(test)]
     pub(crate) fn data_phase(&self) -> &D {
         &self.data_phase
+    }
+}
+
+impl<A, D: Core> Slot<A, D> {
+    fn report_load_bytes(&mut self) {
+        self.counters.finish(&self.report, self.socket_id);
+        let pending = self.data_phase.take_load_bytes();
+        let total = if self.load_receiver {
+            self.load_bytes = self.load_bytes.saturating_add(pending);
+            self.load_bytes
+        } else {
+            self.socket.load_bytes_sent()
+        };
+        let bytes = total.saturating_sub(self.reported_load_bytes);
+        self.reported_load_bytes = total;
+        if bytes > 0 {
+            self.report.send(FromEngine::Event {
+                socket: self.socket_id,
+                event: DataEvent::LoadBytes { bytes },
+            });
+        }
+    }
+}
+
+// Before the exit report releases Admission, even when a socket error or
+// panic drops the slot before its next normal event-forwarding turn.
+impl<A, D: Core> Drop for Slot<A, D> {
+    fn drop(&mut self) {
+        self.report_load_bytes();
     }
 }

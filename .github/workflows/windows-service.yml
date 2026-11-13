@@ -31,11 +31,16 @@ jobs:
       - name: Service lifecycle
         run: |
           & scripts/windows-service-check.ps1 -Udpstp target/debug/udpstp.exe -AllowMachineChanges -Evidence "$env:RUNNER_TEMP/windows-service"
+      - name: Service key permissions
+        run: |
+          & scripts/windows-key-service-check.ps1 -Udpstp target/debug/udpstp.exe -AllowMachineChanges -Evidence "$env:RUNNER_TEMP/windows-key-service"
       - name: Save service evidence
         if: always()
         uses: actions/upload-artifact@v7
         with:
           name: windows-service-${{ github.sha }}
-          path: ${{ runner.temp }}/windows-service
+          path: |
+            ${{ runner.temp }}/windows-service
+            ${{ runner.temp }}/windows-key-service
           retention-days: 3
           if-no-files-found: warn

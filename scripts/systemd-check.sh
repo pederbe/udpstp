@@ -50,7 +50,7 @@ cp "$binary" "$work/udpstp"
 port=24611
 printf '[[key]]\nadmin_key_name = "check"\nkey_id = 1\nkey_text = "systemd-check-key"\n' >"$work/keys.toml"
 chmod 600 "$work/keys.toml"
-printf 'port = %s\nephemeral_ports = "50000-50383"\nmax_hops = 8\n' "$port" >"$work/server.toml"
+printf 'listen = ["127.0.0.1"]\nport = %s\nephemeral_ports = "50000-50383"\nmax_hops = 8\n' "$port" >"$work/server.toml"
 mkdir -p "$(dirname "$user_unit")"
 sed -e "s|/usr/local/bin/udpstp|$work/udpstp|" \
     -e "s|/etc/udpstp/keys.toml|$work/keys.toml|" \

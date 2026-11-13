@@ -195,7 +195,7 @@ pub enum KeyTableError {
 
 /// Why the Client has no key to send with.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum SendKeyError {
+pub enum SendKeyError {
     /// No row's send lifetime includes the current time.
     None,
     /// Several rows tie for the newest SendLifetimeStart.
@@ -291,11 +291,7 @@ impl KeyTable {
     /// `now`, it has keyId `pinned` if one is given, and among those the
     /// most recent SendLifetimeStart wins. A tie is an error rather than a
     /// guess: OB-UDPST key files, for one, have no lifetimes at all.
-    pub(crate) fn sending(
-        &self,
-        now: WallTime,
-        pinned: Option<u8>,
-    ) -> Result<&KeyEntry, SendKeyError> {
+    pub fn sending(&self, now: WallTime, pinned: Option<u8>) -> Result<&KeyEntry, SendKeyError> {
         let valid = || {
             self.entries.iter().filter(move |e| {
                 e.send_lifetime.contains(now) && pinned.is_none_or(|id| e.key_id == id)
