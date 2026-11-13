@@ -242,7 +242,7 @@ fn struct_fields(source: &str, name: &str) -> Vec<Field> {
 }
 
 fn configuration(root: &Path, binary: &Path) -> Result<String, String> {
-    let source = read(&root.join("crates/udpstp/src/config.rs"))?;
+    let source = read(&root.join("src/config.rs"))?;
     let fields = struct_fields(&source, "ServerSettings");
     if fields.is_empty() {
         return Err("config.rs: no ServerSettings fields found".into());
@@ -285,7 +285,7 @@ fn configuration(root: &Path, binary: &Path) -> Result<String, String> {
 }
 
 fn exit_statuses(root: &Path, records: &RecordPages) -> Result<String, String> {
-    let source = read(&root.join("crates/udpstp/src/exit.rs"))?;
+    let source = read(&root.join("src/exit.rs"))?;
     let doc: Vec<&str> = source
         .lines()
         .map_while(|l| l.strip_prefix("//!"))
@@ -312,7 +312,7 @@ fn exit_statuses(root: &Path, records: &RecordPages) -> Result<String, String> {
          `udpstp client` exits with the ErrorStatus that OB-UDPST reports, except that a Test \
          that completed with only warnings exits 0. In JSON results the same number is \
          `ErrorStatus`, warnings included. Generated from the documentation of \
-         `crates/udpstp/src/exit.rs`.\n\n",
+         `src/exit.rs`.\n\n",
     );
     for line in table {
         out.push_str(line);
@@ -337,10 +337,10 @@ fn exit_statuses(root: &Path, records: &RecordPages) -> Result<String, String> {
     Ok(out)
 }
 
-/// The recorded choices from `crates/udpstp/src/keyfile.rs`, which follow
+/// The recorded choices from `src/keyfile.rs`, which follow
 /// the key file format from `docs/key-files.md` on its page.
 fn key_files(root: &Path, records: &RecordPages) -> Result<String, String> {
-    let source = read(&root.join("crates/udpstp/src/keyfile.rs"))?;
+    let source = read(&root.join("src/keyfile.rs"))?;
     let choices: Vec<String> = source
         .lines()
         .map_while(|l| l.strip_prefix("//!"))

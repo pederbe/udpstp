@@ -35,7 +35,7 @@ Scripts and measurement platforms mostly read the JSON results and branch on the
 
 ### Exit statuses
 
-The ErrorStatus is OB-UDPST's (`udpst.h`), and the exit status equals it, except that a Test that completed with only warnings exits 0. udpstp's own statuses take values OB-UDPST leaves unused: 49 in its warning range, and 201 and up in its connection-error range, which uses only 200. A new status may be added; an assigned one never changes meaning (`crates/udpstp/src/exit.rs`):
+The ErrorStatus is OB-UDPST's (`udpst.h`), and the exit status equals it, except that a Test that completed with only warnings exits 0. udpstp's own statuses take values OB-UDPST leaves unused: 49 in its warning range, and 201 and up in its connection-error range, which uses only 200. A new status may be added; an assigned one never changes meaning (`src/exit.rs`):
 
 | ErrorStatus | Meaning | Exit status |
 |---|---|---|
@@ -64,11 +64,11 @@ A TOML Key Table may start with `format = 1`; a file without it is format 1. A l
 
 ### Names come from tables
 
-Every log event, JSON enumerated value and warning code is written from the explicit tables in `crates/udpstp/src/names.rs`, never from a Rust `Debug` name, so renaming a core variant can't change an output. The core's own names are free to change.
+Every log event, JSON enumerated value and warning code is written from the explicit tables in `src/names.rs`, never from a Rust `Debug` name, so renaming a core variant can't change an output. The core's own names are free to change.
 
 ### The library crates
 
-The published library crates, `udpstp-wire`, `udpstp-core` and `udpstp-runtime`, follow Cargo's semver rules only, and aren't a supported interface in 0.x: a minor release may break them without a deprecation period. The binary is the interface.
+Superseded by [ADR 0018](0018-one-application-crate.md). udpstp is one application crate. Its internal Rust modules and types do not establish external library compatibility commitments.
 
 ### The container image
 
@@ -83,7 +83,7 @@ Publishing a GitHub release starts the separate Release container workflow, whic
 - **Snapshot `--help` and the log's text.** Text changes for good reasons, and the specification asserts on structured output, never on text. The tests read clap's Command model, the settings struct and the JSON log's parsed lines instead.
 - **Accept unknown Key Table columns with a warning.** It lets one Key Table serve a mix of versions, but an older Server would drop a restriction it can't read, which widens access; a warning in a log nobody reads doesn't stop that.
 - **Keep deprecated names forever.** Every alias is a second spelling to document and test; one minor release gives users a release to see the warning and move.
-- **Make the library crates a supported interface.** Their API still changes with each feature, and the core's sans-IO shape isn't settled enough to promise.
+- **Make internal modules a supported developer API.** Rejected by ADR 0018. Their purpose is to implement the application.
 
 ## Consequences
 

@@ -1,10 +1,10 @@
 [workspace]
-# Publish the existing Cargo packages in dependency order. Only the binary
-# creates a GitHub release, whose assets are built by release.yml.
+# Release the application. Development tooling is never published.
 git_release_enable = false
 changelog_update = false
 release_always = false
 features_always_increment_minor = true
+semver_check = false
 pr_name = "chore: release{% if version %} v{{ version }}{% endif %}"
 pr_body = """
 ## Problem
@@ -25,27 +25,9 @@ Required CI checks validate this release before automatic merging.
 release_commits = '^(feat|fix|perf|docs|revert)(\([^)]*\))?!?:|^[a-z]+(\([^)]*\))?!:|^[A-Z]|(?m:^BREAKING[ -]CHANGE:)'
 
 [[package]]
-name = "udpstp-wire"
-version_group = "udpstp"
-
-[[package]]
-name = "udpstp-core"
-version_group = "udpstp"
-
-[[package]]
-name = "udpstp-runtime"
-version_group = "udpstp"
-
-[[package]]
-name = "udpstp-key-permissions"
-version_group = "udpstp"
-
-[[package]]
 name = "udpstp"
-version_group = "udpstp"
 changelog_update = true
 changelog_path = "CHANGELOG.md"
-changelog_include = ["udpstp-wire", "udpstp-core", "udpstp-runtime", "udpstp-key-permissions"]
 git_tag_name = "v{{ version }}"
 git_release_enable = true
 git_release_draft = true

@@ -51,7 +51,7 @@ docs_only() {
     [ -n "$changed" ] || return 1
     while IFS= read -r path; do
         case $path in
-        crates/* | scripts/* | xtask/* | fuzz/* | tools/* | tests/* | fixtures/* | examples/* | contrib/* | .github/* | docs/adr/* | docs/conformance/* | docs/rfc/* | docs/guides/windows.md) return 1 ;;
+        src/* | crates/* | scripts/* | xtask/* | fuzz/* | tools/* | tests/* | fixtures/* | examples/* | contrib/* | .github/* | docs/adr/* | docs/conformance/* | docs/rfc/* | docs/guides/windows.md) return 1 ;;
         *.md | docs/* | website/*) ;;
         *) return 1 ;;
         esac
@@ -78,6 +78,7 @@ MINGW* | MSYS* | CYGWIN*)
     ;;
 esac
 cargo test --locked --workspace
+cargo test --locked -p udpstp --features fault-injection --test faults
 cargo test --locked -p udpstp --example setup_flood
 cargo run --locked --package xtask -- req
 if [ -n "$(git status --porcelain -- docs/conformance/summary.md docs/conformance/interop-masks.toml)" ]; then
@@ -114,19 +115,11 @@ esac
 case $platform in
 Linux)
     RUSTDOCFLAGS="-D warnings" cargo doc --locked --workspace --no-deps
-    # The dry run verifies each crate against the others as a registry
-    # would serve them, and Cargo treats a registry crate's version as
-    # immutable: it never unpacks one again over an earlier copy in
-    # ~/.cargo/registry/src, nor rebuilds one it has built. Unchanged
-    # version numbers would verify against stale code, so the earlier
-    # copies go first and the build gets a directory of its own.
-    for crate in udpstp udpstp-wire udpstp-core udpstp-runtime udpstp-key-permissions; do
-        rm -rf "${CARGO_HOME:-$HOME/.cargo}"/registry/src/*/"$crate"-[0-9]*
-    done
+    # Verify the application's packaged source in a disposable build directory.
     rm -rf "$CARGO_TARGET_DIR/publish"
-    CARGO_TARGET_DIR="$CARGO_TARGET_DIR/publish" cargo publish --locked --workspace --dry-run
+    CARGO_TARGET_DIR="$CARGO_TARGET_DIR/publish" cargo publish --locked -p udpstp --dry-run
     rm -rf "$CARGO_TARGET_DIR/publish"
-    # The fuzz targets still build against the wire crate; they
+    # The fuzz targets include application source modules and
     # run only with nightly Rust (scripts/fuzz.sh).
     cargo clippy --locked --manifest-path fuzz/Cargo.toml --all-targets -- -D warnings
     ;;

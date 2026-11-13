@@ -11,7 +11,7 @@ udpstp measures how much traffic a network path can carry, along with its loss, 
 | Run a Server for your own Clients or for the public | [Hosting a Server](../../docs/guides/hosting-a-server.md) and the [security model](../../docs/security.md) |
 | Use udpstp on Windows | [udpstp on Windows](../../docs/guides/windows.md) |
 | Collect results in a script or a measurement platform | [JSON results](../../docs/json-output.md) and [Stable interfaces](../../docs/interfaces.md) |
-| Look up an option or a setting | [Command line](../../crates/udpstp/src/main.rs) and [Server configuration](../../crates/udpstp/src/config.rs) |
+| Look up an option or a setting | [Command line](../../src/main.rs) and [Server configuration](../../src/config.rs) |
 | Check how udpstp follows the RFCs | [Conformance](../../docs/conformance/summary.md) |
 | Fix an error or a warning | [Troubleshooting](../../docs/troubleshooting.md) |
 

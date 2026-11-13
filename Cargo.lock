@@ -1286,25 +1286,29 @@ dependencies = [
  "anstream",
  "anstyle-query",
  "clap",
+ "hmac",
+ "hotpath",
  "nix 0.31.3",
  "nu-ansi-term",
  "portable-pty",
+ "quinn-udp",
+ "rustix",
  "serde",
  "serde_json",
+ "sha2",
+ "socket2",
+ "stats_alloc",
  "terminal_size",
  "tokio",
  "toml",
  "tracing",
  "tracing-appender",
  "tracing-subscriber",
- "udpstp-core",
- "udpstp-key-permissions",
  "udpstp-req",
- "udpstp-runtime",
- "udpstp-wire",
  "unicode-width",
  "vt100",
  "windows-service",
+ "windows-sys",
  "zeroize",
 ]
 
@@ -1327,49 +1331,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "udpstp-core"
-version = "0.2.0"
-dependencies = [
- "hotpath",
- "stats_alloc",
- "udpstp-req",
- "udpstp-wire",
-]
-
-[[package]]
-name = "udpstp-key-permissions"
-version = "0.2.0"
-dependencies = [
- "windows-sys",
-]
-
-[[package]]
 name = "udpstp-req"
 version = "0.1.0"
-
-[[package]]
-name = "udpstp-runtime"
-version = "0.2.0"
-dependencies = [
- "nix 0.31.3",
- "quinn-udp",
- "rustix",
- "socket2",
- "stats_alloc",
- "tokio",
- "udpstp-core",
- "udpstp-req",
-]
-
-[[package]]
-name = "udpstp-wire"
-version = "0.2.0"
-dependencies = [
- "hmac",
- "sha2",
- "udpstp-req",
- "zeroize",
-]
 
 [[package]]
 name = "unicase"

@@ -15,14 +15,14 @@ use std::path::PathBuf;
 use std::process::{Child, Command, Stdio};
 use std::time::{Duration, Instant};
 
-const VECTORS: &str = "crates/udpstp-wire/tests/vectors/obudpst-control.txt";
+const VECTORS: &str = "src/tests/wire/vectors/obudpst-control.txt";
 
 /// The Shared Key, as OB-UDPST writes it in a key file, and its keyId.
 const KEY: &str = "udpstp-kat-key";
 const KEY_ID: u8 = 5;
 
 /// What in the captures is OB-UDPST's own; the known-answer test checks it.
-const FLAGS: &str = "# OB-UDPST-specific content, checked by crates/udpstp-wire/tests/obudpst_control_kat.rs:\n\
+const FLAGS: &str = "# OB-UDPST-specific content, checked by src/tests/wire/obudpst_control_kat.rs:\n\
          # - protocolVer 20; mcIdent OB-UDPST's random identifier; modifierBitmap CHSR_JUMBO_STATUS;\n\
          # - the Activation Requests carry OB-UDPST's default parameters, srIndexConf 10 with\n\
          #   CHTA_SRIDX_ISSTART clear (a Fixed-Rate Test, which OB-UDPST allows anyone) and\n\

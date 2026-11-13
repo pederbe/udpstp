@@ -16,6 +16,7 @@ git clone https://github.com/pederbe/udpstp
 cd udpstp
 cargo build --release --locked -p udpstp
 cargo test --locked --workspace
+cargo test --locked -p udpstp --features fault-injection --test faults
 cargo xtask req
 ```
 
@@ -30,7 +31,9 @@ Use the [validation workflow](docs/testing.md#validation-workflow) to select rel
 
 ## Make a change
 
-Keep pull requests focused. Put protocol decisions in `udpstp-core` and I/O in `udpstp-runtime`. Use glossary terms. Add tests at the boundary where the changed behavior is observable. Tag tests proving an RFC Requirement with its ID, following the [conformance guide](docs/conformance/README.md).
+Keep pull requests focused. Put protocol decisions in `src/protocol` and I/O in `src/runtime`. Use glossary terms. Add tests at the boundary where the changed behavior is observable. Tag tests proving an RFC Requirement with its ID, following the [conformance guide](docs/conformance/README.md).
+
+udpstp has one application crate. Its modules implement the application together and do not establish separate developer APIs. [ADR 0018](docs/adr/0018-one-application-crate.md) records this scope. Test helpers, benchmarks and maintenance commands are unpublished tooling.
 
 Keep first-party Rust safe. ADR 0015 describes the approved, isolated Windows key permission adapter. Expanding that exception requires the maintainer's explicit approval. Use an ADR for a consequential decision that is hard to reverse.
 

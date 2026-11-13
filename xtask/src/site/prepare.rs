@@ -17,8 +17,8 @@ use crate::req::Status;
 const ALIASES: &[(&str, &str)] = &[
     // The options' and the settings' own documentation, which the pages
     // are generated from.
-    ("crates/udpstp/src/main.rs", "reference/cli.md"),
-    ("crates/udpstp/src/config.rs", "reference/configuration.md"),
+    ("src/main.rs", "reference/cli.md"),
+    ("src/config.rs", "reference/configuration.md"),
     ("docs/conformance/summary.md", "conformance/index.md"),
     ("docs/conformance", "conformance/index.md"),
     ("docs/guides", "guides/index.md"),
@@ -653,7 +653,7 @@ fn landing(
 ) -> Result<String, String> {
     let template = read(&paths.website.join("index.html"))?;
     let tested = facts.count(Status::Tested) + facts.count(Status::Nightly);
-    let golden = read(&paths.root.join("crates/udpstp/tests/golden/completed.txt"))?;
+    let golden = read(&paths.root.join("tests/golden/completed.txt"))?;
     let mut terminal = String::from(
         "<span class=\"prompt\">$</span> <span class=\"command\">udpstp client --key-file keys.toml 192.0.2.1</span>\n",
     );

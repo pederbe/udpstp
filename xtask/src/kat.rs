@@ -31,7 +31,7 @@ const LONG_KEY: &str = "000102030405060708090a0b0c0d0e0f101112131415161718191a1b
                         404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f\
                         60616263";
 
-const VECTOR_DIR: &str = "crates/udpstp-wire/tests/vectors";
+const VECTOR_DIR: &str = "src/tests/wire/vectors";
 
 pub fn run() -> Result<(), String> {
     write_vectors("kdf-openssl.txt", &kdf_vectors()?)?;

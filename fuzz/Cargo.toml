@@ -13,15 +13,22 @@ cargo-fuzz = true
 
 [dependencies]
 libfuzzer-sys = { version = "0.4.13", features = ["arbitrary-derive"] }
-# `fuzzing` exposes the drivers of internal modules, such as Admission's.
-udpstp-core = { path = "../crates/udpstp-core", features = ["fuzzing"] }
-udpstp-wire = { path = "../crates/udpstp-wire" }
+# Targets compile the application's maintained source modules directly.
+hmac = { version = "0.13.0", features = ["zeroize"] }
+sha2 = "0.11.1"
+zeroize = { version = "1.9.1", features = ["derive", "serde"] }
+
+[features]
+default = ["fuzzing"]
+fuzzing = []
 
 # Its own workspace, so the main one's toolchain and lints don't apply.
 [workspace]
 
 [lints.rust]
 unsafe_code = "forbid"
+# These application-only features remain disabled in the included sources.
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(feature, values("hotpath", "layout-diagnostics"))'] }
 
 [[bin]]
 name = "setup_pdu"

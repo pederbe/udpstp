@@ -262,26 +262,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b6f5e870be6c3b371b77fe0ee0bafb859fa4964b4404c27de1d380043c4dda20"
 
 [[package]]
-name = "udpstp-core"
-version = "0.2.0"
-dependencies = [
- "udpstp-wire",
-]
-
-[[package]]
 name = "udpstp-fuzz"
 version = "0.0.0"
 dependencies = [
- "libfuzzer-sys",
- "udpstp-core",
- "udpstp-wire",
-]
-
-[[package]]
-name = "udpstp-wire"
-version = "0.2.0"
-dependencies = [
  "hmac",
+ "libfuzzer-sys",
  "sha2",
  "zeroize",
 ]

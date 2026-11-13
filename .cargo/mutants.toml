@@ -3,8 +3,8 @@
 # testing") says how to read the result.
 
 # The core and its tests: its behaviour is what the S1 tests prove.
-examine_globs = ["crates/udpstp-core/src/**/*.rs"]
-test_package = ["udpstp-core"]
+examine_globs = ["src/protocol/**/*.rs"]
+test_package = ["udpstp"]
 
 # Debug formatting and Display only render events; no test reads their text.
 exclude_re = ["impl.*fmt::Debug", "impl.*fmt::Display"]

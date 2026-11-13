@@ -2,7 +2,7 @@
 //! closing, activations, load bytes and time, driven directly: no
 //! request has to be signed to reach it, as the Server core target's do.
 //!
-//! Properties (`udpstp_core::fuzzing::admission`), checked against the
+//! Properties (`crate::protocol::fuzzing::admission`), checked against the
 //! driver's own account of each Test: no panics; after every step each
 //! table is within its limit; the rate held in each direction, by every
 //! admitted Test Connection of the activated Tests, within the Admitted
@@ -12,6 +12,14 @@
 //! left admitted.
 #![no_main]
 
+
+#[path = "../../src/protocol/mod.rs"]
+#[allow(dead_code, unused_imports)]
+mod protocol;
+
+#[path = "../../src/wire/mod.rs"]
+#[allow(dead_code, unused_imports)]
+mod wire;
 use libfuzzer_sys::fuzz_target;
 
-fuzz_target!(|data: &[u8]| udpstp_core::fuzzing::admission(data));
+fuzz_target!(|data: &[u8]| crate::protocol::fuzzing::admission(data));

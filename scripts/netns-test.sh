@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs the network-namespace tier (crates/udpstp/tests/netns.rs and
+# Runs the network-namespace tier (tests/netns.rs and
 # the OB-UDPST interop tests in interop.rs) on
 # Linux, without root: cargo runs the test binary inside a new user,
 # network, mount and PID namespace, where the tests build their topology

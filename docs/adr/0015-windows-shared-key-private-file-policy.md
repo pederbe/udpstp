@@ -2,6 +2,8 @@
 
 **Status: Accepted** (2026-10-05). Production refusal (2026-10-06), following the separately accepted transition.
 
+[ADR 0018](0018-one-application-crate.md) supersedes the separate helper-package layout. The native adapter now lives in the application. This record's permission policy and safety invariants remain in force.
+
 Authenticated Clients and Server administrators need accidental permission grants
 caught when a Shared Key file is loaded. Unix already refuses untrusted ownership
 and group/other read or write access. Windows now assesses permissions at startup.
@@ -56,13 +58,11 @@ remain safe Rust beside key-file loading; the protocol core, wire code and
 network runtime retain `forbid(unsafe_code)`. This is a specific exception to the
 previous blanket prohibition, not authorization for other native features.
 
-The production helper `udpstp-key-permissions` uses `windows-sys` 0.61.2 for
-Win32 bindings. Its crate root denies `unsafe`, and only `src/native.rs` allows
-it. The decoder and policy explicitly forbid it, as does every other production
-crate. No raw pointer or borrowed SID escapes the module, and safe callers
-cannot supply invalid handles. This helper is packaged with the binary's
-library dependencies; it is an implementation detail under the same 0.x
-library-interface rules as ADR 0013.
+The application uses `windows-sys` for Win32 bindings. Its crate root denies
+`unsafe`, and only `src/windows_permissions/native.rs` allows it. The decoder,
+policy and ordinary application modules explicitly forbid it. No raw pointer
+or borrowed SID escapes the module, and safe callers cannot supply invalid
+handles. The adapter is an internal module under ADR 0018.
 
 Safety invariants:
 

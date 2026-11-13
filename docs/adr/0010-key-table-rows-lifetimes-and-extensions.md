@@ -22,7 +22,7 @@ The columns RFC 9946 §5.4 doesn't list (PeerKeyName, Peers, Interfaces, Protoco
 
 ## Consequences
 
-- Proved by `crates/udpstp-core/tests/key_table.rs`:
+- Proved by `src/tests/protocol/key_table.rs`:
   - expired and not-yet-valid keys are dropped silently, and the edges are accepted;
   - rollover between two rows with one keyId works;
   - overlapping and backwards lifetimes are rejected;

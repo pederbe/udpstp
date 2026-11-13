@@ -9,5 +9,5 @@ We police each Trial Interval against the highest rate the Server assigned withi
 ## Consequences
 
 - A Client may run at up to 1.5 times the highest rate of the last second for up to a second after a decrease. That bound is still far below what an unpoliced Client could send.
-- The test `an_upstream_search_through_a_deep_buffer_is_not_stopped_over_rate` (crates/udpstp-core/tests/algorithm_b.rs) proves the fix; `the_server_stops_a_client_sending_over_its_rate` (tests/upstream.rs) still proves the policing.
+- The test `an_upstream_search_through_a_deep_buffer_is_not_stopped_over_rate` (src/tests/protocol/algorithm_b.rs) proves the fix; `the_server_stops_a_client_sending_over_its_rate` (tests/upstream.rs) still proves the policing.
 - Alternatives considered: pausing policing for a fixed time after each decrease (more state, same effect), or a window sized from the measured RTT (the RTT isn't known before the first samples, and a bottleneck's drain time isn't the RTT).

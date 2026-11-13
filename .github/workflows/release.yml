@@ -104,7 +104,7 @@ jobs:
             cp target/${{ matrix.target }}/release/udpstp "$name"/
             tar czf "$name.tar.gz" "$name"
           fi
-      # .deb and .rpm (the metadata is in crates/udpstp/Cargo.toml),
+      # .deb and .rpm (the metadata is in Cargo.toml),
       # with the same unstripped binary as the archive and the example
       # systemd unit set to /usr/bin. Rehearsed locally for both
       # architectures, and installed on Debian 10 and Rocky Linux 8.
@@ -116,7 +116,7 @@ jobs:
           mkdir -p target/packaging
           sed 's|/usr/local/bin/udpstp|/usr/bin/udpstp|' contrib/systemd/udpstp-server.service > target/packaging/udpstp-server.service
           cargo deb -p udpstp --no-build --no-strip --target ${{ matrix.target }} -o .
-          cargo generate-rpm -p crates/udpstp --target ${{ matrix.target }} -o .
+          cargo generate-rpm -p . --target ${{ matrix.target }} -o .
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ${{ matrix.target }}
@@ -215,8 +215,8 @@ jobs:
       - name: SBOM
         run: |
           cargo install --locked --version 0.5.9 cargo-cyclonedx
-          cargo cyclonedx --format json --spec-version 1.5 --describe binaries --target all --manifest-path crates/udpstp/Cargo.toml
-          cp crates/udpstp/udpstp_bin.cdx.json "dist/udpstp-${GITHUB_REF_NAME}.cdx.json"
+          cargo cyclonedx --format json --spec-version 1.5 --describe binaries --target all --manifest-path Cargo.toml
+          cp udpstp_bin.cdx.json "dist/udpstp-${GITHUB_REF_NAME}.cdx.json"
       # The Homebrew formula is rendered from the archives' checksums, then
       # listed and attested with them; the tap's updater takes it from here.
       - name: Checksums and Homebrew formula

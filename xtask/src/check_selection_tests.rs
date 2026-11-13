@@ -98,8 +98,8 @@ fn only_independent_documentation_selects_documentation_checks() {
         assert!(!repo.docs_only(&head, &head), "empty change: {path}");
     }
     for path in [
-        "crates/udpstp/src/main.rs",
-        "crates/udpstp/tests/fixtures/model.md",
+        "src/main.rs",
+        "tests/fixtures/model.md",
         "scripts/check.sh",
         "xtask/fixtures/README.md",
         "fuzz/README.md",
@@ -130,9 +130,9 @@ fn only_independent_documentation_selects_documentation_checks() {
 
 #[test]
 fn moving_application_input_to_documentation_keeps_full_checks() {
-    let (repo, _, base) = Repository::new(&["crates/udpstp/fixture.md"]);
+    let (repo, _, base) = Repository::new(&["src/fixture.md"]);
     fs::create_dir(repo.0.join("docs")).unwrap();
-    repo.git(&["mv", "crates/udpstp/fixture.md", "docs/fixture.md"]);
+    repo.git(&["mv", "src/fixture.md", "docs/fixture.md"]);
     repo.git(&["commit", "--quiet", "-m", "move fixture"]);
     let head = repo.git(&["rev-parse", "HEAD"]);
     assert!(!repo.docs_only(&base, &head));

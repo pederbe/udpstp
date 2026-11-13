@@ -6,7 +6,7 @@ cd "$(dirname "$0")/.."
 mkdir -p target/packaging
 output=target/packaging/THIRD-PARTY-LICENSES.md
 cargo-about generate --locked --fail --target "$target" \
-    --manifest-path crates/udpstp/Cargo.toml --config about.toml about.hbs > "$output"
+    --manifest-path Cargo.toml --config about.toml about.hbs > "$output"
 sysroot=$(rustc --print sysroot)
 case "$(uname -s)" in MINGW*|MSYS*) sysroot=$(cygpath -u "$sysroot");; esac
 standard_library="$sysroot/share/doc/rust/COPYRIGHT-library.html"

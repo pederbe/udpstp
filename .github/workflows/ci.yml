@@ -46,12 +46,12 @@ jobs:
             while IFS= read -r -d '' path; do
               # Keep the full-input boundary from scripts/check-commit.sh.
               case "$path" in
-                crates/*|scripts/*|xtask/*|fuzz/*|tools/*|tests/*|fixtures/*|examples/*|contrib/*|.github/*|docs/adr/*|docs/conformance/*|docs/rfc/*|docs/guides/windows.md) full=true ;;
+                src/*|crates/*|scripts/*|xtask/*|fuzz/*|tools/*|tests/*|fixtures/*|examples/*|contrib/*|.github/*|docs/adr/*|docs/conformance/*|docs/rfc/*|docs/guides/windows.md) full=true ;;
                 *.md|docs/*|website/*) ;;
                 *) full=true ;;
               esac
               case "$path" in
-                website/*|docs/*|GLOSSARY.md|README.md|CONTRIBUTING.md|CHANGELOG.md|SECURITY.md|Cargo*|rust-toolchain.toml|crates/udpstp/*|crates/udpstp-core/src/*|crates/udpstp-runtime/src/*|xtask/*|scripts/build-site.sh|install/*|.github/workflows/ci.yml|.github/workflows/website.yml) website=true ;;
+                website/*|docs/*|GLOSSARY.md|README.md|CONTRIBUTING.md|CHANGELOG.md|SECURITY.md|Cargo*|rust-toolchain.toml|src/*|tests/*|xtask/*|scripts/build-site.sh|install/*|.github/workflows/ci.yml|.github/workflows/website.yml) website=true ;;
               esac
             done < "$RUNNER_TEMP/changed-paths"
           fi
@@ -103,6 +103,7 @@ jobs:
           Get-Command Get-Acl | Select-Object Name, Source
           [Security.AccessControl.FileSecurity]::new() | Out-Null
       - run: cargo test --locked --workspace
+      - run: cargo test --locked -p udpstp --features fault-injection --test faults
       - run: cargo test --locked -p udpstp --example setup_flood
       - name: Traceability check
         run: cargo run --locked --package xtask -- req
@@ -126,7 +127,7 @@ jobs:
           RUSTDOCFLAGS: -D warnings
         run: |
           cargo doc --locked --workspace --no-deps
-          cargo publish --locked --workspace --dry-run
+          cargo publish --locked -p udpstp --dry-run
       - name: Fuzz targets build
         if: matrix.os == 'ubuntu-26.04'
         run: cargo clippy --locked --manifest-path fuzz/Cargo.toml --all-targets -- -D warnings

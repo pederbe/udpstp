@@ -1,11 +1,11 @@
 # Architecture
 
-udpstp is one binary that runs as a Client or a Server, built from four main crates with a firm line between protocol logic and I/O.
+udpstp is one application crate. Its binary runs as a Client or a Server, with internal modules for protocol logic, I/O and presentation.
 
-1. **`udpstp-wire`** holds the PDU layouts and codecs, the checksum, HMAC-SHA-256 and the KDF. It makes no protocol decisions.
-2. **`udpstp-core`** is the protocol core for both roles. It performs no I/O and reads no clock. Its caller passes in received datagrams and the time, and the core returns what to send and when to call it next.
-3. **`udpstp-runtime`** moves the bytes. It owns the sockets and clocks, the Tokio Control Phase loops and the Data Phase Engine, and makes no protocol decisions.
-4. **`udpstp`** is the binary, with the command line, the Server's configuration, key files, exit statuses and output.
+1. **`src/wire`** holds PDU layouts, codecs, checksum, HMAC-SHA-256 and the KDF.
+2. **`src/protocol`** implements both protocol roles. Its caller supplies packets and time, and it returns actions and deadlines without performing I/O.
+3. **`src/runtime`** owns sockets, clocks, the Tokio Control Phase loops and the Data Phase Engine.
+4. **The other `src` modules** own commands, configuration, key files, exit statuses and output. `src/windows_permissions` contains the Windows key-file policy and its approved native adapter.
 
 A Client's Setup Request reaches the Server's Standard Port. The Server admits the Test Connection and gives it an Ephemeral Port, and the Activation exchange agrees the Test's parameters. In the Data Phase, the Load Sender sends Load PDUs, the Load Receiver answers with Status PDUs, and the Server's Load Rate Adjustment Algorithm picks the next sending rate.
 

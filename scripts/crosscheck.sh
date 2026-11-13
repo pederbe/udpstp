@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # The simulator against a real impaired network: runs
-# crates/udpstp/tests/crosscheck.rs in a rootless network namespace, as
+# tests/crosscheck.rs in a rootless network namespace, as
 # scripts/netns-test.sh does, but alone, once (no retry: a disagreement
 # must show), and in release. Its tolerances hold on a quiet host; on a
 # shared one, run it under the host's measurement lock.

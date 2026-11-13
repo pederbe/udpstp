@@ -40,7 +40,6 @@ udpstp is a Rust implementation of the UDP Speed Test Protocol in [RFC 9946](htt
 - Reports capacity, loss, delay variation and RTT in your terminal, or as JSON for your own tools
 - Combines Test Connections to fill a fast path, and holds a fixed rate with an Operator Key
 - Reads OB-UDPST key files and exports compatible JSON
-- Offers its [wire codecs](https://docs.rs/udpstp-wire), [protocol core](https://docs.rs/udpstp-core) and [network runtime](https://docs.rs/udpstp-runtime) as libraries for Rust applications
 
 udpstp measures between two hosts that share a key, so you need a Server at the far end of the path. It is not a one-click test against public servers.
 

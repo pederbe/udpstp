@@ -172,7 +172,7 @@ udpstp: configuration error: ephemeral_ports: "50000-50099" has 100 ports, fewer
   (128)
 ```
 
-An unknown key or an invalid value stops the Server with exit status 50 and names the setting. Check a configuration before you start the Server with `udpstp server --config FILE --print-config`. [Server configuration](../crates/udpstp/src/config.rs) lists every setting.
+An unknown key or an invalid value stops the Server with exit status 50 and names the setting. Check a configuration before you start the Server with `udpstp server --config FILE --print-config`. [Server configuration](../src/config.rs) lists every setting.
 
 | Setting or option | What to change |
 |---|---|
