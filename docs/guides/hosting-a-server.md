@@ -1,6 +1,6 @@
 # Hosting a Server
 
-`udpstp server` answers Clients' Tests from the far end of a path. Four steps get it running, and a few more make it safe to open to Clients outside your own network. [Server configuration](../../crates/udpstp/src/config.rs) lists every setting, [Server log](../server-log.md) every event, and the [security model](../security.md) explains the defaults. On Windows, follow [udpstp on Windows](windows.md) alongside this guide.
+`udpstp server` answers Clients' Tests from the far end of a path. Four steps get it running, and a few more make it safe to open to Clients outside your own network. [Server configuration](../../src/config.rs) lists every setting, [Server log](../server-log.md) every event, and the [security model](../security.md) explains the defaults. On Windows, follow [udpstp on Windows](windows.md) alongside this guide.
 
 The [required setup](#required-setup) gets a Server running. A Server that Clients outside your own network can reach should also take the [recommended steps](#recommended-for-a-public-server). Each [optional step](#optional-steps) says when you need it.
 
@@ -138,7 +138,7 @@ A Server open to the internet should cap the load it agrees to carry. The defaul
 
 3. **Give each population of Clients its own key**, and keys only to Clients you trust. The Server shares its capacity fairly between keys under a flood, but it can't tell one key's Clients apart.
 
-Keep the other limits at their defaults unless you have a reason to change them. [Server configuration](../../crates/udpstp/src/config.rs) lists each one, and the [security model](../security.md#admission-under-load) explains how they hold up under a flood. A Client refused by a limit sees CONNFAIL, CAPEXC or NOMAXBW and exits with status 113, 110 or 109.
+Keep the other limits at their defaults unless you have a reason to change them. [Server configuration](../../src/config.rs) lists each one, and the [security model](../security.md#admission-under-load) explains how they hold up under a flood. A Client refused by a limit sees CONNFAIL, CAPEXC or NOMAXBW and exits with status 113, 110 or 109.
 
 ### Protect Client addresses
 

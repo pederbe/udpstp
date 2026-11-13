@@ -8,19 +8,27 @@
 //! run, no Test Connection, Test or Data Phase is left holding Admission.
 #![no_main]
 
+
+#[path = "../../src/protocol/mod.rs"]
+#[allow(dead_code, unused_imports)]
+mod protocol;
+
+#[path = "../../src/wire/mod.rs"]
+#[allow(dead_code, unused_imports)]
+mod wire;
 use std::collections::BTreeMap;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
 use std::time::Duration;
 
 use libfuzzer_sys::arbitrary::{self, Arbitrary};
 use libfuzzer_sys::fuzz_target;
-use udpstp_core::{
+use crate::protocol::{
     DatagramMeta, Endpoint, IpVersion, KeyEntry, KeyTable, Lifetime, MonoTime, Now, Output, Server,
     ServerConfig, SocketId, WallTime,
 };
-use udpstp_wire::activation::{ActivationPdu, SendingRate};
-use udpstp_wire::setup::{SetupPdu, cmd_request};
-use udpstp_wire::{PROTOCOL_VERSION, auth_mode, checksum};
+use crate::wire::activation::{ActivationPdu, SendingRate};
+use crate::wire::setup::{SetupPdu, cmd_request};
+use crate::wire::{PROTOCOL_VERSION, auth_mode, checksum};
 
 const KEY_ID: u8 = 5;
 const KEY: &[u8] = b"udpstp fuzz key";
@@ -225,7 +233,7 @@ impl Runtime {
     }
 
     fn deliver_to_standard_port(&mut self, source: SocketAddr, payload: &[u8]) {
-        let local = local(server_ip(source), udpstp_wire::STANDARD_PORT);
+        let local = local(server_ip(source), crate::wire::STANDARD_PORT);
         self.deliver(SocketId::PRIMARY, local, source, payload);
     }
 
@@ -272,7 +280,7 @@ impl Runtime {
                     key_id: KEY_ID,
                     checksum: 0,
                 };
-                let keys = udpstp_wire::auth::derive_keys(KEY, time);
+                let keys = crate::wire::auth::derive_keys(KEY, time);
                 if pdu.auth_mode != auth_mode::UNAUTHENTICATED {
                     pdu.sign(keys.client());
                 }
@@ -291,7 +299,7 @@ impl Runtime {
                 let Some((id, local, setup_time)) = self.pick(socket) else {
                     return;
                 };
-                let keys = udpstp_wire::auth::derive_keys(KEY, setup_time.unwrap_or(0));
+                let keys = crate::wire::auth::derive_keys(KEY, setup_time.unwrap_or(0));
                 let mut pdu = ActivationPdu {
                     protocol_version: PROTOCOL_VERSION,
                     cmd_request: fields.cmd_request % 4,

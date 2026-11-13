@@ -163,7 +163,7 @@ The numbered stories below define intended behavior and retain stable identifier
 
 ## Implementation decisions
 
-Protocol decisions belong in `udpstp-core`. It performs no I/O and receives time as an input. `udpstp-wire` encodes and decodes PDUs. `udpstp-runtime` drives sockets and clocks, with Tokio for the Control Phase and a dedicated Data Phase Engine. The binary owns configuration, key loading, presentation and process exit behavior. `docs/architecture.md` describes the maintained interfaces.
+udpstp has one application crate. `src/protocol` makes protocol decisions without I/O and receives time as an input. `src/wire` encodes and decodes PDUs. `src/runtime` drives sockets and clocks, with Tokio for the Control Phase and a dedicated Data Phase Engine. The other application modules own configuration, key loading, presentation and process exit behavior. These internal boundaries are implementation choices described in `docs/architecture.md` and ADR 0018.
 
 The ADRs record the settled KDF layout, timing, Sending Rate Table conventions, algorithms, transport-error reporting, runtime libraries, Data Phase Engine contract, key-file policy and stable interfaces. Read the relevant ADR before changing one of those decisions. `GLOSSARY.md` defines the domain terms.
 

@@ -11,7 +11,7 @@
 //! It scans `GLOSSARY.md`, `README.md`, `CONTRIBUTING.md`, `CHANGELOG.md`,
 //! `SECURITY.md`, the crates' READMEs, the site's pages (`website/pages`)
 //! and the Markdown under `docs/` (not `docs/research` or `docs/rfc`); the string
-//! literals of the `udpstp` binary and `udpstp-runtime`; the doc comments
+//! literals of the application modules; the doc comments
 //! clap turns into `--help`; the requirement notes, never their RFC text;
 //! and the Conformance Records' summaries, OB-UDPST lines and revisit notes.
 //! Quotations are exempt: blockquotes and text in double quotes. So are an
@@ -35,10 +35,6 @@ const MARKDOWN: &[&str] = &[
     "CONTRIBUTING.md",
     "CHANGELOG.md",
     "SECURITY.md",
-    "crates/udpstp/README.md",
-    "crates/udpstp-core/README.md",
-    "crates/udpstp-runtime/README.md",
-    "crates/udpstp-wire/README.md",
     "crates/bench-rounds/README.md",
     "crates/udpstp-bench/README.md",
 ];
@@ -52,7 +48,7 @@ const WEBSITE_PAGES: &str = "website/pages";
 const SKIPPED_DOCS: &[&str] = &["docs/research", "docs/rfc"];
 
 /// Crates whose string literals users see.
-const SOURCE_DIRS: &[&str] = &["crates/udpstp/src", "crates/udpstp-runtime/src"];
+const SOURCE_DIRS: &[&str] = &["src"];
 
 /// clap derives whose items' doc comments become `--help` text.
 const CLAP_DERIVES: &[&str] = &["Parser", "Args", "Subcommand", "ValueEnum"];
@@ -502,6 +498,19 @@ fn texts(root: &Path) -> Result<Vec<Text>, String> {
     }
     for dir in SOURCE_DIRS {
         for path in crate::req::rust_files(&root.join(dir))? {
+            // Preserve the command/presentation and runtime string scope.
+            // Protocol fixtures and implementation diagnostics are not UI text.
+            if [
+                "src/tests",
+                "src/protocol",
+                "src/wire",
+                "src/windows_permissions",
+            ]
+            .iter()
+            .any(|dir| path.starts_with(root.join(dir)))
+            {
+                continue;
+            }
             texts.extend(rust_texts(&relative(root, &path), &read(&path)?));
         }
     }
@@ -1007,16 +1016,16 @@ _Avoid_: Deviation (from OB-UDPST)
         let found = findings(
             "",
             &[text(
-                "crates/udpstp/src/keyfile.rs",
+                "src/keyfile.rs",
                 "a TOML key table; Key tables; the Key Table; key Table; an ob-udpst Difference",
             )],
         );
         assert_eq!(
             found,
             [
-                "crates/udpstp/src/keyfile.rs:1: \"key table\": write it Key Table",
-                "crates/udpstp/src/keyfile.rs:1: \"Key tables\": write it Key Table",
-                "crates/udpstp/src/keyfile.rs:1: \"ob-udpst Difference\": write it OB-UDPST Difference",
+                "src/keyfile.rs:1: \"key table\": write it Key Table",
+                "src/keyfile.rs:1: \"Key tables\": write it Key Table",
+                "src/keyfile.rs:1: \"ob-udpst Difference\": write it OB-UDPST Difference",
             ]
         );
         // Only terms whose later words are capitalized are checked.

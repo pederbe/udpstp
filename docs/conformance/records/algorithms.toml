@@ -13,10 +13,10 @@ requirements = ["RFC9097-6.3-L1", "RFC9097-6.3-3", "RFC9097-6.3-4", "RFC9097-8.1
 obudpst = "OB-UDPST's search takes the same steps (one row each way above the 1 Gbps row, the confirming drop only below it, Sequence Errors counted without reordering and duplicates), so while the queue's delay stays under lowThresh it cycles the same way with the same loss: measured at 50 Mbit/s, and above the 1 Gbps row read from its code. Between lowThresh and upperThresh its Hold Intervals differ, since it judges the RTT variation by default (record delay-var-is-the-maximum-by-default). It reports the Highest IP-Layer Capacity as its maximum whatever the loss (record json-at-max-is-the-maximum), there the bottleneck's rate."
 reference = []
 tests = [
-    "crates/udpstp-core/tests/algorithm_b.rs::a_search_through_a_shallow_queue_alternates_around_the_bottleneck",
-    "crates/udpstp-core/tests/congestion_never_confirmed.rs::a_search_alternating_above_the_gigabit_row_met_the_limit",
-    "crates/udpstp-core/tests/congestion_never_confirmed.rs::a_search_alternating_near_12_gbit_s_met_the_limit",
-    "crates/udpstp-core/tests/maximum_through_drop_tail_queues.rs::above_the_gigabit_row_a_20_ms_queue_leaves_the_maximum_on_the_climb",
+    "src/tests/protocol/algorithm_b.rs::a_search_through_a_shallow_queue_alternates_around_the_bottleneck",
+    "src/tests/protocol/congestion_never_confirmed.rs::a_search_alternating_above_the_gigabit_row_met_the_limit",
+    "src/tests/protocol/congestion_never_confirmed.rs::a_search_alternating_near_12_gbit_s_met_the_limit",
+    "src/tests/protocol/maximum_through_drop_tail_queues.rs::above_the_gigabit_row_a_20_ms_queue_leaves_the_maximum_on_the_climb",
 ]
 
 [[record]]
@@ -27,8 +27,8 @@ rfc = "RFC 9097 §8.1; RFC 9946 §5.1"
 requirements = ["RFC9946-5.1-7", "RFC9097-8.1-L12"]
 reference = ["docs/spec.md"]
 tests = [
-    "crates/udpstp-core/tests/algorithm_b.rs::rows_stay_within_the_table_and_fast_mode_stops_at_1_gbps",
-    "crates/udpstp-core/tests/algorithm_c.rs::the_jump_to_1_gbps_leaves_update_as_it_was",
+    "src/tests/protocol/algorithm_b.rs::rows_stay_within_the_table_and_fast_mode_stops_at_1_gbps",
+    "src/tests/protocol/algorithm_c.rs::the_jump_to_1_gbps_leaves_update_as_it_was",
 ]
 
 [[record]]
@@ -40,9 +40,9 @@ requirements = ["RFC9946-5.1-L1"]
 obudpst = "Keeps the flowchart's single SlowAdjCount, reset only by a Fast Mode pass, so errored, hold, errored, hold, errored also confirms Congestion. OB-UDPST can confirm Congestion earlier on paths with intermittent errors, so the two can report different capacities on the same path."
 reference = ["ADR 0005"]
 tests = [
-    "crates/udpstp-core/tests/algorithm_b.rs::congestion_is_confirmed_by_back_to_back_errored_intervals",
-    "crates/udpstp-core/tests/algorithm_b.rs::intermittent_errored_intervals_do_not_confirm_congestion",
-    "crates/udpstp-core/tests/algorithm_b.rs::algorithm_b_never_leaves_single_step_mode",
+    "src/tests/protocol/algorithm_b.rs::congestion_is_confirmed_by_back_to_back_errored_intervals",
+    "src/tests/protocol/algorithm_b.rs::intermittent_errored_intervals_do_not_confirm_congestion",
+    "src/tests/protocol/algorithm_b.rs::algorithm_b_never_leaves_single_step_mode",
 ]
 
 [[record]]
@@ -53,8 +53,8 @@ rfc = "RFC 9946 §5.1"
 requirements = ["RFC9946-5.1-7"]
 reference = []
 tests = [
-    "crates/udpstp-core/tests/algorithm_b.rs::the_confirming_drop_stops_at_row_0_and_follows_the_row_it_starts_from",
-    "crates/udpstp-core/tests/algorithm_b.rs::above_the_gigabit_row_every_step_is_one_row",
+    "src/tests/protocol/algorithm_b.rs::the_confirming_drop_stops_at_row_0_and_follows_the_row_it_starts_from",
+    "src/tests/protocol/algorithm_b.rs::above_the_gigabit_row_every_step_is_one_row",
 ]
 
 [[record]]
@@ -64,8 +64,8 @@ summary = "Algorithm C's \"Increase Sending by 2x\" doubles the Sending Rate Tab
 rfc = "RFC 9946 §5.1"
 reference = []
 tests = [
-    "crates/udpstp-core/tests/algorithm_c.rs::fast_mode_doubles_the_row_on_every_second_clean_interval",
-    "crates/udpstp-core/tests/algorithm_c.rs::doubling_the_row_doubles_the_rate",
+    "src/tests/protocol/algorithm_c.rs::fast_mode_doubles_the_row_on_every_second_clean_interval",
+    "src/tests/protocol/algorithm_c.rs::doubling_the_row_doubles_the_rate",
 ]
 
 [[record]]
@@ -75,8 +75,8 @@ summary = "RetryThresh starts at 5 and grows by 5 after a Fast-Mode Retry reache
 rfc = "RFC 9946 §5.1"
 reference = ["docs/spec.md"]
 tests = [
-    "crates/udpstp-core/tests/algorithm_c.rs::retries_come_after_5_then_10_then_15_single_steps_up",
-    "crates/udpstp-core/tests/algorithm_c.rs::a_retry_from_a_step_down_keeps_retry_thresh",
+    "src/tests/protocol/algorithm_c.rs::retries_come_after_5_then_10_then_15_single_steps_up",
+    "src/tests/protocol/algorithm_c.rs::a_retry_from_a_step_down_keeps_retry_thresh",
 ]
 
 [[record]]
@@ -86,8 +86,8 @@ summary = "Only a single step that moves the row counts toward RetryThresh: a Cl
 rfc = "RFC 9946 §5.1"
 reference = []
 tests = [
-    "crates/udpstp-core/tests/algorithm_c.rs::clean_intervals_at_the_last_row_are_not_steps",
-    "crates/udpstp-core/tests/algorithm_c.rs::a_confirming_step_above_the_gigabit_row_can_retry",
+    "src/tests/protocol/algorithm_c.rs::clean_intervals_at_the_last_row_are_not_steps",
+    "src/tests/protocol/algorithm_c.rs::a_confirming_step_above_the_gigabit_row_can_retry",
 ]
 
 [[record]]
@@ -97,8 +97,8 @@ summary = "A Fast-Mode Retry clears Congestion Confirmed and also resets the cou
 rfc = "RFC 9946 §5.1"
 reference = ["ADR 0005"]
 tests = [
-    "crates/udpstp-core/tests/algorithm_c.rs::random_interval_sequences_follow_the_flowchart",
-    "crates/udpstp-core/tests/algorithm_c.rs::a_confirming_step_above_the_gigabit_row_can_retry",
+    "src/tests/protocol/algorithm_c.rs::random_interval_sequences_follow_the_flowchart",
+    "src/tests/protocol/algorithm_c.rs::a_confirming_step_above_the_gigabit_row_can_retry",
 ]
 
 [[record]]
@@ -108,8 +108,8 @@ summary = "Algorithm C's Update flag toggles on each Fast Mode pass that doesn't
 rfc = "RFC 9946 §5.1"
 reference = []
 tests = [
-    "crates/udpstp-core/tests/algorithm_c.rs::update_persists_across_a_retry",
-    "crates/udpstp-core/tests/algorithm_c.rs::the_jump_to_1_gbps_leaves_update_as_it_was",
+    "src/tests/protocol/algorithm_c.rs::update_persists_across_a_retry",
+    "src/tests/protocol/algorithm_c.rs::the_jump_to_1_gbps_leaves_update_as_it_was",
 ]
 
 # Lost Status Backoff
@@ -123,9 +123,9 @@ requirements = ["RFC9097-8.1-13", "RFC9097-8.1-L21"]
 obudpst = "Has no Lost Status Backoff: it keeps its rate until its no-traffic timeouts."
 reference = ["ADR 0005"]
 tests = [
-    "crates/udpstp-core/tests/lost_status_backoff.rs::a_backoff_counts_as_an_errored_interval",
-    "crates/udpstp-core/tests/lost_status_backoff.rs::lost_status_pdus_back_the_rate_off_and_confirm_congestion",
-    "crates/udpstp-core/tests/lost_status_backoff.rs::backoffs_stop_at_row_0_and_two_in_a_row_leave_fast_mode_on",
+    "src/tests/protocol/lost_status_backoff.rs::a_backoff_counts_as_an_errored_interval",
+    "src/tests/protocol/lost_status_backoff.rs::lost_status_pdus_back_the_rate_off_and_confirm_congestion",
+    "src/tests/protocol/lost_status_backoff.rs::backoffs_stop_at_row_0_and_two_in_a_row_leave_fast_mode_on",
 ]
 
 [[record]]
@@ -136,9 +136,9 @@ rfc = "RFC 9097 §8.1"
 requirements = ["RFC9097-8.1-14", "RFC9097-8.1-L20"]
 reference = []
 tests = [
-    "crates/udpstp-core/tests/lost_status_backoff.rs::a_long_path_gets_no_backoff_before_its_first_status_pdu",
-    "crates/udpstp-core/src/algorithm.rs::the_initial_w_covers_the_round_trip",
-    "crates/udpstp-core/src/algorithm.rs::the_initial_w_keeps_the_first_backoff_before_the_status_pdu_timeout",
+    "src/tests/protocol/lost_status_backoff.rs::a_long_path_gets_no_backoff_before_its_first_status_pdu",
+    "src/protocol/algorithm.rs::the_initial_w_covers_the_round_trip",
+    "src/protocol/algorithm.rs::the_initial_w_keeps_the_first_backoff_before_the_status_pdu_timeout",
 ]
 
 # Status PDU sequencing
@@ -152,10 +152,10 @@ requirements = ["RFC9946-8.2-4", "RFC9946-8.2-L2"]
 obudpst = "Feeds every Status PDU, reordered or duplicated ones included, to the algorithm in a Downstream Test."
 reference = ["docs/spec.md story 92"]
 tests = [
-    "crates/udpstp-core/tests/stale_status_pdus.rs::a_stale_status_pdu_does_not_steer_the_server",
-    "crates/udpstp-core/tests/stale_status_pdus.rs::a_stale_status_pdu_does_not_steer_the_client",
-    "crates/udpstp-core/tests/stale_status_pdus.rs::a_stale_stop_does_not_end_the_test",
-    "crates/udpstp-core/tests/stale_status_pdus.rs::a_stale_status_pdu_still_counts_as_heard",
+    "src/tests/protocol/stale_status_pdus.rs::a_stale_status_pdu_does_not_steer_the_server",
+    "src/tests/protocol/stale_status_pdus.rs::a_stale_status_pdu_does_not_steer_the_client",
+    "src/tests/protocol/stale_status_pdus.rs::a_stale_stop_does_not_end_the_test",
+    "src/tests/protocol/stale_status_pdus.rs::a_stale_status_pdu_still_counts_as_heard",
 ]
 
 [[record]]
@@ -167,8 +167,8 @@ requirements = ["RFC9946-8.1-L8"]
 obudpst = "Sends 0xFFFF for a reordered Status PDU; udpstp treats that one as stale and never sends 0xFFFF."
 reference = []
 tests = [
-    "crates/udpstp-core/tests/stale_status_pdus.rs::spdu_seq_err_reports_the_status_pdus_missing_before_the_latest",
-    "crates/udpstp-core/tests/status_loss.rs::a_load_sender_counts_the_status_pdus_it_never_received",
+    "src/tests/protocol/stale_status_pdus.rs::spdu_seq_err_reports_the_status_pdus_missing_before_the_latest",
+    "src/tests/protocol/status_loss.rs::a_load_sender_counts_the_status_pdus_it_never_received",
 ]
 
 # Trial Interval classification
@@ -183,9 +183,9 @@ default = "on"
 setting = "`--delay-var-statistic`, `delay_var_statistic` in TOML"
 reference = []
 tests = [
-    "crates/udpstp-core/tests/interval_classification.rs::the_maximum_is_the_default_and_the_average_a_setting",
-    "crates/udpstp-core/tests/interval_classification.rs::the_average_rounds_and_clean_is_strictly_below_the_low_threshold",
-    "crates/udpstp-core/tests/interval_classification.rs::without_one_way_delay_the_latest_rtt_sample_is_delay_var",
+    "src/tests/protocol/interval_classification.rs::the_maximum_is_the_default_and_the_average_a_setting",
+    "src/tests/protocol/interval_classification.rs::the_average_rounds_and_clean_is_strictly_below_the_low_threshold",
+    "src/tests/protocol/interval_classification.rs::without_one_way_delay_the_latest_rtt_sample_is_delay_var",
 ]
 
 [[record]]
@@ -195,7 +195,7 @@ summary = "A Clean Interval needs DelayVar strictly below lowThresh, as RFC 9097
 rfc = "RFC 9946 §5.1"
 requirements = ["RFC9946-5.1-9"]
 reference = []
-tests = ["crates/udpstp-core/tests/interval_classification.rs::the_average_rounds_and_clean_is_strictly_below_the_low_threshold"]
+tests = ["src/tests/protocol/interval_classification.rs::the_average_rounds_and_clean_is_strictly_below_the_low_threshold"]
 
 [[record]]
 id = "seq-err-thresh-always-applied"
@@ -204,7 +204,7 @@ summary = "RFC 9946 §5.1(6) says Congestion MUST be indicated when Sequence Err
 rfc = "RFC 9946 §5.1"
 requirements = ["RFC9946-5.1-9"]
 reference = []
-tests = ["crates/udpstp-core/tests/interval_classification.rs::seq_err_thresh_is_always_applied"]
+tests = ["src/tests/protocol/interval_classification.rs::seq_err_thresh_is_always_applied"]
 
 [[record]]
 id = "no-delay-sample-is-never-clean"
@@ -213,7 +213,7 @@ summary = "A Trial Interval without a delay sample is never clean: it is a Hold 
 rfc = "RFC 9946 §5.1"
 requirements = ["RFC9946-5.1-9"]
 reference = []
-tests = ["crates/udpstp-core/tests/interval_classification.rs::no_delay_samples_is_never_clean"]
+tests = ["src/tests/protocol/interval_classification.rs::no_delay_samples_is_never_clean"]
 
 [[record]]
 id = "stop-status-pdus-are-not-classified"
@@ -223,9 +223,9 @@ rfc = "RFC 9946 §8.2, §9"
 requirements = ["RFC9946-9-L2"]
 reference = []
 tests = [
-    "crates/udpstp-core/tests/interval_classification.rs::a_stop_status_pdu_is_not_classified",
-    "crates/udpstp-core/tests/interval_classification.rs::an_upstream_server_classifies_the_status_pdus_it_sends",
-    "crates/udpstp-core/tests/stop_exchange.rs::load_pdus_arriving_after_stop1_still_count",
+    "src/tests/protocol/interval_classification.rs::a_stop_status_pdu_is_not_classified",
+    "src/tests/protocol/interval_classification.rs::an_upstream_server_classifies_the_status_pdus_it_sends",
+    "src/tests/protocol/stop_exchange.rs::load_pdus_arriving_after_stop1_still_count",
 ]
 
 # Sending Rate Structure sizes
@@ -238,9 +238,9 @@ rfc = "RFC 9946 §6.1, §8.1"
 requirements = ["RFC9946-6.1-8", "RFC9946-6.1-9", "RFC9946-6.1-11", "RFC9946-6.1-12", "RFC9946-7.1-5", "RFC9946-8.1-1", "RFC9946-8.1-6"]
 reference = ["ADR 0004"]
 tests = [
-    "crates/udpstp-core/tests/upstream.rs::an_ipv6_client_sends_20_bytes_less",
-    "crates/udpstp-core/tests/upstream.rs::an_ipv6_client_draws_random_sizes_from_32",
-    "crates/udpstp-core/tests/sending_rate_table.rs::every_row_up_to_1_gbps_fits_the_rfc_sizes_and_ob_udpst_client_limits",
+    "src/tests/protocol/upstream.rs::an_ipv6_client_sends_20_bytes_less",
+    "src/tests/protocol/upstream.rs::an_ipv6_client_draws_random_sizes_from_32",
+    "src/tests/protocol/sending_rate_table.rs::every_row_up_to_1_gbps_fits_the_rfc_sizes_and_ob_udpst_client_limits",
 ]
 
 [[record]]
@@ -254,4 +254,4 @@ obudpst = "OB-UDPST changes the rate when a Status PDU arrives too."
 default = "on"
 revisit = "If per-st Sender Bit Rates were reported (sender-bit-rate-per-sub-interval) and a clean rate per st mattered: defer each change to the next st boundary."
 reference = []
-tests = ["crates/udpstp-core/tests/algorithm_b.rs::in_fast_mode_each_clean_interval_adds_high_speed_delta_rows"]
+tests = ["src/tests/protocol/algorithm_b.rs::in_fast_mode_each_clean_interval_adds_high_speed_delta_rows"]

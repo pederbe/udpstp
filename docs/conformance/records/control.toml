@@ -18,9 +18,9 @@ setting = "`--allow-unauthenticated`, `allow_unauthenticated` in TOML (Server); 
 revisit = "If the interop matrix no longer needs Unauthenticated Mode against OB-UDPST, or a lab use for it disappears."
 reference = []
 tests = [
-  "crates/udpstp-core/tests/setup_exchange.rs::unauthenticated_setup_ends_in_ack_with_a_test_port_when_both_ends_opt_in",
-  "crates/udpstp-core/tests/setup_exchange.rs::server_without_opt_in_does_not_accept_an_unauthenticated_setup",
-  "crates/udpstp-core/tests/replay_cache.rs::unauthenticated_requests_bypass_the_cache",
+  "src/tests/protocol/setup_exchange.rs::unauthenticated_setup_ends_in_ack_with_a_test_port_when_both_ends_opt_in",
+  "src/tests/protocol/setup_exchange.rs::server_without_opt_in_does_not_accept_an_unauthenticated_setup",
+  "src/tests/protocol/replay_cache.rs::unauthenticated_requests_bypass_the_cache",
 ]
 
 [[record]]
@@ -32,10 +32,10 @@ requirements = ["RFC9946-5.3.1-4"]
 obudpst = "OB-UDPST compares 64-bit times and would reject every PDU after the 2106 wraparound."
 reference = ["ADR 0009"]
 tests = [
-  "crates/udpstp-core/tests/setup_mode1.rs::clocks_five_seconds_apart_are_within_the_window",
-  "crates/udpstp-core/tests/setup_mode1.rs::server_silently_drops_a_setup_more_than_five_seconds_off",
-  "crates/udpstp-core/tests/setup_mode1.rs::setup_is_accepted_across_the_2106_wraparound",
-  "crates/udpstp-core/tests/activation_mode1.rs::server_accepts_an_activation_time_5_s_off",
+  "src/tests/protocol/setup_mode1.rs::clocks_five_seconds_apart_are_within_the_window",
+  "src/tests/protocol/setup_mode1.rs::server_silently_drops_a_setup_more_than_five_seconds_off",
+  "src/tests/protocol/setup_mode1.rs::setup_is_accepted_across_the_2106_wraparound",
+  "src/tests/protocol/activation_mode1.rs::server_accepts_an_activation_time_5_s_off",
 ]
 
 [[record]]
@@ -46,7 +46,7 @@ rfc = "RFC 9946 §6.2, §6.2.1"
 requirements = ["RFC9946-6.2-2", "RFC9946-6.2.1-3"]
 obudpst = "OB-UDPST always answers with CHSR_CRSP_AUTHTIME."
 reference = ["ADR 0009"]
-tests = ["crates/udpstp-core/tests/setup_rejections.rs::an_authentic_request_outside_the_time_window_gets_no_response"]
+tests = ["src/tests/protocol/setup_rejections.rs::an_authentic_request_outside_the_time_window_gets_no_response"]
 
 [[record]]
 id = "activation-auth-matches-setup"
@@ -56,7 +56,7 @@ rfc = "RFC 9946 §5.4.1, §6.2, §7.2.1"
 requirements = ["RFC9946-7.2-2", "RFC9946-7.2.1-6", "RFC9946-5.4.1-8"]
 obudpst = "OB-UDPST doesn't check the Activation Request's keyId; its Client always sends the Setup's."
 reference = ["ADR 0009"]
-tests = ["crates/udpstp-core/tests/activation_mode1.rs::server_silently_drops_activations_that_fail_verification"]
+tests = ["src/tests/protocol/activation_mode1.rs::server_silently_drops_activations_that_fail_verification"]
 
 [[record]]
 id = "silent-authentication-failures"
@@ -65,8 +65,8 @@ summary = "Every Setup Request that fails authentication is dropped silently (ba
 obudpst = "OB-UDPST always answers these failures with a coded Setup Response (AUTHFAIL, AUTHTIME, AUTHNC, AUTHREQ, AUTHINV) and has no silent mode."
 reference = []
 tests = [
-  "crates/udpstp-core/tests/troubleshooting_mode.rs::by_default_authentication_failures_are_silent",
-  "crates/udpstp-core/tests/setup_rejections.rs::a_request_whose_digest_fails_gets_no_response",
+  "src/tests/protocol/troubleshooting_mode.rs::by_default_authentication_failures_are_silent",
+  "src/tests/protocol/setup_rejections.rs::a_request_whose_digest_fails_gets_no_response",
 ]
 
 [[record]]
@@ -79,12 +79,12 @@ default = "off"
 setting = "`--troubleshooting`, `troubleshooting` in TOML"
 reference = ["ADR 0009"]
 tests = [
-  "crates/udpstp-core/tests/troubleshooting_mode.rs::a_wrong_key_is_answered_with_authfail",
-  "crates/udpstp-core/tests/troubleshooting_mode.rs::an_unknown_key_id_is_answered_with_authfail",
-  "crates/udpstp-core/tests/troubleshooting_mode.rs::a_time_outside_the_window_is_answered_with_a_signed_authtime",
-  "crates/udpstp-core/tests/troubleshooting_mode.rs::an_unauthenticated_request_is_answered_with_authreq",
-  "crates/udpstp-core/tests/troubleshooting_mode.rs::an_authenticated_request_to_a_server_without_keys_is_answered_with_authnc",
-  "crates/udpstp-core/tests/troubleshooting_mode.rs::an_unsupported_mode_is_answered_with_authinv",
+  "src/tests/protocol/troubleshooting_mode.rs::a_wrong_key_is_answered_with_authfail",
+  "src/tests/protocol/troubleshooting_mode.rs::an_unknown_key_id_is_answered_with_authfail",
+  "src/tests/protocol/troubleshooting_mode.rs::a_time_outside_the_window_is_answered_with_a_signed_authtime",
+  "src/tests/protocol/troubleshooting_mode.rs::an_unauthenticated_request_is_answered_with_authreq",
+  "src/tests/protocol/troubleshooting_mode.rs::an_authenticated_request_to_a_server_without_keys_is_answered_with_authnc",
+  "src/tests/protocol/troubleshooting_mode.rs::an_unsupported_mode_is_answered_with_authinv",
 ]
 
 [[record]]
@@ -97,10 +97,10 @@ default = "off"
 setting = "`--troubleshooting`, `troubleshooting` in TOML"
 reference = []
 tests = [
-  "crates/udpstp-core/tests/troubleshooting_mode.rs::at_most_10_failures_a_second_are_answered",
-  "crates/udpstp-core/tests/troubleshooting_mode.rs::while_on_the_server_warns_every_minute",
-  "crates/udpstp-core/tests/troubleshooting_mode.rs::a_replay_stays_silent",
-  "crates/udpstp-core/tests/troubleshooting_mode.rs::a_failed_activation_request_stays_silent_in_troubleshooting_mode",
+  "src/tests/protocol/troubleshooting_mode.rs::at_most_10_failures_a_second_are_answered",
+  "src/tests/protocol/troubleshooting_mode.rs::while_on_the_server_warns_every_minute",
+  "src/tests/protocol/troubleshooting_mode.rs::a_replay_stays_silent",
+  "src/tests/protocol/troubleshooting_mode.rs::a_failed_activation_request_stays_silent_in_troubleshooting_mode",
 ]
 
 # Setup Request checks and rejection codes
@@ -112,8 +112,8 @@ summary = "Any protocolVer other than 20 is rejected with BADVER, legacy version
 obudpst = "OB-UDPST also serves protocolVer 11 to 19."
 reference = []
 tests = [
-  "crates/udpstp-core/tests/setup_rejections.rs::a_bad_protocol_version_is_rejected_with_the_expected_version",
-  "crates/udpstp-core/tests/setup_rejections.rs::an_unauthenticated_request_gets_unsigned_rejections",
+  "src/tests/protocol/setup_rejections.rs::a_bad_protocol_version_is_rejected_with_the_expected_version",
+  "src/tests/protocol/setup_rejections.rs::an_unauthenticated_request_gets_unsigned_rejections",
 ]
 
 [[record]]
@@ -123,9 +123,9 @@ summary = "The Server checks a Setup Request in the RFC's order: size, checksum,
 obudpst = "OB-UDPST judges the fields before authMode, and checks MCINVPAR right after BADVER, before BADJS and BADTMTU; so an unauthenticated request learns the field results before being told authentication is required."
 reference = []
 tests = [
-  "crates/udpstp-core/tests/setup_rejections.rs::a_disallowed_unauthenticated_request_is_silent_whatever_its_options",
-  "crates/udpstp-core/tests/setup_rejections.rs::the_options_are_judged_before_the_multi_connection_fields",
-  "crates/udpstp-core/src/admission.rs::a_setup_is_refused_by_the_first_check_it_fails",
+  "src/tests/protocol/setup_rejections.rs::a_disallowed_unauthenticated_request_is_silent_whatever_its_options",
+  "src/tests/protocol/setup_rejections.rs::the_options_are_judged_before_the_multi_connection_fields",
+  "src/protocol/admission.rs::a_setup_is_refused_by_the_first_check_it_fails",
 ]
 
 [[record]]
@@ -137,11 +137,11 @@ requirements = ["RFC9946-6.2.1-3", "RFC9946-7.2.1-L2", "RFC9946-12.3.5-L1"]
 obudpst = "OB-UDPST refuses an mcCount above 24 with MCINVPAR, and sends CONNFAIL only when its connection table is full or allocation fails."
 reference = []
 tests = [
-  "crates/udpstp-core/tests/admission_limits.rs::a_test_connection_over_the_per_test_cap_is_refused_with_connfail",
-  "crates/udpstp-core/tests/admission_limits.rs::the_per_test_cap_is_24_by_default",
-  "crates/udpstp-core/tests/admission_limits.rs::a_test_connection_over_the_global_cap_is_refused_with_connfail",
-  "crates/udpstp-core/tests/admission_limits.rs::a_setup_whose_socket_cant_be_opened_is_refused_and_released",
-  "crates/udpstp-core/tests/source_budget.rs::a_request_over_its_sources_budget_gets_a_signed_connfail",
+  "src/tests/protocol/admission_limits.rs::a_test_connection_over_the_per_test_cap_is_refused_with_connfail",
+  "src/tests/protocol/admission_limits.rs::the_per_test_cap_is_24_by_default",
+  "src/tests/protocol/admission_limits.rs::a_test_connection_over_the_global_cap_is_refused_with_connfail",
+  "src/tests/protocol/admission_limits.rs::a_setup_whose_socket_cant_be_opened_is_refused_and_released",
+  "src/tests/protocol/source_budget.rs::a_request_over_its_sources_budget_gets_a_signed_connfail",
 ]
 
 [[record]]
@@ -152,8 +152,8 @@ rfc = "RFC 9946 §11"
 requirements = ["RFC9946-11-4"]
 reference = []
 tests = [
-  "crates/udpstp-core/src/admission.rs::a_test_kept_alive_cannot_start_new_test_connections_past_its_cap",
-  "crates/udpstp-core/src/admission.rs::a_test_waiting_on_one_test_connection_keeps_its_closed_count",
+  "src/protocol/admission.rs::a_test_kept_alive_cannot_start_new_test_connections_past_its_cap",
+  "src/protocol/admission.rs::a_test_waiting_on_one_test_connection_keeps_its_closed_count",
 ]
 
 [[record]]
@@ -165,14 +165,14 @@ requirements = ["RFC9946-6.1-L1", "RFC9946-6.1-L3", "RFC9946-4-L2"]
 obudpst = "OB-UDPST checks only mcCount at most 24 and mcIndex below mcCount, keeps no per-mcIdent state, and accepts mcIdent 0."
 reference = []
 tests = [
-  "crates/udpstp-core/tests/multi_connection_checks.rs::a_zero_mc_ident_is_refused",
-  "crates/udpstp-core/src/admission.rs::an_mc_index_not_below_mc_count_is_refused",
-  "crates/udpstp-core/tests/multi_connection_checks.rs::an_mc_index_already_in_use_in_the_test_is_refused",
-  "crates/udpstp-core/src/admission.rs::a_test_connection_with_another_mc_count_is_refused",
-  "crates/udpstp-core/src/admission.rs::a_test_connection_with_another_auth_mode_is_refused",
-  "crates/udpstp-core/src/admission.rs::a_test_connection_with_another_key_id_is_refused",
-  "crates/udpstp-core/src/admission.rs::in_unauthenticated_mode_the_key_id_is_not_compared",
-  "crates/udpstp-core/src/admission.rs::a_test_runs_without_every_mc_index",
+  "src/tests/protocol/multi_connection_checks.rs::a_zero_mc_ident_is_refused",
+  "src/protocol/admission.rs::an_mc_index_not_below_mc_count_is_refused",
+  "src/tests/protocol/multi_connection_checks.rs::an_mc_index_already_in_use_in_the_test_is_refused",
+  "src/protocol/admission.rs::a_test_connection_with_another_mc_count_is_refused",
+  "src/protocol/admission.rs::a_test_connection_with_another_auth_mode_is_refused",
+  "src/protocol/admission.rs::a_test_connection_with_another_key_id_is_refused",
+  "src/protocol/admission.rs::in_unauthenticated_mode_the_key_id_is_not_compared",
+  "src/protocol/admission.rs::a_test_runs_without_every_mc_index",
 ]
 
 [[record]]
@@ -181,7 +181,7 @@ kind = "interpretation"
 summary = "A copy of an admitted Setup Request (same address, mcIdent and mcIndex) is dropped silently, not refused as an mcIndex in use, so a datagram the network duplicated can't end the Client's Test."
 rfc = "RFC 9946 §6.2.1"
 reference = []
-tests = ["crates/udpstp-core/tests/multi_connection_checks.rs::a_duplicated_setup_request_is_answered_once"]
+tests = ["src/tests/protocol/multi_connection_checks.rs::a_duplicated_setup_request_is_answered_once"]
 
 # Replay cache and budgets
 
@@ -194,10 +194,10 @@ requirements = ["RFC9946-5.3.1-4"]
 obudpst = "OB-UDPST has no replay cache."
 reference = []
 tests = [
-  "crates/udpstp-core/tests/replay_cache.rs::a_replayed_setup_request_is_dropped",
-  "crates/udpstp-core/tests/replay_cache.rs::a_setup_request_replayed_after_its_test_connection_ended_is_dropped",
-  "crates/udpstp-core/tests/replay_cache.rs::a_request_refused_by_its_sources_budget_isnt_remembered",
-  "crates/udpstp-core/tests/setup_rejections.rs::a_replayed_rejected_request_gets_one_response",
+  "src/tests/protocol/replay_cache.rs::a_replayed_setup_request_is_dropped",
+  "src/tests/protocol/replay_cache.rs::a_setup_request_replayed_after_its_test_connection_ended_is_dropped",
+  "src/tests/protocol/replay_cache.rs::a_request_refused_by_its_sources_budget_isnt_remembered",
+  "src/tests/protocol/setup_rejections.rs::a_replayed_rejected_request_gets_one_response",
 ]
 
 [[record]]
@@ -209,8 +209,8 @@ requirements = ["RFC9946-5.3.1-4"]
 obudpst = "OB-UDPST has no replay cache."
 reference = []
 tests = [
-  "crates/udpstp-core/tests/replay_cache.rs::a_replayed_activation_request_is_dropped_at_a_sibling_test_connection",
-  "crates/udpstp-core/tests/replay_cache.rs::an_activation_request_from_another_ip_address_is_dropped",
+  "src/tests/protocol/replay_cache.rs::a_replayed_activation_request_is_dropped_at_a_sibling_test_connection",
+  "src/tests/protocol/replay_cache.rs::an_activation_request_from_another_ip_address_is_dropped",
 ]
 
 [[record]]
@@ -221,9 +221,9 @@ rfc = "RFC 9946 §5.3.1"
 requirements = ["RFC9946-5.3.1-4"]
 reference = []
 tests = [
-  "crates/udpstp-core/src/replay.rs::an_entry_lasts_11_s",
-  "crates/udpstp-core/src/replay.rs::a_full_cache_refuses_new_requests_until_entries_expire",
-  "crates/udpstp-core/src/replay.rs::the_capacity_covers_what_the_budgets_let_through",
+  "src/protocol/replay.rs::an_entry_lasts_11_s",
+  "src/protocol/replay.rs::a_full_cache_refuses_new_requests_until_entries_expire",
+  "src/protocol/replay.rs::the_capacity_covers_what_the_budgets_let_through",
 ]
 
 [[record]]
@@ -235,11 +235,11 @@ default = "on"
 setting = "`--unverified-setups-per-second`, `unverified_setups_per_second` in TOML"
 reference = []
 tests = [
-  "crates/udpstp-core/tests/unverified_budget.rs::setup_requests_beyond_the_budget_are_dropped_silently",
-  "crates/udpstp-core/tests/unverified_budget.rs::the_budget_is_20000_a_second_by_default",
-  "crates/udpstp-core/tests/unverified_budget.rs::setup_requests_that_arrive_together_pass_or_fail_together",
-  "crates/udpstp-core/tests/unverified_budget.rs::a_request_with_an_unknown_key_id_doesnt_spend_the_budget",
-  "crates/udpstp-core/tests/unverified_budget.rs::an_unauthenticated_request_spends_the_budget",
+  "src/tests/protocol/unverified_budget.rs::setup_requests_beyond_the_budget_are_dropped_silently",
+  "src/tests/protocol/unverified_budget.rs::the_budget_is_20000_a_second_by_default",
+  "src/tests/protocol/unverified_budget.rs::setup_requests_that_arrive_together_pass_or_fail_together",
+  "src/tests/protocol/unverified_budget.rs::a_request_with_an_unknown_key_id_doesnt_spend_the_budget",
+  "src/tests/protocol/unverified_budget.rs::an_unauthenticated_request_spends_the_budget",
 ]
 
 [[record]]
@@ -251,10 +251,10 @@ default = "on"
 setting = "`--source-setup-burst`, `--source-setups-per-second`"
 reference = []
 tests = [
-  "crates/udpstp-core/tests/source_budget.rs::requests_that_fail_the_hmac_dont_spend_the_budget",
-  "crates/udpstp-core/tests/source_budget.rs::a_whole_multi_connection_test_fits_the_default_burst",
-  "crates/udpstp-core/tests/source_budget.rs::unauthenticated_requests_dont_spend_the_budget",
-  "crates/udpstp-core/tests/source_budget.rs::only_the_first_refusal_is_answered",
+  "src/tests/protocol/source_budget.rs::requests_that_fail_the_hmac_dont_spend_the_budget",
+  "src/tests/protocol/source_budget.rs::a_whole_multi_connection_test_fits_the_default_burst",
+  "src/tests/protocol/source_budget.rs::unauthenticated_requests_dont_spend_the_budget",
+  "src/tests/protocol/source_budget.rs::only_the_first_refusal_is_answered",
 ]
 
 [[record]]
@@ -267,11 +267,11 @@ default = "on"
 setting = "`--key-setup-burst`, `--key-setups-per-second`"
 reference = []
 tests = [
-  "crates/udpstp-core/tests/key_budget.rs::a_keys_setup_requests_over_its_budget_are_dropped_silently",
-  "crates/udpstp-core/tests/key_budget.rs::an_operator_keys_setup_requests_spend_its_budget_too",
-  "crates/udpstp-core/tests/key_budget.rs::a_flood_on_one_key_leaves_another_keys_budget_alone",
-  "crates/udpstp-core/tests/key_budget.rs::unauthenticated_setup_requests_share_one_budget",
-  "crates/udpstp-core/tests/key_budget.rs::a_replayed_setup_request_spends_no_keys_budget",
+  "src/tests/protocol/key_budget.rs::a_keys_setup_requests_over_its_budget_are_dropped_silently",
+  "src/tests/protocol/key_budget.rs::an_operator_keys_setup_requests_spend_its_budget_too",
+  "src/tests/protocol/key_budget.rs::a_flood_on_one_key_leaves_another_keys_budget_alone",
+  "src/tests/protocol/key_budget.rs::unauthenticated_setup_requests_share_one_budget",
+  "src/tests/protocol/key_budget.rs::a_replayed_setup_request_spends_no_keys_budget",
 ]
 
 # Test limits and admission
@@ -285,11 +285,11 @@ requirements = ["RFC9946-4.2-1"]
 obudpst = "OB-UDPST has no per-source or per-path limit."
 reference = []
 tests = [
-  "crates/udpstp-core/tests/tests_per_source.rs::a_second_test_from_the_same_source_is_refused_at_setup",
-  "crates/udpstp-core/tests/tests_per_source.rs::of_two_tests_set_up_together_the_second_is_refused_at_activation",
-  "crates/udpstp-core/src/admission.rs::the_test_connections_of_one_test_are_one_test",
-  "crates/udpstp-core/src/admission.rs::only_activated_tests_count_against_their_source",
-  "crates/udpstp-core/src/admission.rs::a_source_is_an_ipv4_address_or_an_ipv6_64",
+  "src/tests/protocol/tests_per_source.rs::a_second_test_from_the_same_source_is_refused_at_setup",
+  "src/tests/protocol/tests_per_source.rs::of_two_tests_set_up_together_the_second_is_refused_at_activation",
+  "src/protocol/admission.rs::the_test_connections_of_one_test_are_one_test",
+  "src/protocol/admission.rs::only_activated_tests_count_against_their_source",
+  "src/protocol/admission.rs::a_source_is_an_ipv4_address_or_an_ipv6_64",
 ]
 
 [[record]]
@@ -303,7 +303,7 @@ default = "off"
 setting = "`--tests-per-source`, `tests_per_source` in TOML"
 revisit = "If a per-path measure better than the source address appears, or CGNAT deployments don't need it."
 reference = []
-tests = ["crates/udpstp-core/src/admission.rs::a_higher_per_source_cap_admits_both"]
+tests = ["src/protocol/admission.rs::a_higher_per_source_cap_admits_both"]
 
 [[record]]
 id = "admitted-rate-cap-per-direction"
@@ -316,9 +316,9 @@ default = "off"
 setting = "`--admitted-rate-cap`, `--require-max-bandwidth`"
 reference = []
 tests = [
-  "crates/udpstp-core/src/admission.rs::the_bandwidth_cap_holds_per_direction_with_usdir_masked",
-  "crates/udpstp-core/tests/admission_limits.rs::a_test_connection_over_the_bandwidth_cap_is_refused_with_capexc",
-  "crates/udpstp-core/tests/admission_limits.rs::a_server_that_requires_max_bandwidth_refuses_its_absence_with_nomaxbw",
+  "src/protocol/admission.rs::the_bandwidth_cap_holds_per_direction_with_usdir_masked",
+  "src/tests/protocol/admission_limits.rs::a_test_connection_over_the_bandwidth_cap_is_refused_with_capexc",
+  "src/tests/protocol/admission_limits.rs::a_server_that_requires_max_bandwidth_refuses_its_absence_with_nomaxbw",
 ]
 
 [[record]]
@@ -329,9 +329,9 @@ rfc = "RFC 9946 §6.1, §7.2.1"
 requirements = ["RFC9946-6.1-L8"]
 reference = []
 tests = [
-  "crates/udpstp-core/tests/admission_limits.rs::an_activation_in_the_other_direction_than_the_setup_stated_is_refused",
-  "crates/udpstp-core/src/admission.rs::an_upstream_test_stating_no_max_bandwidth_may_leave_usdir_clear",
-  "crates/udpstp-core/src/admission.rs::without_a_bandwidth_cap_the_direction_bit_is_not_checked",
+  "src/tests/protocol/admission_limits.rs::an_activation_in_the_other_direction_than_the_setup_stated_is_refused",
+  "src/protocol/admission.rs::an_upstream_test_stating_no_max_bandwidth_may_leave_usdir_clear",
+  "src/protocol/admission.rs::without_a_bandwidth_cap_the_direction_bit_is_not_checked",
 ]
 
 [[record]]
@@ -343,12 +343,12 @@ requirements = ["RFC9946-11-4"]
 obudpst = "OB-UDPST reserves the rate at Setup."
 reference = []
 tests = [
-  "crates/udpstp-core/src/admission.rs::an_unactivated_setup_holds_no_rate",
-  "crates/udpstp-core/tests/admission_limits.rs::of_two_setups_racing_past_the_cap_the_first_activated_keeps_it",
-  "crates/udpstp-core/src/admission.rs::a_multi_connection_test_is_admitted_or_refused_whole",
-  "crates/udpstp-core/src/admission.rs::an_upstream_test_that_no_longer_fits_is_refused_at_activation_and_released",
-  "crates/udpstp-core/src/admission.rs::an_activated_tests_test_connections_hold_their_rate_before_their_sockets_open",
-  "crates/udpstp-core/src/admission.rs::a_first_activation_reserves_each_direction_its_test_states",
+  "src/protocol/admission.rs::an_unactivated_setup_holds_no_rate",
+  "src/tests/protocol/admission_limits.rs::of_two_setups_racing_past_the_cap_the_first_activated_keeps_it",
+  "src/protocol/admission.rs::a_multi_connection_test_is_admitted_or_refused_whole",
+  "src/protocol/admission.rs::an_upstream_test_that_no_longer_fits_is_refused_at_activation_and_released",
+  "src/protocol/admission.rs::an_activated_tests_test_connections_hold_their_rate_before_their_sockets_open",
+  "src/protocol/admission.rs::a_first_activation_reserves_each_direction_its_test_states",
 ]
 
 [[record]]
@@ -362,9 +362,9 @@ default = "on"
 setting = "`--max-test-share`, `max_test_share` in TOML"
 reference = []
 tests = [
-  "crates/udpstp-core/tests/test_share.rs::a_consumer_s_test_may_hold_half_the_cap",
-  "crates/udpstp-core/src/admission.rs::the_share_counts_every_test_connection_of_the_test",
-  "crates/udpstp-core/src/admission.rs::an_operator_key_may_hold_the_whole_cap",
+  "src/tests/protocol/test_share.rs::a_consumer_s_test_may_hold_half_the_cap",
+  "src/protocol/admission.rs::the_share_counts_every_test_connection_of_the_test",
+  "src/protocol/admission.rs::an_operator_key_may_hold_the_whole_cap",
 ]
 
 [[record]]
@@ -378,26 +378,26 @@ default = "on"
 setting = "`--max-unactivated-test-connections`, `max_unactivated_test_connections` in TOML"
 reference = []
 tests = [
-  "crates/udpstp-core/tests/unactivated_share.rs::a_new_setup_evicts_the_oldest_unactivated_test_connection",
-  "crates/udpstp-core/src/admission.rs::activated_test_connections_dont_count",
-  "crates/udpstp-core/src/admission.rs::a_whole_multi_connection_test_fits_the_share",
-  "crates/udpstp-core/src/admission.rs::a_setup_refused_anyway_evicts_no_one",
-  "crates/udpstp-core/src/admission.rs::a_setup_the_rate_cap_refuses_evicts_no_one_from_a_full_cap",
-  "crates/udpstp-core/src/admission.rs::a_flooding_key_evicts_its_own_unactivated_test_connections",
-  "crates/udpstp-core/src/admission.rs::a_busy_server_still_evicts_a_flooding_keys_unactivated_test_connections",
-  "crates/udpstp-core/src/admission.rs::a_test_that_no_longer_fits_cannot_activate_a_remaining_sibling",
-  "crates/udpstp-core/src/admission.rs::the_first_activation_reserves_siblings_waiting_for_their_sockets",
-  "crates/udpstp-core/src/admission.rs::the_unactivated_share_can_exceed_the_global_cap",
-  "crates/udpstp-core/tests/admission_limits.rs::of_two_setups_racing_for_one_place_only_one_activates",
-  "crates/udpstp/tests/cli.rs::a_ephemeral_port_range_smaller_than_the_cap_plus_share_is_a_configuration_error",
-  "crates/udpstp/tests/cli.rs::the_port_range_accounts_for_configured_and_default_shares_without_overflow",
-  "crates/udpstp-core/src/admission.rs::unauthenticated_test_connections_are_one_group",
-  "crates/udpstp-core/src/admission.rs::a_multi_connection_test_survives_another_keys_flood",
-  "crates/udpstp-core/src/admission.rs::of_two_groups_holding_as_many_the_older_gives_up_its_oldest",
-  "crates/udpstp-core/src/admission.rs::a_group_holding_the_most_only_in_waiting_setups_evicts_no_one_else",
-  "crates/udpstp-core/tests/unactivated_share.rs::another_keys_flood_cannot_evict_a_clients_unactivated_test_connection",
-  "crates/udpstp-core/tests/unactivated_share.rs::an_unauthenticated_flood_cannot_evict_a_keyed_clients_unactivated_test_connection",
-  "crates/udpstp-core/tests/unactivated_share.rs::a_flood_on_the_clients_own_key_still_evicts_it",
+  "src/tests/protocol/unactivated_share.rs::a_new_setup_evicts_the_oldest_unactivated_test_connection",
+  "src/protocol/admission.rs::activated_test_connections_dont_count",
+  "src/protocol/admission.rs::a_whole_multi_connection_test_fits_the_share",
+  "src/protocol/admission.rs::a_setup_refused_anyway_evicts_no_one",
+  "src/protocol/admission.rs::a_setup_the_rate_cap_refuses_evicts_no_one_from_a_full_cap",
+  "src/protocol/admission.rs::a_flooding_key_evicts_its_own_unactivated_test_connections",
+  "src/protocol/admission.rs::a_busy_server_still_evicts_a_flooding_keys_unactivated_test_connections",
+  "src/protocol/admission.rs::a_test_that_no_longer_fits_cannot_activate_a_remaining_sibling",
+  "src/protocol/admission.rs::the_first_activation_reserves_siblings_waiting_for_their_sockets",
+  "src/protocol/admission.rs::the_unactivated_share_can_exceed_the_global_cap",
+  "src/tests/protocol/admission_limits.rs::of_two_setups_racing_for_one_place_only_one_activates",
+  "tests/cli.rs::a_ephemeral_port_range_smaller_than_the_cap_plus_share_is_a_configuration_error",
+  "tests/cli.rs::the_port_range_accounts_for_configured_and_default_shares_without_overflow",
+  "src/protocol/admission.rs::unauthenticated_test_connections_are_one_group",
+  "src/protocol/admission.rs::a_multi_connection_test_survives_another_keys_flood",
+  "src/protocol/admission.rs::of_two_groups_holding_as_many_the_older_gives_up_its_oldest",
+  "src/protocol/admission.rs::a_group_holding_the_most_only_in_waiting_setups_evicts_no_one_else",
+  "src/tests/protocol/unactivated_share.rs::another_keys_flood_cannot_evict_a_clients_unactivated_test_connection",
+  "src/tests/protocol/unactivated_share.rs::an_unauthenticated_flood_cannot_evict_a_keyed_clients_unactivated_test_connection",
+  "src/tests/protocol/unactivated_share.rs::a_flood_on_the_clients_own_key_still_evicts_it",
 ]
 
 # Activation handling
@@ -410,10 +410,10 @@ rfc = "RFC 9946 §6.2.2, §7.2"
 obudpst = "OB-UDPST accepts the Activation Request from any address and port and connects to whichever sent it."
 reference = []
 tests = [
-  "crates/udpstp-core/tests/connection_locking.rs::the_first_verified_activation_request_connects_the_socket",
-  "crates/udpstp-core/tests/connection_locking.rs::a_request_from_another_ip_address_connects_nothing",
-  "crates/udpstp-core/tests/connection_locking.rs::a_request_failing_verification_connects_nothing",
-  "crates/udpstp-core/tests/connection_locking.rs::a_nat_that_changes_the_port_is_followed",
+  "src/tests/protocol/connection_locking.rs::the_first_verified_activation_request_connects_the_socket",
+  "src/tests/protocol/connection_locking.rs::a_request_from_another_ip_address_connects_nothing",
+  "src/tests/protocol/connection_locking.rs::a_request_failing_verification_connects_nothing",
+  "src/tests/protocol/connection_locking.rs::a_nat_that_changes_the_port_is_followed",
 ]
 
 [[record]]
@@ -425,8 +425,8 @@ requirements = ["RFC9946-7.2.1-L2"]
 obudpst = "OB-UDPST keeps no per-Test state, so one mcIdent may mix directions (its own Client never does)."
 reference = []
 tests = [
-  "crates/udpstp-core/tests/activation_exchange.rs::a_test_connection_asking_for_the_other_direction_is_rejected",
-  "crates/udpstp-core/tests/activation_exchange.rs::test_connections_of_one_test_with_the_same_direction_are_activated",
+  "src/tests/protocol/activation_exchange.rs::a_test_connection_asking_for_the_other_direction_is_rejected",
+  "src/tests/protocol/activation_exchange.rs::test_connections_of_one_test_with_the_same_direction_are_activated",
 ]
 
 [[record]]
@@ -435,7 +435,7 @@ kind = "obudpst-difference"
 summary = "An Activation Request whose rateAdjAlgo is neither B nor C is refused with BADPARAM: running another algorithm would measure by a method the Client didn't ask for."
 obudpst = "OB-UDPST coerces any other value to B. Its Client only sends B or C, so interop isn't affected."
 reference = []
-tests = ["crates/udpstp-core/tests/activation_coercion.rs::an_unknown_rate_adjustment_algorithm_is_rejected_with_badparam"]
+tests = ["src/tests/protocol/activation_coercion.rs::an_unknown_rate_adjustment_algorithm_is_rejected_with_badparam"]
 
 [[record]]
 id = "fixed-rate-needs-operator-key"
@@ -446,9 +446,9 @@ requirements = ["RFC9946-4.1-3"]
 obudpst = "OB-UDPST accepts a Fixed-Rate Test from anyone and never sends BADPARAM; an OB-UDPST Client given BADPARAM exits with 152."
 reference = []
 tests = [
-  "crates/udpstp-core/tests/fixed_rate.rs::a_fixed_rate_test_is_refused_without_an_operator_key",
-  "crates/udpstp-core/tests/fixed_rate.rs::an_operator_runs_a_fixed_rate_test_at_the_requested_row",
-  "crates/udpstp-core/tests/fixed_rate.rs::a_refused_downstream_fixed_rate_test_sends_no_load",
+  "src/tests/protocol/fixed_rate.rs::a_fixed_rate_test_is_refused_without_an_operator_key",
+  "src/tests/protocol/fixed_rate.rs::an_operator_runs_a_fixed_rate_test_at_the_requested_row",
+  "src/tests/protocol/fixed_rate.rs::a_refused_downstream_fixed_rate_test_sends_no_load",
 ]
 masks = [
   { pdu = "activation-response", fields = ["cmd_response"], when = ["fixed-rate", "consumer-key"] },
@@ -461,7 +461,7 @@ summary = "srIndexConf CHTA_SRIDX_DEF asks for the Server's default search from 
 rfc = "RFC 9946 §7.1"
 requirements = ["RFC9946-7.1-3", "RFC9946-7.1-4"]
 reference = []
-tests = ["crates/udpstp-core/tests/fixed_rate.rs::a_consumer_may_choose_the_starting_row_or_the_default"]
+tests = ["src/tests/protocol/fixed_rate.rs::a_consumer_may_choose_the_starting_row_or_the_default"]
 
 [[record]]
 id = "sr-index-conf-beyond-the-top-row-coerced"
@@ -472,8 +472,8 @@ requirements = ["RFC9946-7.2.1-3"]
 obudpst = "OB-UDPST does not apply the same top-row coercion."
 reference = []
 tests = [
-  "crates/udpstp-core/tests/fixed_rate.rs::a_row_beyond_the_table_is_coerced_to_the_last_row",
-  "crates/udpstp-core/tests/activation_coercion.rs::a_coerced_row_is_reported_at_both_ends",
+  "src/tests/protocol/fixed_rate.rs::a_row_beyond_the_table_is_coerced_to_the_last_row",
+  "src/tests/protocol/activation_coercion.rs::a_coerced_row_is_reported_at_both_ends",
 ]
 masks = [
   { pdu = "activation-response", fields = ["sr_index_conf"], when = ["row-beyond-the-top-row"] },
@@ -486,7 +486,7 @@ kind = "obudpst-difference"
 summary = "The Activation Request's reserved fields are ignored, as the RFC requires, including the one OB-UDPST uses for srAdjSuppCount (dual-phase testing), so a Consumer can't get a fixed rate that way."
 obudpst = "OB-UDPST reads srAdjSuppCount from a reserved field and runs row 0 or the requested row as a fixed rate for the suppressed Sub-Intervals."
 reference = []
-tests = ["crates/udpstp-wire/tests/activation_pdu.rs::reserved_fields_are_ignored_on_receipt"]
+tests = ["src/tests/wire/activation_pdu.rs::reserved_fields_are_ignored_on_receipt"]
 
 [[record]]
 id = "search-capped-at-stated-max-bandwidth"
@@ -497,11 +497,11 @@ requirements = ["RFC9946-6.1-6", "RFC9946-11-5", "RFC9946-11-L2"]
 obudpst = "OB-UDPST caps the search only in a RATE_LIMITING build with -B set, so an OB-UDPST Client stating maxBandwidth measures higher against an OB-UDPST Server than against ours."
 reference = ["ADR 0004"]
 tests = [
-  "crates/udpstp-core/tests/algorithm_capped.rs::fast_mode_stops_at_the_row_matching_max_bandwidth",
-  "crates/udpstp-core/tests/algorithm_capped.rs::single_steps_stop_at_the_cap",
-  "crates/udpstp-core/tests/algorithm_capped.rs::the_cap_masks_the_direction_bit",
-  "crates/udpstp-core/tests/algorithm_capped.rs::a_max_bandwidth_of_0_states_no_cap",
-  "crates/udpstp-core/tests/algorithm_capped.rs::a_cap_above_1_gbps_stops_at_the_row_within_it",
+  "src/tests/protocol/algorithm_capped.rs::fast_mode_stops_at_the_row_matching_max_bandwidth",
+  "src/tests/protocol/algorithm_capped.rs::single_steps_stop_at_the_cap",
+  "src/tests/protocol/algorithm_capped.rs::the_cap_masks_the_direction_bit",
+  "src/tests/protocol/algorithm_capped.rs::a_max_bandwidth_of_0_states_no_cap",
+  "src/tests/protocol/algorithm_capped.rs::a_cap_above_1_gbps_stops_at_the_row_within_it",
 ]
 
 [[record]]
@@ -513,9 +513,9 @@ requirements = ["RFC9946-7.2.1-3", "RFC9946-7.2.1-4"]
 obudpst = "OB-UDPST doesn't tie srIndexConf to maxBandwidth; it echoes a row up to its -I maximum."
 reference = []
 tests = [
-  "crates/udpstp-core/tests/algorithm_capped.rs::a_start_row_above_the_cap_is_coerced_to_it",
-  "crates/udpstp-core/tests/algorithm_capped.rs::a_fixed_rate_above_the_cap_is_coerced_to_it",
-  "crates/udpstp-core/tests/algorithm_capped.rs::a_start_row_at_the_cap_is_not_coerced",
+  "src/tests/protocol/algorithm_capped.rs::a_start_row_above_the_cap_is_coerced_to_it",
+  "src/tests/protocol/algorithm_capped.rs::a_fixed_rate_above_the_cap_is_coerced_to_it",
+  "src/tests/protocol/algorithm_capped.rs::a_start_row_at_the_cap_is_not_coerced",
 ]
 masks = [
   { pdu = "activation-response", fields = ["sr_index_conf"], when = ["row-above-max-bandwidth"] },
@@ -533,10 +533,10 @@ default = "on"
 setting = "`--max-start-row`, `max_start_row` in TOML"
 reference = []
 tests = [
-  "crates/udpstp-core/tests/start_row_cap.rs::a_consumer_s_start_row_is_coerced_to_the_cap",
-  "crates/udpstp-core/tests/start_row_cap.rs::an_operator_key_is_exempt",
-  "crates/udpstp-core/tests/start_row_cap.rs::by_default_a_search_starts_at_row_100_at_most",
-  "crates/udpstp-core/tests/start_row_cap.rs::a_capped_search_still_climbs_past_the_cap",
+  "src/tests/protocol/start_row_cap.rs::a_consumer_s_start_row_is_coerced_to_the_cap",
+  "src/tests/protocol/start_row_cap.rs::an_operator_key_is_exempt",
+  "src/tests/protocol/start_row_cap.rs::by_default_a_search_starts_at_row_100_at_most",
+  "src/tests/protocol/start_row_cap.rs::a_capped_search_still_climbs_past_the_cap",
 ]
 masks = [
   { pdu = "activation-response", fields = ["sr_index_conf"], when = ["start-row-above-100", "consumer-key"] },
@@ -553,7 +553,7 @@ rfc = "RFC 9946 §7.1"
 requirements = ["RFC9946-7.1-L4"]
 obudpst = "OB-UDPST defaults to False (RTT variation). Interop runs pin it to False."
 reference = []
-tests = ["crates/udpstp-core/tests/parameter_ranges.rs::the_client_asks_for_the_defaults"]
+tests = ["src/tests/protocol/parameter_ranges.rs::the_client_asks_for_the_defaults"]
 
 [[record]]
 id = "parameter-ranges-follow-y1540"
@@ -562,7 +562,7 @@ summary = "The Activation parameters' ranges come from Y.1540 Amd 2 Tables B.1 a
 rfc = "RFC 9946 §7.1, §7.2.1"
 requirements = ["RFC9946-7.2.1-L1"]
 reference = []
-tests = ["crates/udpstp-core/tests/parameter_ranges.rs::out_of_range_values_are_clamped_to_the_nearest_limit"]
+tests = ["src/tests/protocol/parameter_ranges.rs::out_of_range_values_are_clamped_to_the_nearest_limit"]
 
 [[record]]
 id = "out-of-range-parameters-clamped"
@@ -570,7 +570,7 @@ kind = "obudpst-difference"
 summary = "An out-of-range Activation parameter is clamped to the nearest limit of our range, and the response reports it. Our ranges are narrower than OB-UDPST's. An OB-UDPST Client adopts the coerced values without complaint."
 obudpst = "OB-UDPST resets an out-of-range value to its default (useOwDelVar to False, ignoreOooDup to True). Its ranges are wider: thresholds 1 to 10000, highSpeedDelta and slowAdjThresh from 1, seqErrThresh to 65535, testIntTime to 3600."
 reference = []
-tests = ["crates/udpstp-core/tests/parameter_ranges.rs::out_of_range_values_are_clamped_to_the_nearest_limit"]
+tests = ["src/tests/protocol/parameter_ranges.rs::out_of_range_values_are_clamped_to_the_nearest_limit"]
 masks = [
   { pdu = "activation-response", fields = ["low_thresh", "upper_thresh", "trial_int", "test_int_time", "use_ow_del_var", "high_speed_delta", "slow_adj_thresh", "seq_err_thresh", "ignore_ooo_dup", "sub_int_period"], when = ["coerced-parameters"] },
 ]
@@ -582,7 +582,7 @@ summary = "A lowThresh above upperThresh is lowered to upperThresh."
 rfc = "RFC 9946 §7.2.1"
 obudpst = "OB-UDPST resets both thresholds to their defaults."
 reference = []
-tests = ["crates/udpstp-core/tests/parameter_ranges.rs::a_low_threshold_above_the_upper_one_is_lowered_to_it"]
+tests = ["src/tests/protocol/parameter_ranges.rs::a_low_threshold_above_the_upper_one_is_lowered_to_it"]
 masks = [
   { pdu = "activation-response", fields = ["low_thresh"], when = ["coerced-parameters"] },
 ]
@@ -594,7 +594,7 @@ summary = "A subIntPeriod longer than the Test Interval is shortened to it."
 rfc = "RFC 9946 §7.2.1"
 obudpst = "OB-UDPST resets both testIntTime and subIntPeriod to their defaults."
 reference = []
-tests = ["crates/udpstp-core/tests/parameter_ranges.rs::a_sub_interval_longer_than_the_test_is_shortened"]
+tests = ["src/tests/protocol/parameter_ranges.rs::a_sub_interval_longer_than_the_test_is_shortened"]
 masks = [
   { pdu = "activation-response", fields = ["sub_int_period"], when = ["coerced-parameters"] },
 ]
@@ -607,7 +607,7 @@ rfc = "RFC 9097 §5.3; RFC 9946 §7.2.1"
 requirements = ["RFC9097-5.3-2", "RFC9097-5.3-6", "RFC9097-6.3-2", "RFC9097-6.3-7"]
 obudpst = "OB-UDPST keeps subIntPeriod and divides by each Sub-Interval's measured time."
 reference = []
-tests = ["crates/udpstp-core/tests/sub_interval_results.rs::the_sub_interval_becomes_a_whole_number_of_trial_intervals"]
+tests = ["src/tests/protocol/sub_interval_results.rs::the_sub_interval_becomes_a_whole_number_of_trial_intervals"]
 masks = [
   { pdu = "activation-response", fields = ["sub_int_period"], when = ["coerced-parameters"] },
 ]
@@ -621,10 +621,10 @@ requirements = ["RFC9946-7.3-L1"]
 obudpst = "OB-UDPST allows up to its -t maximum, 3600 s by default, and keeps useOwDelVar."
 reference = []
 tests = [
-  "crates/udpstp-core/tests/test_interval_limits.rs::an_ordinary_key_gets_at_most_60_s",
-  "crates/udpstp-core/tests/test_interval_limits.rs::an_operator_key_allows_its_own_maximum_with_rtt_variation",
-  "crates/udpstp-core/tests/test_interval_limits.rs::the_client_runs_a_long_test_its_operator_key_allows",
-  "crates/udpstp-core/tests/test_interval_limits.rs::the_client_refuses_a_longer_test_than_it_asked_for",
+  "src/tests/protocol/test_interval_limits.rs::an_ordinary_key_gets_at_most_60_s",
+  "src/tests/protocol/test_interval_limits.rs::an_operator_key_allows_its_own_maximum_with_rtt_variation",
+  "src/tests/protocol/test_interval_limits.rs::the_client_runs_a_long_test_its_operator_key_allows",
+  "src/tests/protocol/test_interval_limits.rs::the_client_refuses_a_longer_test_than_it_asked_for",
 ]
 masks = [
   { pdu = "activation-response", fields = ["test_int_time", "use_ow_del_var"], when = ["test-interval-over-60s"] },
@@ -639,8 +639,8 @@ requirements = ["RFC9946-5.1-8"]
 obudpst = "OB-UDPST doesn't limit slowAdjThresh × trialInt."
 reference = []
 tests = [
-  "crates/udpstp-core/tests/test_interval_limits.rs::slow_adj_thresh_times_trial_int_is_at_most_500_ms",
-  "crates/udpstp-core/tests/test_interval_limits.rs::an_operator_key_allows_its_own_maximum_with_rtt_variation",
+  "src/tests/protocol/test_interval_limits.rs::slow_adj_thresh_times_trial_int_is_at_most_500_ms",
+  "src/tests/protocol/test_interval_limits.rs::an_operator_key_allows_its_own_maximum_with_rtt_variation",
 ]
 masks = [
   { pdu = "activation-response", fields = ["slow_adj_thresh"], when = ["coerced-parameters"] },
@@ -657,10 +657,10 @@ default = "on"
 setting = "`--allowed-dscp`, `--operator-allowed-dscp`"
 reference = []
 tests = [
-  "crates/udpstp-core/tests/activation_coercion.rs::the_server_clears_a_requested_ecn_codepoint",
-  "crates/udpstp-core/tests/dscp.rs::a_server_allowing_only_the_default_coerces_a_priority_dscp_to_0",
-  "crates/udpstp-core/tests/dscp.rs::an_operator_key_may_ask_for_any_dscp",
-  "crates/udpstp-core/tests/dscp.rs::an_operator_key_may_not_ask_for_network_control_by_default",
+  "src/tests/protocol/activation_coercion.rs::the_server_clears_a_requested_ecn_codepoint",
+  "src/tests/protocol/dscp.rs::a_server_allowing_only_the_default_coerces_a_priority_dscp_to_0",
+  "src/tests/protocol/dscp.rs::an_operator_key_may_ask_for_any_dscp",
+  "src/tests/protocol/dscp.rs::an_operator_key_may_not_ask_for_network_control_by_default",
 ]
 masks = [
   { pdu = "activation-response", fields = ["dscp_ecn"], when = ["dscp-requested"] },
@@ -673,8 +673,8 @@ summary = "A Client accepts a Server lowering its DSCP to 0 but ends the Test if
 rfc = "RFC 9946 §7.3"
 requirements = ["RFC9946-7.3-L1"]
 tests = [
-  "crates/udpstp-core/tests/activation_coercion.rs::the_client_refuses_a_dscp_it_did_not_ask_for",
-  "crates/udpstp-core/tests/activation_coercion.rs::the_client_sends_not_ect_whatever_the_server_answers",
+  "src/tests/protocol/activation_coercion.rs::the_client_refuses_a_dscp_it_did_not_ask_for",
+  "src/tests/protocol/activation_coercion.rs::the_client_sends_not_ect_whatever_the_server_answers",
 ]
 
 # The Sending Rate Table's shape
@@ -690,12 +690,12 @@ obudpst = "OB-UDPST's rows above 1000 use packets up to 9000 bytes when jumbo is
 setting = "`--jumbo`, `--traditional-mtu`, `--server-mtu`"
 reference = ["ADR 0004"]
 tests = [
-  "crates/udpstp-core/tests/table_variants.rs::a_client_asking_for_the_server_s_modifiers_is_served",
-  "crates/udpstp-core/tests/table_variants.rs::srstruct_packet_sizes_follow_the_modifiers",
-  "crates/udpstp-core/tests/setup_rejections.rs::a_jumbo_setting_the_server_doesnt_use_is_rejected",
-  "crates/udpstp-core/tests/setup_rejections.rs::a_traditional_mtu_setting_the_server_doesnt_use_is_rejected",
-  "crates/udpstp-core/tests/setup_rejections.rs::traditional_mtu_without_jumbo_is_rejected_as_a_jumbo_mismatch",
-  "crates/udpstp-core/tests/sending_rate_table.rs::row_n_is_n_mbps_up_to_1_gbps",
+  "src/tests/protocol/table_variants.rs::a_client_asking_for_the_server_s_modifiers_is_served",
+  "src/tests/protocol/table_variants.rs::srstruct_packet_sizes_follow_the_modifiers",
+  "src/tests/protocol/setup_rejections.rs::a_jumbo_setting_the_server_doesnt_use_is_rejected",
+  "src/tests/protocol/setup_rejections.rs::a_traditional_mtu_setting_the_server_doesnt_use_is_rejected",
+  "src/tests/protocol/setup_rejections.rs::traditional_mtu_without_jumbo_is_rejected_as_a_jumbo_mismatch",
+  "src/tests/protocol/sending_rate_table.rs::row_n_is_n_mbps_up_to_1_gbps",
 ]
 masks = [
   { pdu = "activation-response", fields = ["sending_rate.tx_interval1", "sending_rate.udp_payload1", "sending_rate.burst_size1", "sending_rate.tx_interval2", "sending_rate.udp_payload2", "sending_rate.burst_size2", "sending_rate.udp_addon2"], when = ["row-above-1000", "upstream"] },
@@ -707,7 +707,7 @@ kind = "obudpst-difference"
 summary = "Row 0 sends one 625-byte IP packet every 50 ms on the second transmitter: 0.1 Mbps, always the same size. The RFC gives row 0 no meaning beyond the first row."
 obudpst = "OB-UDPST's row 0 sends one add-on every 50 ms of random size, up to 1222 bytes of payload (1472 with -T), with the random-size bit set in udpAddon2: about 0.11 Mbps."
 reference = []
-tests = ["crates/udpstp-core/tests/sending_rate_table.rs::row_zero_sends_fixed_size_datagrams_near_0_1_mbps"]
+tests = ["src/tests/protocol/sending_rate_table.rs::row_zero_sends_fixed_size_datagrams_near_0_1_mbps"]
 masks = [
   { pdu = "activation-response", fields = ["sending_rate.udp_addon2"], when = ["upstream", "default-search"] },
 ]
@@ -724,9 +724,9 @@ default = "on"
 revisit = "If a rate limit on signed rejections made answering every refused request safe, or a Client were seen to hang on a refusal it was never sent."
 reference = ["docs/spec.md"]
 tests = [
-  "crates/udpstp-core/tests/source_budget.rs::only_the_first_refusal_is_answered",
-  "crates/udpstp-core/tests/multi_connection_checks.rs::a_duplicated_setup_request_is_answered_once",
-  "crates/udpstp-core/src/replay.rs::a_full_cache_refuses_new_requests_until_entries_expire",
+  "src/tests/protocol/source_budget.rs::only_the_first_refusal_is_answered",
+  "src/tests/protocol/multi_connection_checks.rs::a_duplicated_setup_request_is_answered_once",
+  "src/protocol/replay.rs::a_full_cache_refuses_new_requests_until_entries_expire",
 ]
 
 [[record]]
@@ -740,7 +740,7 @@ obudpst = "OB-UDPST applies no 500 ms limit to anyone."
 default = "on"
 revisit = "If no Operator needs Congestion inferred more slowly, or RFC 9946 §5.1's limit is clarified as applying to consumer Tests only."
 reference = ["docs/spec.md"]
-tests = ["crates/udpstp-core/tests/test_interval_limits.rs::slow_adj_thresh_times_trial_int_is_at_most_500_ms"]
+tests = ["src/tests/protocol/test_interval_limits.rs::slow_adj_thresh_times_trial_int_is_at_most_500_ms"]
 
 [[record]]
 id = "no-frequency-or-volume-quotas"
@@ -755,13 +755,13 @@ setting = "`--quota-period`, `--source-tests-per-quota-period`, `--source-bytes-
 revisit = "If a deployment serves Consumers whose data volumes are limited, set Quotas there; revisit the default if RFC 9946 §11 item 6 is read as requiring them on."
 reference = ["docs/spec.md"]
 tests = [
-  "crates/udpstp-core/tests/quotas.rs::a_source_past_its_quota_of_tests_is_refused_with_connfail",
-  "crates/udpstp-core/tests/quotas.rs::a_source_past_its_quota_of_bytes_is_refused",
-  "crates/udpstp-core/src/admission.rs::the_quota_refills_over_the_quota_period",
-  "crates/udpstp-core/tests/quotas.rs::tests_set_up_together_past_the_quota_are_refused_at_activation",
-  "crates/udpstp-core/tests/quotas.rs::a_key_past_its_quota_is_refused",
-  "crates/udpstp-core/src/admission.rs::operator_keys_are_exempt",
-  "crates/udpstp-core/src/admission.rs::a_test_lives_on_in_a_test_connection_waiting_for_its_socket",
+  "src/tests/protocol/quotas.rs::a_source_past_its_quota_of_tests_is_refused_with_connfail",
+  "src/tests/protocol/quotas.rs::a_source_past_its_quota_of_bytes_is_refused",
+  "src/protocol/admission.rs::the_quota_refills_over_the_quota_period",
+  "src/tests/protocol/quotas.rs::tests_set_up_together_past_the_quota_are_refused_at_activation",
+  "src/tests/protocol/quotas.rs::a_key_past_its_quota_is_refused",
+  "src/protocol/admission.rs::operator_keys_are_exempt",
+  "src/protocol/admission.rs::a_test_lives_on_in_a_test_connection_waiting_for_its_socket",
 ]
 
 [[record]]
@@ -776,8 +776,8 @@ default = "on"
 revisit = "If a search's first Trial Intervals at row 0 mattered, or matching OB-UDPST's table stopped mattering."
 reference = []
 tests = [
-  "crates/udpstp-core/tests/sending_rate_table.rs::row_zero_sends_fixed_size_datagrams_near_0_1_mbps",
-  "crates/udpstp-core/tests/sending_rate_table.rs::row_n_is_n_mbps_up_to_1_gbps",
+  "src/tests/protocol/sending_rate_table.rs::row_zero_sends_fixed_size_datagrams_near_0_1_mbps",
+  "src/tests/protocol/sending_rate_table.rs::row_n_is_n_mbps_up_to_1_gbps",
 ]
 
 [[record]]
@@ -791,4 +791,4 @@ obudpst = "OB-UDPST's table has the same rows."
 default = "on"
 revisit = "If matching OB-UDPST's table stopped mattering, or searches above 7.2 Gbps needed finer steps than 720 Mbps."
 reference = []
-tests = ["crates/udpstp-core/src/sending_rate_table.rs::rows_offer_their_rates"]
+tests = ["src/protocol/sending_rate_table.rs::rows_offer_their_rates"]

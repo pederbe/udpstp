@@ -16,11 +16,11 @@ RFC 9946 leaves several details of mode 1 open. We resolve them as follows.
 
 ## Consequences
 
-- Proved by `crates/udpstp-core/tests/setup_mode1.rs` and `activation_mode1.rs`:
+- Proved by `src/tests/protocol/setup_mode1.rs` and `activation_mode1.rs`:
   - accepted at ±5 s, dropped at ±6 s;
   - accepted across the 2106 wraparound;
   - scripted peers check which key signs each PDU in both directions;
   - a non-zero reserved field signed as sent is accepted;
   - an Activation Request with another authMode or keyId than its Setup is dropped silently.
 - The requirement entries for §5.3.1 and §5.4.1 reference this ADR.
-- A replay of a Setup or Activation Request inside the window is dropped by the replay cache (`crates/udpstp-core/src/replay.rs`). Mode 2 Status PDUs aren't in it: a replayed one has a stale spduSeqNo, so it can't change the rate or deliver STOP.
+- A replay of a Setup or Activation Request inside the window is dropped by the replay cache (`src/protocol/replay.rs`). Mode 2 Status PDUs aren't in it: a replayed one has a stale spduSeqNo, so it can't change the rate or deliver STOP.

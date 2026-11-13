@@ -17,9 +17,9 @@ Both are byte-identical to the RFC Editor's files as fetched on 2026-09-24 (SHA-
 
 | File | Source | Licence |
 |---|---|---|
-| `crates/udpstp-wire/tests/vectors/hmac-rfc4231.txt` | Test cases 1-7 extracted from <https://www.rfc-editor.org/rfc/rfc4231.txt> by `cargo xtask kat` | IETF Trust Legal Provisions; the extracted test cases are Code Components under the Revised BSD licence (TLP section 4.e) |
-| `crates/udpstp-wire/tests/vectors/obudpst-control.txt` | Control PDUs an OB-UDPST v9.1.0 Client and Server exchanged, captured by `cargo xtask capture`; the header records the build and commands | Output of OB-UDPST (BSD-3-Clause) run with our own test key; no OB-UDPST text |
-| `crates/udpstp-wire/tests/vectors/kdf-openssl.txt` | Generated with OpenSSL's `kdf` command by `cargo xtask kat`; the header records the version and command | Our own output; no third-party text |
+| `src/tests/wire/vectors/hmac-rfc4231.txt` | Test cases 1-7 extracted from <https://www.rfc-editor.org/rfc/rfc4231.txt> by `cargo xtask kat` | IETF Trust Legal Provisions; the extracted test cases are Code Components under the Revised BSD licence (TLP section 4.e) |
+| `src/tests/wire/vectors/obudpst-control.txt` | Control PDUs an OB-UDPST v9.1.0 Client and Server exchanged, captured by `cargo xtask capture`; the header records the build and commands | Output of OB-UDPST (BSD-3-Clause) run with our own test key; no OB-UDPST text |
+| `src/tests/wire/vectors/kdf-openssl.txt` | Generated with OpenSSL's `kdf` command by `cargo xtask kat`; the header records the version and command | Our own output; no third-party text |
 
 ## OB-UDPST v9.1.0 fixtures
 

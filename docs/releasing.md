@@ -27,11 +27,9 @@ section. The [release workflow](../.github/workflows/release-plz.yml) owns the
 schedule, release selection and refresh behavior. Required CI checks gate its
 release pull request.
 
-After preparing each release pull request, the workflow refreshes `fuzz/Cargo.lock` on its branch to match the local crate versions. It commits the lockfile only when it changes, before enabling auto-merge. Existing registry dependency versions stay locked.
+Merging the release pull request publishes the `udpstp` application to crates.io, creates its `vVERSION` tag and creates a GitHub draft release with the dated changelog section. The Release workflow builds and attests the assets, attaches them to that draft, runs the downloaded-archive and native-package qualification, and publishes it after those checks pass. Publication starts the container and signed package repository workflows.
 
-Merging the release pull request publishes changed crates to crates.io in dependency order and creates their tags. The published crates share a version group so a feature or breaking change in a library also raises the binary's version appropriately. Unchanged crates may keep their previous versions. The binary uses `vVERSION`, while the libraries use `PACKAGE-vVERSION`. Only the binary creates a GitHub draft release, using its combined changelog section as the release notes. The Release workflow builds and attests the assets, attaches them to that draft, runs the downloaded-archive and native-package qualification, and publishes it after those checks pass. Publication starts the container and signed package repository workflows.
-
-Published notes are already on `main` before tagging, and stay under their dated version heading. Keep `## [Unreleased]` empty. Release-plz manages version numbers and dependency requirements, including the library crates required by `cargo install udpstp`. Test helpers, benchmarks, fuzzing and `xtask` are not released.
+Published notes are already on `main` before tagging, and stay under their dated version heading. Keep `## [Unreleased]` empty. Release-plz manages the application version. Previously published component packages remain available, but receive no new releases. Test helpers, benchmarks, fuzzing and `xtask` are not released. Fuzz targets include application source directly, so their lockfile has no application package version to refresh during releases.
 
 Release-plz uses short-lived trusted-publishing credentials for Cargo uploads.
 The workflow explicitly dispatches the binary build because tags and drafts
@@ -71,7 +69,7 @@ stops the affected stage and is visible in GitHub Actions.
 
 `<tag>` includes the `v` prefix, such as `v0.1.0`. `<version>` omits it.
 
-Each archive contains the binary, README, changelog, licence files and third-party notices under a directory named like the archive. The notices cover the binary's Rust dependencies and standard library. The [install scripts](../install/install.sh) and [`cargo-binstall` metadata](../crates/udpstp/Cargo.toml) consume these names, layouts and checksum format.
+Each archive contains the binary, README, changelog, licence files and third-party notices under a directory named like the archive. The notices cover the binary's Rust dependencies and standard library. The [install scripts](../install/install.sh) and [`cargo-binstall` metadata](../Cargo.toml) consume these names, layouts and checksum format.
 
 The software bill of materials (SBOM) includes Rust dependencies for all targets, including conditional Windows and macOS dependencies. It is a union, so a particular binary does not use every listed dependency. It does not inventory the container's Debian runtime or provide separate inventories per platform. Provenance and dependency inventory attestations answer different questions.
 

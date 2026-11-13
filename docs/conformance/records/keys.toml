@@ -9,8 +9,8 @@ rfc = "RFC 9946 §5.4.1"
 requirements = ["RFC9946-5.4.1-3"]
 reference = ["ADR 0001"]
 tests = [
-  "crates/udpstp-wire/tests/kdf_kat.rs::derived_keys_match_every_openssl_vector",
-  "crates/udpstp-wire/tests/kdf_kat.rs::vectors_cover_authunixtime_extremes_and_zero_bytes_in_keys",
+  "src/tests/wire/kdf_kat.rs::derived_keys_match_every_openssl_vector",
+  "src/tests/wire/kdf_kat.rs::vectors_cover_authunixtime_extremes_and_zero_bytes_in_keys",
 ]
 
 [[record]]
@@ -21,13 +21,13 @@ rfc = "RFC 9946 §5.4, RFC 7210 §3"
 requirements = ["RFC9946-5.4-3"]
 reference = ["ADR 0010"]
 tests = [
-  "crates/udpstp-core/tests/key_table.rs::a_key_outside_its_accept_lifetime_is_an_authentication_failure",
-  "crates/udpstp-core/tests/key_table.rs::a_key_is_accepted_on_the_edges_of_its_accept_lifetime",
-  "crates/udpstp-core/tests/key_table.rs::a_shared_key_id_uses_the_row_valid_at_the_time",
-  "crates/udpstp-core/tests/key_table.rs::rows_sharing_a_key_id_must_not_overlap",
-  "crates/udpstp-core/tests/key_table.rs::the_client_sends_with_the_newest_valid_key",
-  "crates/udpstp-core/tests/key_table.rs::a_client_without_a_valid_send_key_does_not_start",
-  "crates/udpstp/tests/loopback.rs::the_server_ignores_a_key_past_its_accept_lifetime",
+  "src/tests/protocol/key_table.rs::a_key_outside_its_accept_lifetime_is_an_authentication_failure",
+  "src/tests/protocol/key_table.rs::a_key_is_accepted_on_the_edges_of_its_accept_lifetime",
+  "src/tests/protocol/key_table.rs::a_shared_key_id_uses_the_row_valid_at_the_time",
+  "src/tests/protocol/key_table.rs::rows_sharing_a_key_id_must_not_overlap",
+  "src/tests/protocol/key_table.rs::the_client_sends_with_the_newest_valid_key",
+  "src/tests/protocol/key_table.rs::a_client_without_a_valid_send_key_does_not_start",
+  "tests/loopback.rs::the_server_ignores_a_key_past_its_accept_lifetime",
 ]
 
 [[record]]
@@ -38,8 +38,8 @@ rfc = "RFC 9946 §5.4, RFC 7210 §2"
 requirements = ["RFC9946-5.4-3", "RFC9946-5.4-4"]
 reference = ["ADR 0010", "docs/spec.md"]
 tests = [
-  "crates/udpstp/tests/key_files.rs::the_server_loads_a_toml_key_table",
-  "crates/udpstp/tests/key_files.rs::an_invalid_key_file_exits_with_51_and_says_where",
+  "tests/key_files.rs::the_server_loads_a_toml_key_table",
+  "tests/key_files.rs::an_invalid_key_file_exits_with_51_and_says_where",
 ]
 
 [[record]]
@@ -51,9 +51,9 @@ requirements = ["RFC9946-5.4-3"]
 obudpst = "OB-UDPST key files have only a keyId and a key: no role and no per-key Test Interval."
 reference = ["ADR 0010", "docs/spec.md"]
 tests = [
-  "crates/udpstp/tests/key_files.rs::the_server_loads_a_toml_key_table",
-  "crates/udpstp/tests/key_files.rs::an_invalid_key_file_exits_with_51_and_says_where",
-  "crates/udpstp/tests/loopback.rs::fixed_rate_tests_complete_over_loopback",
+  "tests/key_files.rs::the_server_loads_a_toml_key_table",
+  "tests/key_files.rs::an_invalid_key_file_exits_with_51_and_says_where",
+  "tests/loopback.rs::fixed_rate_tests_complete_over_loopback",
 ]
 
 [[record]]
@@ -62,7 +62,7 @@ kind = "interpretation"
 summary = "Lifetimes are written `YYYYMMDDHHMMSSZ`, in UTC, as RFC 7210's prose describes (year, month, day, hour, minute, second), although its format line says `YYYYMMDDHHSSZ`. Leap seconds (second 60) and years before 1970 are refused."
 rfc = "RFC 7210 §2"
 reference = ["ADR 0010"]
-tests = ["crates/udpstp-core/tests/key_table.rs::rfc7210_times_convert_to_unix_seconds"]
+tests = ["src/tests/protocol/key_table.rs::rfc7210_times_convert_to_unix_seconds"]
 
 [[record]]
 id = "key-text-extension"
@@ -71,8 +71,8 @@ summary = "A TOML Key Table row gives its key as exactly one of `key_hex` or `ke
 rfc = "RFC 7210 §2"
 reference = ["docs/spec.md"]
 tests = [
-  "crates/udpstp/tests/key_files.rs::the_server_loads_a_toml_key_table",
-  "crates/udpstp/tests/loopback.rs::a_mode1_test_runs_with_a_toml_key_table_and_an_obudpst_key_file",
+  "tests/key_files.rs::the_server_loads_a_toml_key_table",
+  "tests/loopback.rs::a_mode1_test_runs_with_a_toml_key_table_and_an_obudpst_key_file",
 ]
 
 [[record]]
@@ -82,10 +82,10 @@ summary = "An OB-UDPST `udpst.keys` file is read as OB-UDPST reads it (comma, sp
 obudpst = "OB-UDPST reads lines with fgets into a 1024-byte buffer, so a longer line continues as a new one, and narrows strtol's result to int, so a signed or oversized keyId can wrap into 0-255."
 reference = []
 tests = [
-  "crates/udpstp/tests/key_files.rs::the_server_loads_an_obudpst_key_file",
-  "crates/udpstp/tests/key_files.rs::an_invalid_key_file_exits_with_51_and_says_where",
-  "crates/udpstp/tests/loopback.rs::a_mode1_test_runs_with_a_toml_key_table_and_an_obudpst_key_file",
-  "crates/udpstp/tests/loopback.rs::an_obudpst_key_need_not_be_utf8",
+  "tests/key_files.rs::the_server_loads_an_obudpst_key_file",
+  "tests/key_files.rs::an_invalid_key_file_exits_with_51_and_says_where",
+  "tests/loopback.rs::a_mode1_test_runs_with_a_toml_key_table_and_an_obudpst_key_file",
+  "tests/loopback.rs::an_obudpst_key_need_not_be_utf8",
 ]
 
 [[record]]
@@ -98,8 +98,8 @@ setting = "`--key-id`"
 default = "on"
 reference = ["ADR 0010"]
 tests = [
-  "crates/udpstp-core/tests/key_table.rs::equally_new_send_keys_need_a_pinned_key_id",
-  "crates/udpstp/tests/key_files.rs::an_ambiguous_key_file_asks_for_a_key_id",
+  "src/tests/protocol/key_table.rs::equally_new_send_keys_need_a_pinned_key_id",
+  "tests/key_files.rs::an_ambiguous_key_file_asks_for_a_key_id",
 ]
 
 [[record]]
@@ -109,17 +109,17 @@ summary = "On Unix unsafe key-file permissions are refused. Windows assesses and
 obudpst = "OB-UDPST reads a key file whatever its permissions."
 reference = ["docs/spec.md", "ADR 0015"]
 tests = [
-  "crates/udpstp/tests/key_files.rs::a_key_file_others_can_read_is_refused",
-  "crates/udpstp/tests/key_files.rs::a_key_file_must_be_a_regular_file",
-  "crates/udpstp/tests/key_files.rs::a_private_key_file_loads_on_windows",
-  "crates/udpstp/tests/windows_key_permissions.rs::native_acl_matrix_uses_the_production_assessment",
-  "crates/udpstp/tests/windows_key_permissions.rs::both_roles_refuse_mismatch_and_unverified_without_key_material",
-  "crates/udpstp/tests/windows_key_permissions.rs::native_inspection_failure_and_read_sharing",
-  "crates/udpstp/tests/windows_key_permissions.rs::a_private_file_supports_a_successful_authenticated_test",
-  "crates/udpstp/tests/windows_key_permissions.rs::manual_setup_removes_pre_existing_outsider_grants",
-  "crates/udpstp/tests/windows_key_permissions.rs::refused_server_keys_reach_stderr_and_the_daily_log",
-  "crates/udpstp/tests/cli.rs::settings_only_prints_settings_without_loading_keys_or_opening_logs",
-  "crates/udpstp/tests/cli.rs::settings_only_requires_printing_and_cannot_run_as_a_service",
+  "tests/key_files.rs::a_key_file_others_can_read_is_refused",
+  "tests/key_files.rs::a_key_file_must_be_a_regular_file",
+  "tests/key_files.rs::a_private_key_file_loads_on_windows",
+  "tests/windows_key_permissions.rs::native_acl_matrix_uses_the_production_assessment",
+  "tests/windows_key_permissions.rs::both_roles_refuse_mismatch_and_unverified_without_key_material",
+  "tests/windows_key_permissions.rs::native_inspection_failure_and_read_sharing",
+  "tests/windows_key_permissions.rs::a_private_file_supports_a_successful_authenticated_test",
+  "tests/windows_key_permissions.rs::manual_setup_removes_pre_existing_outsider_grants",
+  "tests/windows_key_permissions.rs::refused_server_keys_reach_stderr_and_the_daily_log",
+  "tests/cli.rs::settings_only_prints_settings_without_loading_keys_or_opening_logs",
+  "tests/cli.rs::settings_only_requires_printing_and_cannot_run_as_a_service",
 ]
 
 [[record]]
@@ -128,7 +128,7 @@ kind = "obudpst-difference"
 summary = "On Unix a key file must be owned by the effective user running udpstp or by root; another owner could replace the keys. Running udpstp setuid isn't supported."
 obudpst = "OB-UDPST doesn't check who owns a key file."
 reference = []
-tests = ["crates/udpstp/tests/key_files.rs::a_key_file_owned_by_another_user_is_refused"]
+tests = ["tests/key_files.rs::a_key_file_owned_by_another_user_is_refused"]
 
 [[record]]
 id = "key-file-size-limit"
@@ -136,7 +136,7 @@ kind = "obudpst-difference"
 summary = "A key file larger than 1 MiB is refused, so it can be read into one buffer that is wiped after parsing."
 obudpst = "OB-UDPST reads a key file of any length, line by line."
 reference = []
-tests = ["crates/udpstp/tests/key_files.rs::an_oversized_key_file_is_refused"]
+tests = ["tests/key_files.rs::an_oversized_key_file_is_refused"]
 
 [[record]]
 id = "derived-keys-depend-only-on-the-row-and-time"
@@ -146,6 +146,6 @@ rfc = "RFC 9946 §5.4.1"
 requirements = ["RFC9946-5.4.1-7"]
 reference = []
 tests = [
-  "crates/udpstp-core/src/budget.rs::requests_sharing_a_row_and_time_cost_one_kdf_run",
-  "crates/udpstp-core/tests/setup_mode1.rs::server_silently_drops_a_setup_signed_from_a_different_shared_key",
+  "src/protocol/budget.rs::requests_sharing_a_row_and_time_cost_one_kdf_run",
+  "src/tests/protocol/setup_mode1.rs::server_silently_drops_a_setup_signed_from_a_different_shared_key",
 ]

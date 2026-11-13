@@ -25,10 +25,10 @@ const REQUIREMENTS_DIR: &str = "docs/conformance/requirements";
 const RECORDS_DIR: &str = "docs/conformance/records";
 
 /// Where the wire structs that masks name are defined.
-const WIRE_DIR: &str = "crates/udpstp-wire/src";
+const WIRE_DIR: &str = "src/wire";
 
 /// Where the `udpstp` binary's options and settings are defined.
-const SETTINGS_DIR: &str = "crates/udpstp/src";
+const SETTINGS_DIR: &str = "src";
 
 /// The generated interop mask list.
 const MASKS_PATH: &str = "docs/conformance/interop-masks.toml";
@@ -108,7 +108,13 @@ pub fn load(root: &Path) -> Result<Loaded, String> {
     let adrs = adr_numbers(&root.join(ADR_DIR))?;
     let adrs: Vec<&str> = adrs.iter().map(String::as_str).collect();
     let mut sources = Vec::new();
-    for path in rust_files(&root.join("crates"))? {
+    for path in ["src", "tests", "examples"]
+        .into_iter()
+        .map(|dir| rust_files(&root.join(dir)))
+        .collect::<Result<Vec<_>, _>>()?
+        .into_iter()
+        .flatten()
+    {
         let text = std::fs::read_to_string(&path)
             .map_err(|e| format!("reading {}: {e}", path.display()))?;
         let relative = path.strip_prefix(root).unwrap_or(&path);

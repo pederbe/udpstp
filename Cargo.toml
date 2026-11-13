@@ -1,12 +1,150 @@
+[package]
+name = "udpstp"
+version = "0.2.0"
+description = "Measure network-path capacity, loss and delay with authenticated tests and JSON results"
+edition.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage = "https://udpstp.com"
+readme = "README.md"
+# Development tooling, fixtures and documentation are maintained in the repository.
+exclude = ["tests/", "src/tests/", "crates/", "xtask/", "fuzz/", "scripts/", "website/", "docs/", "testdata/", "contrib/", "install/"]
+keywords = ["capacity", "measurement", "rfc9946", "speedtest", "udp"]
+categories = ["command-line-utilities", "network-programming"]
+
+# `cargo binstall udpstp` installs the release archive for the host's
+# target, as the Release workflow names and lays it out (docs/releasing.md),
+# and builds from source where there is none.
+[package.metadata.binstall]
+# The suffixes are spelled out: binstall's `{ archive-suffix }` for tgz is
+# `.tgz`, not the archives' `.tar.gz`.
+pkg-url = "{ repo }/releases/download/v{ version }/udpstp-v{ version }-{ target }.tar.gz"
+bin-dir = "udpstp-v{ version }-{ target }/{ bin }{ binary-ext }"
+pkg-fmt = "tgz"
+
+[package.metadata.binstall.overrides.x86_64-pc-windows-msvc]
+pkg-url = "{ repo }/releases/download/v{ version }/udpstp-v{ version }-{ target }.zip"
+pkg-fmt = "zip"
+
+# .deb and .rpm packages, which the Release workflow builds with
+# cargo-deb and cargo-generate-rpm. The systemd unit is the example one
+# with the binary's path set to /usr/bin; the Release workflow writes it to
+# target/packaging first (docs/releasing.md). The service isn't enabled:
+# it needs /etc/udpstp/server.toml and keys.toml first.
+[package.metadata.deb]
+maintainer = "Peder Bergan <pederbe@users.noreply.github.com>"
+section = "net"
+priority = "optional"
+# The binary is built against glibc 2.28 (docs/releasing.md); cargo-deb's
+# own guess comes from the build host's libc6 and asks for more.
+depends = "libc6 (>= 2.28)"
+extended-description = """A Client and a Server for the UDP Speed Test Protocol (RFC 9946), which measures the Maximum IP-Layer Capacity of a path with the method of RFC 9097. The Server's systemd unit is installed but not enabled."""
+assets = [
+    ["target/release/udpstp", "usr/bin/", "755"],
+    ["target/packaging/udpstp-server.service", "usr/lib/systemd/system/", "644"],
+    ["README.md", "usr/share/doc/udpstp/", "644"],
+    ["LICENSE-MIT", "usr/share/doc/udpstp/", "644"],
+    ["LICENSE-APACHE", "usr/share/doc/udpstp/", "644"],
+    ["target/packaging/THIRD-PARTY-LICENSES.md", "usr/share/doc/udpstp/", "644"],
+]
+
+[package.metadata.generate-rpm]
+summary = "udpstp: Client and Server for UDPSTP (RFC 9946)"
+assets = [
+    { source = "target/release/udpstp", dest = "/usr/bin/udpstp", mode = "755" },
+    { source = "target/packaging/udpstp-server.service", dest = "/usr/lib/systemd/system/udpstp-server.service", mode = "644" },
+    { source = "README.md", dest = "/usr/share/doc/udpstp/README.md", mode = "644", doc = true },
+    { source = "LICENSE-MIT", dest = "/usr/share/licenses/udpstp/LICENSE-MIT", mode = "644", doc = true },
+    { source = "LICENSE-APACHE", dest = "/usr/share/licenses/udpstp/LICENSE-APACHE", mode = "644", doc = true },
+    { source = "target/packaging/THIRD-PARTY-LICENSES.md", dest = "/usr/share/licenses/udpstp/THIRD-PARTY-LICENSES.md", mode = "644", doc = true },
+]
+
+[dependencies]
+# signal: the Server stops on SIGTERM and SIGINT.
+tokio = { workspace = true, features = ["signal"] }
+clap = { workspace = true, features = ["wrap_help", "unicode"] }
+anstream = "1.0.0"
+anstyle-query = "1.1.5"
+terminal_size = "0.4.4"
+unicode-width = "0.2.3"
+serde.workspace = true
+toml.workspace = true
+zeroize.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+tracing-appender.workspace = true
+hmac.workspace = true
+sha2.workspace = true
+socket2.workspace = true
+hotpath = { workspace = true, optional = true }
+
+[dev-dependencies]
+udpstp-req.workspace = true
+stats_alloc.workspace = true
+
+# ADR 0018 moves ADR 0015's existing native exception into this application.
+[lints.rust]
+unsafe_code = "deny"
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+
+[target."cfg(unix)".dependencies]
+nix = { workspace = true, features = ["signal", "user"] }
+
+[target."cfg(windows)".dependencies]
+windows-service.workspace = true
+quinn-udp.workspace = true
+windows-sys = { version = "=0.61.2", features = ["Win32_Foundation", "Win32_Security", "Win32_System_Threading", "Win32_System_SystemServices", "Win32_Storage_FileSystem"] }
+nu-ansi-term = "0.50.3"
+
+[target."cfg(windows)".dev-dependencies]
+# Native console capability and displayed attributes, separate from ANSI
+# captured through redirected stdout/stderr.
+portable-pty = "0.9.0"
+vt100 = "0.18.1"
+
+[[test]]
+name = "windows_terminal"
+harness = false
+
+# fs: a test fills a pipe for the Server's stdout.
+[target."cfg(unix)".dev-dependencies]
+nix = { workspace = true, features = ["fs", "term"] }
+
+[features]
+# Development-only drivers and diagnostics. Normal builds enable none.
+fuzzing = []
+fault-injection = []
+layout-diagnostics = []
+hotpath = ["dep:hotpath", "hotpath/hotpath"]
+hotpath-cpu = ["hotpath", "hotpath/hotpath-cpu"]
+hotpath-alloc = ["hotpath", "hotpath/hotpath-alloc"]
+
+[[test]]
+name = "faults"
+required-features = ["fault-injection"]
+
+[[example]]
+name = "layout_cost"
+required-features = ["layout-diagnostics"]
+
+[target.'cfg(any(target_os = "linux", target_os = "android"))'.dependencies]
+rustix.workspace = true
+
+[target.'cfg(any(target_os = "linux", target_os = "android", target_vendor = "apple"))'.dependencies]
+nix = { workspace = true, features = ["socket", "net", "uio", "process", "poll", "signal", "event"] }
+
+
 [workspace]
 resolver = "3"
+default-members = ["."]
 members = [
-    "crates/udpstp-wire",
-    "crates/udpstp-core",
+    ".",
     "crates/udpstp-req",
-    "crates/udpstp-runtime",
-    "crates/udpstp",
-    "crates/udpstp-key-permissions",
     # The benchmark round tooling, never published.
     "crates/bench-rounds",
     "crates/udpstp-bench",
@@ -29,12 +167,8 @@ unsafe_code = "forbid"
 all = { level = "warn", priority = -1 }
 
 [workspace.dependencies]
-udpstp-wire = { path = "crates/udpstp-wire", version = "0.2.0" }
-udpstp-core = { path = "crates/udpstp-core", version = "0.2.0" }
 # Tests only: never published, so cargo drops it from the packages.
 udpstp-req = { path = "crates/udpstp-req" }
-udpstp-runtime = { path = "crates/udpstp-runtime", version = "0.2.0" }
-udpstp-key-permissions = { path = "crates/udpstp-key-permissions", version = "0.2.0" }
 # The bench tooling's general machinery: never published, and only
 # udpstp-bench uses it.
 bench-rounds = { path = "crates/bench-rounds" }

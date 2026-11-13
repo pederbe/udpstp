@@ -47,7 +47,7 @@ default = "off"                 # on | off: for a Deviation, and whenever there 
 setting = "`--tests-per-source`, `tests_per_source` in TOML"
 revisit = "…"                   # for a Deviation: what would make it worth revisiting
 reference = ["ADR 0002", "docs/spec.md story 32"] # Durable public sources
-tests = ["crates/udpstp-core/tests/tests_per_source.rs::…"]
+tests = ["src/tests/protocol/tests_per_source.rs::…"]
 masks = [{ pdu = "activation-response", fields = ["sr_index_conf"], when = ["max-bandwidth-stated"] }]
 ```
 
@@ -55,7 +55,7 @@ masks = [{ pdu = "activation-response", fields = ["sr_index_conf"], when = ["max
 - **Deviations and Requirements:** a Deviation that lists a Requirement makes that Requirement's state `deviation`, with the record's ID in its `reference` (a list when several Deviations depart from it), and the other way round. An Interpretation or OB-UDPST Difference may list Requirements without changing their state: a Requirement it reads is met as read, and counts as tested once a test carries its tag, as any other.
 - **Proving tests:** `path/to/file.rs::test_name`. The report says for each whether it runs, runs only under a `cfg`, is ignored, isn't a test or is missing. A record none of whose tests runs is unproven and listed in the summary.
 - **Code notes:** code that implements a record says so in a comment ending `(conformance: <id>)`; the reason lives in the record.
-- **Masks:** a difference from OB-UDPST that shows in a Control PDU udpstp sends (`setup-request`, `setup-response`, `activation-request`, `activation-response`, `null-request`) names the fields, as udpstp-wire names them (`sending_rate.udp_payload1` for a nested one), and the conditions under which it shows, from `CONDITIONS` in `xtask/src/records.rs`. `interop-masks.toml` lists every masked field with its conditions and records; the OB-UDPST interop comparison ignores those fields in runs where the conditions hold. Per-run fields (authUnixTime, authDigest, ports, mcIdent) and the checksum, which follows the other fields, are the comparison's own business. OB-UDPST's uses of reserved fields are checked separately, by the check that they stay zero.
+- **Masks:** a difference from OB-UDPST that shows in a Control PDU udpstp sends (`setup-request`, `setup-response`, `activation-request`, `activation-response`, `null-request`) names the fields, as `src/wire` names them (`sending_rate.udp_payload1` for a nested one), and the conditions under which it shows, from `CONDITIONS` in `xtask/src/records.rs`. `interop-masks.toml` lists every masked field with its conditions and records; the OB-UDPST interop comparison ignores those fields in runs where the conditions hold. Per-run fields (authUnixTime, authDigest, ports, mcIdent) and the checksum, which follows the other fields, are the comparison's own business. OB-UDPST's uses of reserved fields are checked separately, by the check that they stay zero.
 
 ## Tags
 

@@ -13,7 +13,7 @@ cargo build --locked --release -p udpstp
 The binary is `target/release/udpstp`, or `target\release\udpstp.exe` on Windows. Run it by that path, or install it into Cargo's binary directory so the guides' `udpstp` commands work.
 
 ```sh
-cargo install --locked --path crates/udpstp
+cargo install --locked --path .
 udpstp --version
 ```
 

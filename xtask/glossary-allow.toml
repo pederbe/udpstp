@@ -55,7 +55,7 @@ reason = "Avoided only unqualified: the sending rate, a Sending Rate Table row's
 
 [[unchecked]]
 term = "Runtime"
-reason = "Avoided only unqualified: the udpstp-runtime crate, and async runtimes."
+reason = "Avoided only unqualified: the runtime module and async runtimes."
 
 [[unchecked]]
 term = "report"

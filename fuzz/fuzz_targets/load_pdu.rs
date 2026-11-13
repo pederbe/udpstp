@@ -3,9 +3,13 @@
 //! decode to it again and carry a valid checksum once it is filled.
 #![no_main]
 
+
+#[path = "../../src/wire/mod.rs"]
+#[allow(dead_code, unused_imports)]
+mod wire;
 use libfuzzer_sys::fuzz_target;
-use udpstp_wire::LoadHeader;
-use udpstp_wire::load::LOAD_HEADER_LEN;
+use crate::wire::load::LoadHeader;
+use crate::wire::load::LOAD_HEADER_LEN;
 
 fuzz_target!(|datagram: &[u8]| {
     let _ = LoadHeader::checksum_valid(datagram);

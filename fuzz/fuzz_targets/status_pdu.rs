@@ -3,8 +3,12 @@
 //! that decode to it again and carry a valid checksum once it is filled.
 #![no_main]
 
+
+#[path = "../../src/wire/mod.rs"]
+#[allow(dead_code, unused_imports)]
+mod wire;
 use libfuzzer_sys::fuzz_target;
-use udpstp_wire::StatusPdu;
+use crate::wire::StatusPdu;
 
 fuzz_target!(|datagram: &[u8]| {
     let _ = StatusPdu::verify_received(datagram, &[0x5a; 32]);

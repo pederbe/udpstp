@@ -206,7 +206,7 @@ pub fn slug(text: &str) -> String {
 
 /// The `udpstp` package version, from its manifest.
 pub fn version(root: &Path) -> Result<String, String> {
-    let manifest = read(&root.join("crates/udpstp/Cargo.toml"))?;
+    let manifest = read(&root.join("Cargo.toml"))?;
     manifest
         .lines()
         .find_map(|line| {
@@ -214,7 +214,7 @@ pub fn version(root: &Path) -> Result<String, String> {
                 .and_then(|rest| rest.strip_suffix('"'))
         })
         .map(str::to_string)
-        .ok_or_else(|| "crates/udpstp/Cargo.toml has no version".to_string())
+        .ok_or_else(|| "Cargo.toml has no version".to_string())
 }
 
 #[cfg(test)]

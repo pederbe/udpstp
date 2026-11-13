@@ -16,7 +16,7 @@ Scripts and tools can rely on udpstp's exit statuses, JSON results, key files, u
 
 | Interface | What becomes stable | Reference |
 |---|---|---|
-| Command line and the Server's TOML settings | Option and key names, value spellings, defaults | `udpstp client --help`, `udpstp server --help`, `udpstp server --print-config`; [Server configuration](../crates/udpstp/src/config.rs) |
+| Command line and the Server's TOML settings | Option and key names, value spellings, defaults | `udpstp client --help`, `udpstp server --help`, `udpstp server --print-config`; [Server configuration](../src/config.rs) |
 | The Server's JSON log (`log_format = "json"`) | Event names, field keys, enumerated values | [Server log](server-log.md) |
 
 Until then, a 0.x minor release may rename or remove one of these, with no deprecation period. The changelog lists each change under Changed or Removed, so read it before upgrading a script or a configuration file.
@@ -33,7 +33,7 @@ Human output adapts to the width of the terminal it is written to. Redirected ou
 - `UDPSTP_ENGINE_CATCH_UP_US`, an experimental setting for measurements: the Data Phase Engine's catch-up budget in µs (ADR 0012), in place of 1 ms (2 ms on Windows). It may change or go in any release.
 - `UDPSTP_ENGINE_THREADS`, an experimental setting for measurements of a Linux Server, whose Data Phase Engine runs on a pool of Engine Threads: the most Engine Threads the pool starts, in place of the CPUs the process may use (ADR 0008). It may change or go in any release.
 - `UDPSTP_ENGINE_HOLD_OFF_US`, an experimental setting for measurements: on Linux it sets the Data Phase Engine's receive hold-off in µs, 0 for none, in place of the one derived from the receive buffer, and a Load Receiver takes it after every turn that read datagrams (a Load Sender, when flooded), where it takes the derived one only when more than one datagram is due within it. It may change or go in any release.
-- The library crates (`udpstp-wire`, `udpstp-core`, `udpstp-runtime`, `udpstp-key-permissions`): they follow Cargo's semver rules only, and aren't a supported interface in 0.x.
+- Internal Rust modules and types are implementation details of the application, without external library compatibility commitments (ADR 0018).
 
 ## Terminal color
 
