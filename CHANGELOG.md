@@ -4,6 +4,17 @@ User-facing changes in udpstp, including capabilities, installation and compatib
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-14
+
+### Changed
+
+- Consolidate udpstp into one application crate ([#59](https://github.com/pederbe/udpstp/pull/59))
+
+### Fixed
+
+- Enforce traffic limits and protect validation credentials ([#57](https://github.com/pederbe/udpstp/pull/57))
+
+
 ## [0.2.0] - 2026-11-13
 
 ### Removed
