@@ -97,24 +97,44 @@ fn the_server_loads_a_toml_key_table() {
     assert!(!diagnostic(&output).contains("deprecated"));
 }
 
-// ADR 0013 and ADR 0016: keep the deprecated input through its minor release.
+// ADR 0013 and ADR 0016: refuse the marker after its notice release.
 #[test]
-fn a_deprecated_format_marker_is_accepted_with_an_actionable_warning() {
+fn a_removed_format_marker_is_refused_with_actionable_guidance_for_both_roles() {
     let file = KeyFile::new("format", "keys.toml", &format!("format = 1\n{TOML_TABLE}"));
 
-    let output = server_with(&file);
+    for args in [
+        vec!["server", "--key-file", file.path()],
+        vec!["server", "--key-file", file.path(), "--print-config"],
+        vec!["client", "--key-file", file.path(), "127.0.0.1"],
+        vec![
+            "client",
+            "--key-file",
+            file.path(),
+            "--format",
+            "json",
+            "127.0.0.1",
+        ],
+    ] {
+        let output = udpstp(&args);
 
-    assert!(output.status.success(), "{}", stderr(&output));
-    let warning = diagnostic(&output);
-    assert!(warning.contains("format = 1 is deprecated"), "{warning}");
-    assert!(warning.contains("Remove that line"), "{warning}");
-    assert!(warning.contains("next minor release"), "{warning}");
-    assert_no_secret(&output, "deprecated marker");
+        assert_eq!(output.status.code(), Some(KEY_FILE_ERROR), "{args:?}");
+        assert!(output.stdout.is_empty(), "{args:?}: {}", stdout(&output));
+        let message = diagnostic(&output);
+        assert!(
+            message.contains("format is no longer supported"),
+            "{message}"
+        );
+        assert!(message.contains("Remove the format line"), "{message}");
+        assert!(message.contains("same meaning without it"), "{message}");
+        assert!(stderr(&output).contains(file.path()), "{message}");
+        assert_no_secret(&output, "removed marker");
+    }
+
+    // Deleting only the marker restores a valid Key Table.
     std::fs::write(file.path(), TOML_TABLE).unwrap();
     let unmarked = server_with(&file);
     assert!(unmarked.status.success(), "{}", stderr(&unmarked));
-    assert_eq!(stdout(&output), stdout(&unmarked));
-    assert!(!diagnostic(&unmarked).contains("deprecated"));
+    assert_no_secret(&unmarked, "unmarked Key Table");
 }
 
 // docs/spec.md "Key table" (OB-UDPST's key file format can be loaded
@@ -279,22 +299,19 @@ fn an_invalid_key_file_exits_with_51_and_says_where() {
             "an unsupported format",
             "keys.toml",
             format!("format = 2\n{}", row("key_text = \"s3cr3t\"")),
-            "format must be 1",
+            "Remove the format line",
         ),
         (
-            "an unsupported format with a column this version doesn't know",
+            "an unknown top-level restriction",
             "keys.toml",
-            format!(
-                "format = 2\n{}",
-                row("key_text = \"s3cr3t\"\nnew_column = true")
-            ),
+            format!("new_column = true\n{}", row("key_text = \"s3cr3t\"")),
             "new_column",
         ),
         (
             "format 0",
             "keys.toml",
             format!("format = 0\n{}", row("key_text = \"s3cr3t\"")),
-            "format must be 1",
+            "Remove the format line",
         ),
         (
             "format in a row",
@@ -309,19 +326,16 @@ fn an_invalid_key_file_exits_with_51_and_says_where() {
             "key_txet",
         ),
         (
-            "a deprecated marker with an unknown restriction",
+            "an unknown restriction in a row",
             "keys.toml",
-            format!(
-                "format = 1\n{}",
-                row("key_text = \"s3cr3t\"\nnew_column = true")
-            ),
+            row("key_text = \"s3cr3t\"\nnew_column = true"),
             "new_column",
         ),
         (
             "a format value containing a key",
             "keys.toml",
             format!("format = \"s3cr3t\"\n{}", row("key_text = \"s3cr3t\"")),
-            "not valid TOML, or a value of the wrong type",
+            "Remove the format line",
         ),
         (
             "a key that isn't a string",

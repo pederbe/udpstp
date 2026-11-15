@@ -23,8 +23,8 @@
 //! - a key file over 1 MiB is refused (conformance: key-file-size-limit).
 //!
 //! Unknown TOML fields are refused rather than silently dropping a key's
-//! restrictions. The redundant top-level `format = 1` marker is deprecated
-//! but still accepted during its minor-release window (ADR 0016).
+//! restrictions. The removed top-level `format` marker is refused with
+//! guidance to delete its line (ADR 0016).
 
 #![forbid(unsafe_code)]
 
@@ -61,14 +61,8 @@ impl fmt::Display for KeyFileError {
     }
 }
 
-/// A validated Key Table and its deprecated input marker, if present.
-pub struct LoadedKeyTable {
-    pub table: KeyTable,
-    pub format_deprecated: bool,
-}
-
 /// Loads the Key Table from `path`, inspecting and reading the same file.
-pub fn load(path: &Path) -> Result<LoadedKeyTable, KeyFileError> {
+pub fn load(path: &Path) -> Result<KeyTable, KeyFileError> {
     let error = |line: Option<usize>, message: String| KeyFileError {
         path: path.display().to_string(),
         line,
@@ -106,11 +100,11 @@ pub fn load(path: &Path) -> Result<LoadedKeyTable, KeyFileError> {
         })
     }
     .map_err(|(line, message)| error(line, message))?;
-    if parsed.entries.is_empty() {
+    if parsed.is_empty() {
         return Err(error(None, "no keys".into()));
     }
     let mut table = KeyTable::default();
-    for (line, entry) in parsed.entries {
+    for (line, entry) in parsed {
         table.insert(entry).map_err(|e| {
             let message = match e {
                 KeyTableError::OverlappingLifetimes { key_id, names } => format!(
@@ -124,10 +118,7 @@ pub fn load(path: &Path) -> Result<LoadedKeyTable, KeyFileError> {
             error(line, message)
         })?;
     }
-    Ok(LoadedKeyTable {
-        table,
-        format_deprecated: parsed.format_deprecated,
-    })
+    Ok(table)
 }
 
 /// The supported policy is a startup assessment, not effective-access
@@ -207,12 +198,7 @@ fn check_private(_metadata: &std::fs::Metadata) -> Result<(), String> {
     Ok(())
 }
 
-struct ParsedKeyFile {
-    entries: Vec<(Option<usize>, KeyEntry)>,
-    format_deprecated: bool,
-}
-
-type Parsed = Result<ParsedKeyFile, (Option<usize>, String)>;
+type Parsed = Result<Vec<(Option<usize>, KeyEntry)>, (Option<usize>, String)>;
 
 /// OB-UDPST's format: `<keyId>,<key>` per line, with commas, spaces and
 /// tabs separating fields. A line ends at `#`, `\r` or a NUL byte. The keyId
@@ -264,10 +250,7 @@ fn parse_obudpst(bytes: &[u8]) -> Parsed {
         );
         entries.push((number, entry));
     }
-    Ok(ParsedKeyFile {
-        entries,
-        format_deprecated: false,
-    })
+    Ok(entries)
 }
 
 /// A non-negative integer as C's `strtol` with base 0 reads a whole token.
@@ -292,8 +275,6 @@ fn parse_c_integer(text: &str) -> Option<u64> {
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct TomlKeyTable {
-    /// Deprecated compatibility input, accepted only when it is 1 (ADR 0016).
-    format: Option<i64>,
     #[serde(default)]
     key: Vec<TomlKey>,
 }
@@ -333,11 +314,8 @@ fn parse_toml(bytes: &[u8]) -> Parsed {
         (Some(line), toml_error_message(e.message()))
     };
     let table: TomlKeyTable = toml::from_str(text).map_err(at)?;
-    if table.format.is_some_and(|format| format != 1) {
-        return Err((None, "format must be 1".into()));
-    }
     let mut names = HashSet::new();
-    let entries = table
+    table
         .key
         .into_iter()
         .map(|row| {
@@ -352,17 +330,18 @@ fn parse_toml(bytes: &[u8]) -> Parsed {
                 .map(|entry| (None, entry))
                 .map_err(|m| (None, format!("{name:?}: {m}")))
         })
-        .collect::<Result<_, _>>()?;
-    Ok(ParsedKeyFile {
-        entries,
-        format_deprecated: table.format.is_some(),
-    })
+        .collect()
 }
 
 /// toml's messages can quote a mistyped value, which may be a key, and its
 /// error display quotes the whole line. Only messages that name fields are
 /// passed on.
 fn toml_error_message(message: &str) -> String {
+    // ADR 0016: the notice period ended before removal. Only the top-level
+    // marker gets this hint, never a value that might contain a Shared Key.
+    if message == "unknown field `format`, expected `key`" {
+        return "format is no longer supported. Remove the format line. The Key Table keeps the same meaning without it".into();
+    }
     let names_a_field = ["unknown field", "missing field", "duplicate key"]
         .iter()
         .any(|prefix| message.starts_with(prefix));
@@ -522,7 +501,7 @@ mod tests {
         fields
     }
 
-    // ADR 0013 and ADR 0016: supported columns include the deprecated marker.
+    // ADR 0013 and ADR 0016: the removed marker is not a supported column.
     #[test]
     fn every_key_table_column_is_in_the_checked_in_list() {
         let mut text = String::from("format\t1\n");

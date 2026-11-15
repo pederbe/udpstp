@@ -1,5 +1,4 @@
 format	1
-table	format
 table	key
 key	admin_key_name
 key	key_id

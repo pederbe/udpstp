@@ -131,11 +131,10 @@ pub mod startup_warning {
     pub const SOCKET_BUFFERS_UNKNOWN: &str = "SocketBuffersUnknown";
     pub const MAX_HOPS_NOT_SET: &str = "MaxHopsNotSet";
     pub const TESTS_PER_SOURCE: &str = "TestsPerSource";
-    pub const KEY_TABLE_FORMAT_DEPRECATED: &str = "KeyTableFormatDeprecated";
 
     // The names test lists them all.
     #[allow(dead_code)]
-    pub const ALL: [&str; 11] = [
+    pub const ALL: [&str; 10] = [
         DSCP_ASKED_AS_ZERO,
         DSCP_COERCED_TO_ZERO,
         DONT_FRAGMENT_UNSUPPORTED,
@@ -146,7 +145,6 @@ pub mod startup_warning {
         SOCKET_BUFFERS_UNKNOWN,
         MAX_HOPS_NOT_SET,
         TESTS_PER_SOURCE,
-        KEY_TABLE_FORMAT_DEPRECATED,
     ];
 }
 
