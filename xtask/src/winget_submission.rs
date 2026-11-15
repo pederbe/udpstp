@@ -7,11 +7,22 @@ use std::{
     process::{Command, Stdio},
 };
 
-type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
-const REPO: &str = "microsoft/winget-pkgs";
+pub(super) type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+pub(super) const REPO: &str = "microsoft/winget-pkgs";
 
-fn gh(args: &[&str], input: Option<&Value>) -> Result<String> {
+pub(super) fn gh(args: &[&str], input: Option<&Value>) -> Result<String> {
+    gh_with_token(args, input, None)
+}
+
+pub(super) fn gh_with_token(
+    args: &[&str],
+    input: Option<&Value>,
+    token: Option<&str>,
+) -> Result<String> {
     let mut command = Command::new("gh");
+    if let Some(token) = token {
+        command.env("GH_TOKEN", token);
+    }
     command
         .args(args)
         .stdout(Stdio::piped())
@@ -34,7 +45,7 @@ fn gh(args: &[&str], input: Option<&Value>) -> Result<String> {
     Ok(String::from_utf8(out.stdout)?)
 }
 
-fn api(path: &str) -> Result<Value> {
+pub(super) fn api(path: &str) -> Result<Value> {
     Ok(serde_json::from_str(&gh(&["api", path], None)?)?)
 }
 
@@ -267,6 +278,9 @@ pub fn run(args: &[String]) -> Result<()> {
     {
         return Err("expected a package identifier and stable numeric version".into());
     }
+    if mode == "--submit" {
+        super::winget_cleanup::require_latest(version)?;
+    }
     let (schema, files) = manifests(Path::new(directory), package, version)?;
     if std::env::var("WINGET_CHECKED").as_deref() != Ok("true") {
         return Err("Windows manifest checks have not passed".into());
@@ -288,6 +302,7 @@ pub fn run(args: &[String]) -> Result<()> {
     }
     let mut number = find_pr(package, version)?;
     if number.is_none() && mode == "--submit" {
+        super::winget_cleanup::require_latest(version)?;
         if schema != "1.28.0" {
             return Err("new submissions require the repository's current 1.28 schema; regenerate the manifests before submitting".into());
         }
@@ -441,6 +456,7 @@ pub fn run(args: &[String]) -> Result<()> {
     let completed = complete_body(&seeded, package, version, &schema, &evidence, cla)?;
     fs::write("winget-pr-body.md", &completed)?;
     if mode == "--submit" && completed.trim_end() != body.trim_end() {
+        super::winget_cleanup::require_latest(version)?;
         if std::env::var("WINGET_CHECKED").as_deref() != Ok("true") {
             return Err("Windows manifest checks have not passed".into());
         }

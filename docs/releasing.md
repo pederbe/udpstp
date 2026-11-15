@@ -8,6 +8,15 @@ generates its portable manifest, and checks validation, installation, authentica
 loopback operation and removal on Windows. With submission enabled it uses
 Komac to submit the version, then completes and reads back the PR description.
 
+Before checking the Windows package, submission runs close the owner's unmerged
+WinGet PRs for older udpstp versions and delete their submission branches. Cleanup
+uses the existing submission and fork credentials. It verifies that each PR
+adds only one older udpstp manifest and that its branch still matches the PR's
+commit. A retry finishes branch cleanup for PRs already closed by an earlier
+attempt. Current and newer versions, merged PRs, catalog removals, metadata
+repairs and other packages stay intact.
+Only the latest stable application release can submit or update a WinGet PR.
+
 The [WinGet workflow](../.github/workflows/winget.yml) provides a preparation-only
 route and a separate submission action. Its inputs and environment declarations
 are the source for current options and credential requirements. Preparation does

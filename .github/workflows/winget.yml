@@ -41,6 +41,14 @@ jobs:
         run: |
           test "$ENABLED" = true || { echo 'WinGet submission is disabled' >&2; exit 1; }
           test -n "$TOKEN" || { echo 'WINGET_TOKEN is not configured in distribution' >&2; exit 1; }
+      - name: Retire superseded WinGet submissions
+        if: inputs.submit
+        shell: bash
+        env:
+          TAG: ${{ inputs.tag }}
+          GH_TOKEN: ${{ secrets.WINGET_TOKEN }}
+          WINGET_FORK_TOKEN: ${{ secrets.WINGET_FORK_TOKEN }}
+        run: cargo run --locked -p xtask -- winget-cleanup "${TAG#v}" --submit
       - name: Download and verify the published Windows executable
         shell: bash
         env:
