@@ -11,6 +11,7 @@ mod release_smoke;
 mod req;
 mod site;
 mod winget;
+mod winget_cleanup;
 mod winget_submission;
 
 #[cfg(all(test, target_os = "linux"))]
@@ -64,6 +65,10 @@ fn main() -> ExitCode {
         Some("release-smoke") => release_smoke::run(&std::env::args().skip(2).collect::<Vec<_>>()),
         Some("winget-submit") => {
             winget_submission::run(&std::env::args().skip(2).collect::<Vec<_>>())
+                .map_err(|e| e.to_string())
+        }
+        Some("winget-cleanup") => {
+            winget_cleanup::run(&std::env::args().skip(2).collect::<Vec<_>>())
                 .map_err(|e| e.to_string())
         }
         Some("winget") => winget::run(&std::env::args().skip(2).collect::<Vec<_>>()),
