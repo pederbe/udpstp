@@ -132,7 +132,6 @@ only for a Server you run)",
             flood_common::now_unix(),
         )));
         let entry = table
-            .table
             .sending(now, Some(id))
             .map_err(|_| "no unambiguous keyId with a current send lifetime")?;
         (

@@ -28,9 +28,9 @@ tests_per_quota_period = 12
 
 Unknown fields, empty keys and malformed values are errors. udpstp sets no minimum key length, but use at least 32 random bytes.
 
-Remove the optional top-level `format = 1` line if your file has it. The marker is deprecated and the Key Table keeps the same meaning without it. udpstp still accepts the marker with a warning throughout the minor release that first publishes its deprecation and that release's patches. It may be removed in the following minor release ([Stable interfaces](interfaces.md#key-files)).
+The top-level `format` marker is no longer supported. If your file has a `format = 1` line, delete it before using the file. The Key Table keeps the same meaning without it ([Stable interfaces](interfaces.md#key-files)).
 
-Later versions may add columns, but never change what an existing column means. A column this version doesn't know, or any `format` value other than 1, is refused rather than half read, so a file written for a newer udpstp fails to load instead of losing a restriction.
+Later versions may add columns, but never change what an existing column means. A column this version doesn't know is refused rather than half read, so a file written for a newer udpstp fails to load instead of losing a restriction.
 
 ## OB-UDPST key files
 

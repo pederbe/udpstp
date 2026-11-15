@@ -84,16 +84,12 @@ impl ClientStart {
         let mut warnings = Vec::new();
         let auth = match &args.key_file {
             Some(path) => {
-                let loaded = keyfile::load(path).map_err(|error| {
+                let keys = keyfile::load(path).map_err(|error| {
                     StartError::new(
                         exit::KEY_FILE_ERROR,
                         format!("udpstp: key file error: {error}"),
                     )
                 })?;
-                if loaded.format_deprecated {
-                    warnings.push(StartupWarning::KeyTableFormatDeprecated { path: path.clone() });
-                }
-                let keys = loaded.table;
                 if let Some(id) = args.key_id
                     && !keys.entries().iter().any(|entry| entry.key_id == id)
                 {

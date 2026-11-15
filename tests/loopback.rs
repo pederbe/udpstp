@@ -895,11 +895,10 @@ fn an_oversized_datagram_does_not_stop_the_server() {
 #[test]
 fn a_mode1_test_runs_with_a_toml_key_table_and_an_obudpst_key_file() {
     // The same key written both ways: "shared" is 736861726564 in hex.
-    // ADR 0016: the deprecated marker still works for both roles.
     let toml = KeyFile::new(
         "loopback-toml",
         "keys.toml",
-        "format = 1\n[[key]]\nadmin_key_name = \"lab\"\nkey_id = 4\nkey_hex = \"736861726564\"\n\
+        "[[key]]\nadmin_key_name = \"lab\"\nkey_id = 4\nkey_hex = \"736861726564\"\n\
          send_lifetime_start = \"20200101000000Z\"\naccept_lifetime_start = \"20200101000000Z\"\n",
     );
     // A CR, a comment and what follows a NUL byte end the key, as in
@@ -939,17 +938,6 @@ fn a_mode1_test_runs_with_a_toml_key_table_and_an_obudpst_key_file() {
         } else {
             assert_activated(&output, what);
         }
-        assert_eq!(
-            prose(&stderr(&output)).contains("format = 1 is deprecated"),
-            client_keys.path().ends_with(".toml"),
-            "{what}: {}",
-            stderr(&output)
-        );
-        assert_eq!(
-            prose(&server.stop()).contains("format = 1 is deprecated"),
-            server_keys.path().ends_with(".toml"),
-            "{what}"
-        );
     }
 }
 

@@ -102,8 +102,6 @@ pub enum StartupWarning {
     MaxHopsNotSet,
     /// More than one Test at a time per Source (RFC 9946 §4.2).
     TestsPerSource { tests_per_source: usize },
-    /// A valid TOML Key Table uses the deprecated format marker (ADR 0016).
-    KeyTableFormatDeprecated { path: std::path::PathBuf },
 }
 
 /// Where DF can't be set yet.
@@ -129,7 +127,6 @@ impl StartupWarning {
             Self::SocketBuffersUnknown { .. } => name::SOCKET_BUFFERS_UNKNOWN,
             Self::MaxHopsNotSet => name::MAX_HOPS_NOT_SET,
             Self::TestsPerSource { .. } => name::TESTS_PER_SOURCE,
-            Self::KeyTableFormatDeprecated { .. } => name::KEY_TABLE_FORMAT_DEPRECATED,
         }
     }
 
@@ -159,10 +156,6 @@ impl StartupWarning {
             ),
             Self::TestsPerSource { tests_per_source } => format!(
                 "udpstp: warning: tests_per_source is {tests_per_source}: RFC 9946 §4.2 allows one Test at a time per path"
-            ),
-            Self::KeyTableFormatDeprecated { path } => format!(
-                "udpstp: warning: {}: format = 1 is deprecated. Remove that line before upgrading to the next minor release. The Key Table keeps the same meaning without it",
-                path.display()
             ),
         }
     }
