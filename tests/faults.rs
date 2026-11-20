@@ -47,7 +47,22 @@ struct Server {
 
 impl Server {
     fn start(keys: &KeyFile, faults: &str) -> Self {
-        let port = free_port();
+        Self::start_on_ports(keys, faults, std::iter::repeat_with(free_port))
+    }
+
+    fn start_on_ports(keys: &KeyFile, faults: &str, ports: impl Iterator<Item = u16>) -> Self {
+        // Another socket can take a candidate before the child binds it.
+        let mut failures = Vec::new();
+        for port in ports.take(3) {
+            match Self::try_start(keys, faults, port) {
+                Ok(server) => return server,
+                Err(error) => failures.push(error),
+            }
+        }
+        panic!("the Server didn't start:\n{}", failures.join("\n"));
+    }
+
+    fn try_start(keys: &KeyFile, faults: &str, port: u16) -> Result<Self, String> {
         let mut child = Command::new(env!("CARGO_BIN_EXE_udpstp"))
             .args([
                 "server",
@@ -59,10 +74,13 @@ impl Server {
             .args(["--key-file", keys.path(), "--log-format", "json"])
             .env("UDPSTP_FAULTS", faults)
             .stdout(Stdio::piped())
-            .stderr(Stdio::null())
+            .stderr(Stdio::piped())
             .spawn()
             .expect("the Server starts");
         let stdout = child.stdout.take().expect("piped");
+        let stderr = child.stderr.take().expect("piped");
+        let diagnostics =
+            std::thread::spawn(move || std::io::read_to_string(stderr).unwrap_or_default());
         let (lines, log) = mpsc::channel();
         std::thread::spawn(move || {
             for line in BufReader::new(stdout).lines().map_while(Result::ok) {
@@ -70,8 +88,14 @@ impl Server {
             }
         });
         let server = Self { child, port, log };
-        server.log_until("listening", Duration::from_secs(10));
-        server
+        let ready = "\"event\":\"Listening\"";
+        let log = server.log_until(ready, Duration::from_secs(10));
+        if log.contains(ready) {
+            return Ok(server);
+        }
+        drop(server);
+        let stderr = diagnostics.join().expect("the stderr reader finishes");
+        Err(format!("port {port} did not start:\n{log}{stderr}"))
     }
 
     /// The log up to the first line containing `text`, or all within
@@ -122,6 +146,16 @@ fn client(server: &Server, keys: &KeyFile, direction: &str, faults: &str) -> Out
         .arg(format!("127.0.0.1:{}", server.port))
         .env("UDPSTP_FAULTS", faults);
     run_bounded(command, Duration::from_secs(30))
+}
+
+#[test]
+fn the_server_tries_another_port_if_its_first_port_is_taken() {
+    let keys = operator_keys("fault-startup");
+    let occupied = UdpSocket::bind("127.0.0.1:0").expect("reserve the first candidate");
+    let occupied_port = occupied.local_addr().expect("bound").port();
+    let ports = std::iter::once(occupied_port).chain(std::iter::repeat_with(free_port));
+    let server = Server::start_on_ports(&keys, "", ports);
+    assert_ne!(server.port, occupied_port);
 }
 
 // docs/spec.md (the engine must release admission state on every exit path,
