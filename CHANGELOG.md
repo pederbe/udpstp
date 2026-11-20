@@ -4,6 +4,17 @@ User-facing changes in udpstp, including capabilities, installation and compatib
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-20
+
+### Removed
+
+- **Breaking:** Remove the redundant Key Table format marker ([#64](https://github.com/pederbe/udpstp/pull/64))
+
+### Dependencies
+
+- Update daily dependencies ([#69](https://github.com/pederbe/udpstp/pull/69))
+
+
 ## [0.3.0] - 2026-11-14
 
 ### Changed
