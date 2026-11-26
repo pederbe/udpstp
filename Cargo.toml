@@ -173,7 +173,7 @@ udpstp-req = { path = "crates/udpstp-req" }
 # udpstp-bench uses it.
 bench-rounds = { path = "crates/bench-rounds" }
 hmac = { version = "0.13.0", features = ["zeroize"] }
-sha2 = "0.11.1"
+sha2 = "0.11.2"
 zeroize = { version = "1.9.2", features = ["derive", "serde"] }
 clap = { version = "4.6.10", features = ["derive"] }
 serde = { version = "1.0.229", features = ["derive"] }
