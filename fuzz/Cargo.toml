@@ -15,7 +15,7 @@ cargo-fuzz = true
 libfuzzer-sys = { version = "0.4.13", features = ["arbitrary-derive"] }
 # Targets compile the application's maintained source modules directly.
 hmac = { version = "0.13.0", features = ["zeroize"] }
-sha2 = "0.11.1"
+sha2 = "0.11.2"
 zeroize = { version = "1.9.2", features = ["derive", "serde"] }
 
 [features]
