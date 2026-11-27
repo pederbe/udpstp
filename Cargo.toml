@@ -1,6 +1,6 @@
 [package]
 name = "udpstp"
-version = "0.4.0"
+version = "0.4.1"
 description = "Measure network-path capacity, loss and delay with authenticated tests and JSON results"
 edition.workspace = true
 authors.workspace = true
