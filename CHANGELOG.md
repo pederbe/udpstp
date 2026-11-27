@@ -4,6 +4,13 @@ User-facing changes in udpstp, including capabilities, installation and compatib
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-11-27
+
+### Dependencies
+
+- Update daily dependencies ([#80](https://github.com/pederbe/udpstp/pull/80))
+
+
 ## [0.4.0] - 2026-11-20
 
 ### Removed
